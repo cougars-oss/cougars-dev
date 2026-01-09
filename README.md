@@ -31,25 +31,25 @@
   git clone git@github.com:snelsondurrant/coug_fgo_dev.git
   ```
 
-- Enter the repository and run `bash compose.sh` to pull the latest image from Docker Hub and launch the `cougars-ct` container.
+- Enter the repository and run `./compose.sh` to pull the latest image from Docker Hub and launch the `cougars-ct` container.
 
   ```bash
-  cd coug_fgo_dev && bash compose.sh
+  cd coug_fgo_dev && ./compose.sh
   ```
 
 - Exit the container and follow the instructions [here](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker) to build a runtime Docker image for `holoocean-ros`. When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
 
-- When finished, launch HoloOcean in the `holoocean-ct` container using `bash holoocean/compose.sh`.
+- When finished, launch HoloOcean in the `holoocean-ct` container using `./compose.sh`.
 
   ```bash
-  cd coug_fgo_dev/holoocean && bash compose.sh
+  cd coug_fgo_dev/holoocean && ./compose.sh
   ```
 
-- Open a new terminal, enter the `cougars-ct` container using `bash compose.sh`, build the `coug_ws` workspace, and launch the development stack using `bash dev_launch.sh`.
+- Open a new terminal, enter the `cougars-ct` container using `./compose.sh`, build the `coug_ws` workspace, and launch the development stack using `./dev_launch.sh`.
 
   ```bash
   cd ~/coug_ws && colcon build
-  cd ~/scripts && bash dev_launch.sh
+  cd ~/scripts && ./dev_launch.sh
   ```
 
 --
