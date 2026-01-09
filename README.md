@@ -26,7 +26,7 @@
 - Open a new terminal and clone the `coug_fgo_dev` repository.
 
   ```bash
-  git clone https://github.com/snelsondurrant/coug_fgo_dev.git
+  git clone git@github.com:snelsondurrant/coug_fgo_dev.git
   ```
 
 - Enter the repository and run `bash compose.sh` to pull the latest image from Docker Hub and launch the `cougars-ct` container.
@@ -54,13 +54,13 @@
 
 ## Contributing
 
-- **Create a Branch or Fork:** Fork this repository or create a new branch using the format `name/feature` (e.g., `nelson/repo-docs`).
+- **Create a Branch:** Create a new branch using the format `name/feature` (e.g., `nelson/repo-docs`).
 
 - **Make Changes:** Develop and debug your new feature. Add good documentation.
 
   > **NOTE:** If you need to add dependencies, update the `package.xml` or `Dockerfile` in your branch and test building the image locally. The CI will automatically build and push the new image to Docker Hub upon merge.
 
-- **Sync Frequently:** Regularly rebase your branch against `main` (or merge `main` into your branch) to prevent conflicts. If using a fork, sync with the upstream repository.
+- **Sync Frequently:** Regularly rebase your branch against `main` (or merge `main` into your branch) to prevent conflicts.
 
 - **Submit a PR:** Open a pull request, ensure required tests pass, and merge once approved.
 
