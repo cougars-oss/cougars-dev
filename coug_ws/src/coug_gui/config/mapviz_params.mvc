@@ -86,6 +86,26 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
+    name: FGO (TM)
+    config:
+      visible: false
+      collapsed: true
+      topic: /auv0/tm/odometry/global
+      color: "#55aaff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
     name: EKF
     config:
       visible: false
