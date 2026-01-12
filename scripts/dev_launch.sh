@@ -41,7 +41,7 @@ while getopts ":bcmr:" opt; do
             AGENTS=2
             ;;
         r)
-            BAG_PATH="$HOME/scripts/plots/$OPTARG"
+            BAG_PATH="$HOME/bags/$OPTARG"
             if [ -d "$BAG_PATH" ]; then
                 printError "Bag already exists: $BAG_PATH"
                 exit 1

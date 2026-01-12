@@ -5,10 +5,11 @@
 **/install_isolated
 **/devel_isolated
 
-scripts/plots/**/*.db3
-scripts/plots/**/metadata.yaml
-scripts/plots/**/*.png
-coug_ws/src/examples
+bags/*
+!bags/.gitkeep
+coug_ws/src/*
+!coug_ws/src/coug_*
+!coug_ws/src/holoocean_*
 
 __pycache__
 .vscode

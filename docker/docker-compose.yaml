@@ -46,6 +46,7 @@ services:
       - DISPLAY=$DISPLAY
       - QT_X11_NO_MITSHM=1
     volumes:
+      - ../bags:/home/frostlab-docker/bags
       - ../coug_ws:/home/frostlab-docker/coug_ws
       - ../scripts:/home/frostlab-docker/scripts
       - ./entrypoint.sh:/entrypoint.sh
