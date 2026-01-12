@@ -26,7 +26,7 @@ from evo.core.metrics import PoseRelation
 
 # %%
 # Configuration
-BAG_PATH = "../../bags/dvl_dropouts_tm"
+BAG_PATH = "../../bags/bag_name"
 TRUTH_TOPIC = "/auv0/odometry/truth"
 ESTIMATE_TOPICS = [
     "/auv0/odometry/global",
