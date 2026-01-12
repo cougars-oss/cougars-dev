@@ -25,6 +25,7 @@ from tf2_geometry_msgs import do_transform_pose
 class TruthConverterNode(Node):
     """
     Converts ground truth data from HoloOcean to an odometry message.
+    Optionally publishes the map->base_link transform.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026

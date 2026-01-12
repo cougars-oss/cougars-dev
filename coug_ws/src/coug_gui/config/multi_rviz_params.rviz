@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /FGO1/Shape1
-        - /Truth1/Shape1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz_common/Selection
@@ -110,6 +108,8 @@ Visualization Manager:
           Value: true
         auv1/tray_link:
           Value: true
+        holoocean:
+          Value: true
         map:
           Value: true
         map__identity:
@@ -173,6 +173,8 @@ Visualization Manager:
                   {}
                 auv1/tray_link:
                   {}
+          holoocean:
+            {}
           origin:
             {}
         map__identity:
@@ -260,7 +262,7 @@ Visualization Manager:
       Mass Properties:
         Inertia: false
         Mass: false
-      Name: RobotModel
+      Name: RobotModel (auv0)
       TF Prefix: auv0
       Update Interval: 0
       Value: true
@@ -284,13 +286,13 @@ Visualization Manager:
         Value: true
       Enabled: true
       Keep: 1
-      Name: FGO
+      Name: Truth (auv0)
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 0; 255; 0
+        Color: 255; 255; 255
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -302,7 +304,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /auv0/odometry/global
+        Value: /auv0/odometry/truth
       Value: true
     - Angle Tolerance: 0.10000000149011612
       Class: rviz_default_plugins/Odometry
@@ -323,13 +325,13 @@ Visualization Manager:
         Value: true
       Enabled: true
       Keep: 1
-      Name: Truth
+      Name: FGO (auv0)
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 255; 255; 255
+        Color: 0; 255; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -341,7 +343,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /auv0/odometry/truth
+        Value: /auv0/odometry/global
       Value: true
     - Alpha: 1
       Buffer Length: 1
@@ -353,7 +355,7 @@ Visualization Manager:
       Length: 0.30000001192092896
       Line Style: Lines
       Line Width: 0.029999999329447746
-      Name: Path
+      Name: Path (auv0)
       Offset:
         X: 0
         Y: 0
@@ -476,13 +478,13 @@ Visualization Manager:
         Value: true
       Enabled: true
       Keep: 1
-      Name: FGO (auv1)
+      Name: Truth (auv1)
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 0; 255; 0
+        Color: 255; 255; 255
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -494,7 +496,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /auv1/odometry/global
+        Value: /auv1/odometry/truth
       Value: true
     - Angle Tolerance: 0.10000000149011612
       Class: rviz_default_plugins/Odometry
@@ -515,13 +517,13 @@ Visualization Manager:
         Value: true
       Enabled: true
       Keep: 1
-      Name: Truth (auv1)
+      Name: FGO (auv1)
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 255; 255; 255
+        Color: 0; 255; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -533,7 +535,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /auv1/odometry/truth
+        Value: /auv1/odometry/global
       Value: true
     - Alpha: 1
       Buffer Length: 1

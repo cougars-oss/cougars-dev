@@ -66,27 +66,7 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: auv0
-    config:
-      visible: true
-      collapsed: true
-      topic: /auv0/odometry/global
-      color: "#00ff00"
-      draw_style: lines
-      position_tolerance: 0
-      buffer_size: 0
-      show_laps: false
-      show_covariance: true
-      show_all_covariances: false
-      static_arrow_sizes: false
-      arrow_size: 25
-      show_timestamps: 0
-      qos_depth: 10
-      qos_history: 1
-      qos_reliability: 1
-      qos_durability: 2
-  - type: mapviz_plugins/odometry
-    name: auv0
+    name: auv0, Truth
     config:
       visible: true
       collapsed: true
@@ -97,6 +77,26 @@ displays:
       buffer_size: 0
       show_laps: false
       show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: auv0, FGO
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv0/odometry/global
+      color: "#00ff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -143,27 +143,7 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: auv1
-    config:
-      visible: true
-      collapsed: true
-      topic: /auv1/odometry/global
-      color: "#00ff00"
-      draw_style: lines
-      position_tolerance: 0
-      buffer_size: 0
-      show_laps: false
-      show_covariance: true
-      show_all_covariances: false
-      static_arrow_sizes: false
-      arrow_size: 22
-      show_timestamps: 0
-      qos_depth: 10
-      qos_history: 1
-      qos_reliability: 1
-      qos_durability: 2
-  - type: mapviz_plugins/odometry
-    name: auv1
+    name: auv1, Truth
     config:
       visible: true
       collapsed: true
@@ -177,6 +157,26 @@ displays:
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: auv1, FGO
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv1/odometry/global
+      color: "#00ff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 22
       show_timestamps: 0
       qos_depth: 10
       qos_history: 1

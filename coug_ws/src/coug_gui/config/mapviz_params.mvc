@@ -66,37 +66,17 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: FGO
+    name: Truth
     config:
       visible: true
       collapsed: true
-      topic: /auv0/odometry/global
-      color: "#00ff00"
+      topic: /auv0/odometry/truth
+      color: "#ffffff"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: true
-      show_all_covariances: false
-      static_arrow_sizes: false
-      arrow_size: 25
-      show_timestamps: 0
-      qos_depth: 10
-      qos_history: 1
-      qos_reliability: 1
-      qos_durability: 2
-  - type: mapviz_plugins/odometry
-    name: FGO (TM)
-    config:
-      visible: false
-      collapsed: true
-      topic: /auv0/odometry/global_tm
-      color: "#55aaff"
-      draw_style: lines
-      position_tolerance: 0
-      buffer_size: 0
-      show_laps: false
-      show_covariance: true
+      show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -146,17 +126,57 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: Truth
+    name: IEKF
     config:
-      visible: true
+      visible: false
       collapsed: true
-      topic: /auv0/odometry/truth
-      color: "#ffffff"
+      topic: /auv0/odometry/global_iekf
+      color: "#ff0000"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: FGO
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv0/odometry/global
+      color: "#00ff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: FGO (TM)
+    config:
+      visible: false
+      collapsed: true
+      topic: /auv0/odometry/global_tm
+      color: "#55aaff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25

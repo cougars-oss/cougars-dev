@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /FGO1/Shape1
-        - /Truth1/Shape1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz_common/Selection
@@ -67,58 +66,62 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        auv0/base_link:
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        com_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        auv0/depth_link:
+        depth_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        auv0/dvl_link:
+        dvl_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        auv0/handle_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        auv0/hull_link:
+        handle_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        auv0/imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        auv0/left_fin_link:
+        hull_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        auv0/modem_link:
+        imu_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        auv0/right_fin_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        auv0/thruster_link:
+        left_fin_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        auv0/top_fin_link:
+        modem_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_fin_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        auv0/tray_link:
+        thruster_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_fin_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        tray_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -127,7 +130,7 @@ Visualization Manager:
         Inertia: false
         Mass: false
       Name: RobotModel
-      TF Prefix: "auv0"
+      TF Prefix: auv0
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -138,6 +141,8 @@ Visualization Manager:
         All Enabled: true
         auv0/base_link:
           Value: true
+        auv0/com_link:
+          Value: true
         auv0/depth_link:
           Value: true
         auv0/dvl_link:
@@ -150,15 +155,9 @@ Visualization Manager:
           Value: true
         auv0/left_fin_link:
           Value: true
-        map:
-          Value: true
-        map__identity:
-          Value: true
         auv0/modem_link:
           Value: true
         auv0/odom:
-          Value: true
-        origin:
           Value: true
         auv0/right_fin_link:
           Value: true
@@ -168,7 +167,13 @@ Visualization Manager:
           Value: true
         auv0/tray_link:
           Value: true
-        utm:
+        holoocean:
+          Value: true
+        map:
+          Value: true
+        map__identity:
+          Value: true
+        origin:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -179,31 +184,32 @@ Visualization Manager:
         map:
           auv0/odom:
             auv0/base_link:
-              auv0/depth_link:
-                {}
-              auv0/dvl_link:
-                {}
-              auv0/handle_link:
-                {}
-              auv0/hull_link:
-                {}
-              auv0/imu_link:
-                {}
-              auv0/left_fin_link:
-                {}
-              auv0/modem_link:
-                {}
-              auv0/right_fin_link:
-                {}
-              auv0/thruster_link:
-                {}
-              auv0/top_fin_link:
-                {}
-              auv0/tray_link:
-                {}
-          origin:
+              auv0/com_link:
+                auv0/depth_link:
+                  {}
+                auv0/dvl_link:
+                  {}
+                auv0/handle_link:
+                  {}
+                auv0/hull_link:
+                  {}
+                auv0/imu_link:
+                  {}
+                auv0/left_fin_link:
+                  {}
+                auv0/modem_link:
+                  {}
+                auv0/right_fin_link:
+                  {}
+                auv0/thruster_link:
+                  {}
+                auv0/top_fin_link:
+                  {}
+                auv0/tray_link:
+                  {}
+          holoocean:
             {}
-          utm:
+          origin:
             {}
         map__identity:
           {}
@@ -228,13 +234,13 @@ Visualization Manager:
         Value: true
       Enabled: true
       Keep: 1
-      Name: FGO
+      Name: Truth
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 0; 255; 0
+        Color: 255; 255; 255
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -246,46 +252,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /auv0/odometry/global
-      Value: true
-    - Angle Tolerance: 0.10000000149011612
-      Class: rviz_default_plugins/Odometry
-      Covariance:
-        Orientation:
-          Alpha: 0.5
-          Color: 255; 255; 127
-          Color Style: Unique
-          Frame: Local
-          Offset: 1
-          Scale: 1
-          Value: true
-        Position:
-          Alpha: 0.30000001192092896
-          Color: 204; 51; 204
-          Scale: 1
-          Value: true
-        Value: true
-      Enabled: false
-      Keep: 1
-      Name: FGO (TM)
-      Position Tolerance: 0.10000000149011612
-      Shape:
-        Alpha: 1
-        Axes Length: 1
-        Axes Radius: 0.10000000149011612
-        Color: 85; 170; 255
-        Head Length: 0.30000001192092896
-        Head Radius: 0.10000000149011612
-        Shaft Length: 1
-        Shaft Radius: 0.05000000074505806
-        Value: Arrow
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /auv0/odometry/global_tm
+        Value: /auv0/odometry/truth
       Value: true
     - Angle Tolerance: 0.10000000149011612
       Class: rviz_default_plugins/Odometry
@@ -382,15 +349,15 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 1
-      Name: Truth
+      Name: IEKF
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 255; 255; 255
+        Color: 255; 0; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
         Shaft Length: 1
@@ -402,8 +369,86 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /auv0/odometry/truth
+        Value: /auv0/odometry/global_iekf
+      Value: false
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz_default_plugins/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: true
+      Keep: 1
+      Name: FGO
+      Position Tolerance: 0.10000000149011612
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 0; 255; 0
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /auv0/odometry/global
       Value: true
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz_default_plugins/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: false
+      Keep: 1
+      Name: FGO (TM)
+      Position Tolerance: 0.10000000149011612
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 85; 170; 255
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /auv0/odometry/global_tm
+      Value: false
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
