@@ -3,3 +3,4 @@ rosbags
 pandas
 matplotlib
 numpy
+jupytext

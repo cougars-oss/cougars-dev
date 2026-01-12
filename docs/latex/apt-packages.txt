@@ -3,3 +3,5 @@ texlive-latex-extra
 texlive-extra-utils
 latexmk
 texlive-publishers
+cm-super
+dvipng
