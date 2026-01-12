@@ -119,4 +119,3 @@ plot_path = OUTPUT_DIR / "trajectories.png"
 plt.savefig(plot_path)
 print(f"Plot saved to: {plot_path.resolve()}")
 display(fig)
-
