@@ -36,10 +36,10 @@
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
   <depend>stereo_msgs</depend>
-  <depend>swri_image_util</depend>
-  <depend>swri_math_util</depend>
-  <depend>swri_route_util</depend>
-  <depend>swri_transform_util</depend>
+  <depend condition="$ROS_BUILD_ARCH == 'amd64'">swri_image_util</depend>
+  <depend condition="$ROS_BUILD_ARCH == 'amd64'">swri_math_util</depend>
+  <depend condition="$ROS_BUILD_ARCH == 'amd64'">swri_route_util</depend>
+  <depend condition="$ROS_BUILD_ARCH == 'amd64'">swri_transform_util</depend>
   <depend>tf2</depend>
   <depend>visualization_msgs</depend>
   <depend>rviz2</depend>
