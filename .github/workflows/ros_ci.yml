@@ -49,7 +49,7 @@ jobs:
           su frostlab-docker -c "vcs import coug_ws/src < coug_ws/src/cougars.repos"
           su frostlab-docker -c "rosdep update"
           apt update
-          su frostlab-docker -c "rosdep install --from-paths coug_ws/src --ignore-src -r -y"
+          su frostlab-docker -c "rosdep install --from-paths coug_ws/src --ignore-src -y"
       - name: Build workspace
         shell: bash
         run: |
