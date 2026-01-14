@@ -280,9 +280,21 @@ void CougWaypointsPlugin::SaveWaypoints()
     QJsonArray waypoints_array;
     for (const auto & wp : wps) {
       QJsonObject wp_obj;
-      wp_obj["x"] = wp.position.x;
-      wp_obj["y"] = wp.position.y;
+      
+      wp_obj["lon"] = wp.position.x;
+      wp_obj["lat"] = wp.position.y;
       wp_obj["z"] = wp.position.z;
+
+      swri_transform_util::Transform transform;
+      if (tf_manager_->GetTransform(target_frame_, swri_transform_util::_wgs84_frame, transform)) {
+        tf2::Vector3 wgs_point(wp.position.x, wp.position.y, 0.0);
+        tf2::Vector3 map_point = transform * wgs_point;
+        wp_obj["map_x"] = map_point.x();
+        wp_obj["map_y"] = map_point.y();
+      } else {
+         PrintError("Transform failed");
+      }
+
       waypoints_array.append(wp_obj);
     }
     multi_topic_obj[QString::fromStdString(topic)] = waypoints_array;
@@ -337,13 +349,17 @@ void CougWaypointsPlugin::LoadWaypoints()
     if (waypoint_map_.find(topic_str) != waypoint_map_.end()) {
       std::vector<geometry_msgs::msg::Pose> wps;
       QJsonArray array = obj[topic_key].toArray();
+      
       for (const auto & val : array) {
         QJsonObject wp_obj = val.toObject();
         geometry_msgs::msg::Pose pose;
-        pose.position.x = wp_obj["x"].toDouble();
-        pose.position.y = wp_obj["y"].toDouble();
-        pose.position.z = wp_obj["z"].toDouble();
-        wps.push_back(pose);
+        
+        if (wp_obj.contains("lat") && wp_obj.contains("lon")) {
+          pose.position.x = wp_obj["lon"].toDouble();
+          pose.position.y = wp_obj["lat"].toDouble();
+          pose.position.z = wp_obj["z"].toDouble();
+          wps.push_back(pose);
+        }
       }
       waypoint_map_[topic_str] = wps;
       loaded_count++;
