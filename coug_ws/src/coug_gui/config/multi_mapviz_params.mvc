@@ -182,6 +182,83 @@ displays:
       qos_history: 1
       qos_reliability: 1
       qos_durability: 2
+  - type: mapviz_plugins/tf_frame
+    name: auv2
+    config:
+      visible: true
+      collapsed: true
+      frame: auv2/base_link
+      color: "#00ff00"
+      draw_style: arrows
+      position_tolerance: 0
+      buffer_size: 1
+      static_arrow_sizes: true
+      arrow_size: 53
+  - type: mapviz_plugins/navsat
+    name: auv2
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv2/gps/fix
+      color: "#55aaff"
+      draw_style: points
+      position_tolerance: 0
+      buffer_size: 1
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/path
+    name: auv2
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv2/smoothed_path
+      color: "#aa00ff"
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: auv2, Truth
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv2/odometry/truth
+      color: "#ffffff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: false
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: auv2, FGO
+    config:
+      visible: true
+      collapsed: true
+      topic: /auv2/odometry/global
+      color: "#00ff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 22
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
   - type: coug_gui/coug_waypoints
     name: new display
     config:

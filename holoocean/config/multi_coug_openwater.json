@@ -203,6 +203,105 @@
                 "fin_count": 3,
                 "fin_offset_deg": 90.0
             }
+        },
+        {
+            "agent_name": "auv2",
+            "agent_type": "CougUV",
+            "sensors": [
+                {
+                    "sensor_type": "IMUSensor",
+                    "socket": "IMUSocket",
+                    "Hz": 200,
+                    "configuration": {
+                        "AccelSigma": 0.0078,
+                        "AngVelSigma": 0.0012,
+                        "AccelBiasSigma": 1.05e-05,
+                        "AngVelBiasSigma": 3.91e-06,
+                        "ReturnBias": true
+                    },
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "GPSSensor",
+                    "socket": "COM",
+                    "Hz": 1,
+                    "configuration": {
+                        "Sigma": 0.2,
+                        "Depth": 0.5,
+                        "DepthSigma": 0.1
+                    },
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "DepthSensor",
+                    "socket": "DepthSocket",
+                    "Hz": 10,
+                    "configuration": {
+                        "Sigma": 0.2
+                    },
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "MagnetometerSensor",
+                    "socket": "IMUSocket",
+                    "Hz": 50,
+                    "configuration": {
+                        "Sigma": 0.006,
+                        "MagneticVector": [
+                            0.41,
+                            0.08,
+                            0.91
+                        ]
+                    },
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "RotationSensor",
+                    "socket": "AcousticModemSocket",
+                    "Hz": 10,
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "DVLSensor",
+                    "socket": "DVLSocket",
+                    "Hz": 15,
+                    "configuration": {
+                        "VelSigma": 0.02,
+                        "DebugLines": false
+                    },
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "DynamicsSensor",
+                    "configuration": {
+                        "UseCOM": true,
+                        "UseRPY": false
+                    },
+                    "ros_publish": true
+                },
+                {
+                    "sensor_type": "VelocitySensor",
+                    "socket": "DVLSocket",
+                    "ros_publish": true
+                }
+            ],
+            "fossen_model": "torpedo",
+            "control_mode": "depthHeadingAutopilot",
+            "control_scheme": 1,
+            "location": [
+                0,
+                40,
+                0
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "actuator": {
+                "fin_count": 3,
+                "fin_offset_deg": 90.0
+            }
         }
     ]
 }

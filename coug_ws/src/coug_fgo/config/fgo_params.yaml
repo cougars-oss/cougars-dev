@@ -133,6 +133,13 @@
         initial_position: [0.0, 20.0, 0.0] # [m]
         initial_orientation: [0.0, 0.0, 0.0] # [rad]
 
+/auv2/**:
+  ros__parameters:
+    prior:
+      parameter_priors:
+        initial_position: [0.0, 40.0, 0.0] # [m]
+        initial_orientation: [0.0, 0.0, 0.0] # [rad]
+
 /**/navsat_preprocessor_node:
   ros__parameters:
     # --- Node Settings ---

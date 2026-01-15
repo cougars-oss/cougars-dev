@@ -40,7 +40,7 @@ while getopts ":bcmr:" opt; do
             COMPARE="true"
             ;;
         m)
-            AGENTS=2
+            AGENTS=3
             ;;
         r)
             BAG_PATH="$HOME/bags/$OPTARG"
