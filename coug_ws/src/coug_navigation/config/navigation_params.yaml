@@ -1,15 +1,16 @@
-/**/hsd_commander_node:
-  ros__parameters:
-    # --- ROS Topics and Frames ---
-    waypoint_topic: "waypoints"
-    odom_topic: "odometry/global"
-    heading_topic: "heading"
-    speed_topic: "speed"
-    depth_topic: "depth"
+/**:
+  hsd_commander_node:
+    ros__parameters:
+      # --- ROS Topics and Frames ---
+      waypoint_topic: "waypoints"
+      odom_topic: "odometry/global"
+      heading_topic: "heading"
+      speed_topic: "speed"
+      depth_topic: "depth"
 
-    # Waypoint reached if distance < capture_radius (direct hit).
-    capture_radius: 25.0 # [m]
-    # Waypoint reached if distance < slip_radius AND distance > prev_distance (overshoot).
-    slip_radius: 50.0 # [m] (typically 2x capture_radius)
-    desired_speed_rpm: 1500.0 # [RPM] Constant thruster speed to command when moving.
-    odom_timeout_sec: 2.0 # [s] Time to wait for odometry before stopping.
+      # Waypoint reached if distance < capture_radius (direct hit).
+      capture_radius: 25.0 # [m]
+      # Waypoint reached if distance < slip_radius AND distance > prev_distance (overshoot).
+      slip_radius: 50.0 # [m] (typically 2x capture_radius)
+      desired_speed_rpm: 1500.0 # [RPM] Constant thruster speed to command when moving.
+      odom_timeout_sec: 2.0 # [s] Time to wait for odometry before stopping.

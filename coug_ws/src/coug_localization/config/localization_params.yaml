@@ -1,179 +1,180 @@
-/**/ekf_filter_node_odom:
-  ros__parameters:
-    frequency: 30.0
-    two_d_mode: false
-    publish_tf: false # Published by IEKF instead
+/**:
+  ekf_filter_node_odom:
+    ros__parameters:
+      frequency: 30.0
+      two_d_mode: false
+      publish_tf: false # Published by IEKF instead
 
-    twist0: dvl/data
-    twist0_config: [false, false, false, # X, Y, Z
+      twist0: dvl/data
+      twist0_config: [false, false, false, # X, Y, Z
+                      false, false, false, # Roll, Pitch, Yaw
+                      true,  true,  true,  # Vx, Vy, Vz
+                      false, false, false, # Vroll, Vpitch, Vyaw
+                      false, false, false] # Ax, Ay, Az
+      twist0_queue_size: 5
+
+      imu0: imu/data
+      imu0_config: [false, false, false, # X, Y, Z
                     false, false, false, # Roll, Pitch, Yaw
-                    true,  true,  true,  # Vx, Vy, Vz
+                    false, false, false, # Vx, Vy, Vz
+                    true,  true,  true,  # Vroll, Vpitch, Vyaw
+                    true,  true,  true]  # Ax, Ay, Az
+      imu0_differential: false
+      imu0_relative: true
+      imu0_queue_size: 10
+      imu0_remove_gravitational_acceleration: true
+
+      use_control: false
+
+  ekf_filter_node_map:
+    ros__parameters:
+      frequency: 20.0
+      two_d_mode: false
+      publish_tf: false # Published by FGO instead
+
+      initial_state: [0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0]
+
+      process_noise_covariance: [
+        # X, Y, Z
+        1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        # Roll, Pitch, Yaw
+        0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  1e-3, 0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        # Vx, Vy, Vz
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-3,   0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    1e-3,   0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    1e-3,   0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        # Vroll, Vpitch, Vyaw
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.001,   0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.001,   0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.001,   0.0,   0.0,   0.0,
+        # Ax, Ay, Az
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.01,  0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.01,  0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.01
+      ]
+
+      odom0: odometry/local_ekf
+      odom0_config: [false, false, false, # X, Y, Z
+                     false, false, false, # Roll, Pitch, Yaw
+                     true,  true,  true,  # Vx, Vy, Vz
+                     true,  true,  true,  # Vroll, Vpitch, Vyaw
+                     false, false, false] # Ax, Ay, Az
+      odom0_queue_size: 10
+      odom0_differential: false
+      odom0_relative: false
+
+      odom1: odometry/depth
+      odom1_config: [false, false, true,  # X, Y, Z
+                     false, false, false, # Roll, Pitch, Yaw
+                     false, false, false, # Vx, Vy, Vz
+                     false, false, false, # Vroll, Vpitch, Vyaw
+                     false, false, false] # Ax, Ay, Az
+      odom1_queue_size: 2
+      odom1_differential: false
+      odom1_relative: false # Absolute depth in the map frame.
+
+      # odom2: odometry/gps
+      # odom2_config: [true,  true,  false, # X, Y, Z
+      #                false, false, false, # Roll, Pitch, Yaw
+      #                false, false, false, # Vx, Vy, Vz
+      #                false, false, false, # Vroll, Vpitch, Vyaw
+      #                false, false, false] # Ax, Ay, Az
+      # odom2_queue_size: 2
+      # odom2_differential: false
+      # odom2_relative: false # Absolute GPS position in the map frame.
+
+      imu0: imu/ahrs
+      imu0_config: [false, false, false, # X, Y, Z
+                    false, false, true,  # Roll, Pitch, Yaw
+                    false, false, false, # Vx, Vy, Vz
                     false, false, false, # Vroll, Vpitch, Vyaw
                     false, false, false] # Ax, Ay, Az
-    twist0_queue_size: 5
+      imu0_queue_size: 2
+      imu0_differential: false
+      imu0_relative: false # Absolute heading in the map frame.
 
-    imu0: imu/data
-    imu0_config: [false, false, false, # X, Y, Z
-                  false, false, false, # Roll, Pitch, Yaw
-                  false, false, false, # Vx, Vy, Vz
-                  true,  true,  true,  # Vroll, Vpitch, Vyaw
-                  true,  true,  true]  # Ax, Ay, Az
-    imu0_differential: false
-    imu0_relative: true
-    imu0_queue_size: 10
-    imu0_remove_gravitational_acceleration: true
+  ukf_filter_node_map:
+    ros__parameters:
+      frequency: 20.0
+      two_d_mode: false
+      publish_tf: false # Published by FGO instead
 
-    use_control: false
+      initial_state: [0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0]
 
-/**/ekf_filter_node_map:
-  ros__parameters:
-    frequency: 20.0
-    two_d_mode: false
-    publish_tf: false # Published by FGO instead
+      process_noise_covariance: [
+        # X, Y, Z
+        1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        # Roll, Pitch, Yaw
+        0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  1e-3, 0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        # Vx, Vy, Vz
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-3,   0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    1e-3,   0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    1e-3,   0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
+        # Vroll, Vpitch, Vyaw
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.001,   0.0,     0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.001,   0.0,     0.0,   0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.001,   0.0,   0.0,   0.0,
+        # Ax, Ay, Az
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.01,  0.0,   0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.01,  0.0,
+        0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.01
+      ]
 
-    initial_state: [0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0]
+      odom0: odometry/local_ekf
+      odom0_config: [false, false, false, # X, Y, Z
+                     false, false, false, # Roll, Pitch, Yaw
+                     true,  true,  true,  # Vx, Vy, Vz
+                     true,  true,  true,  # Vroll, Vpitch, Vyaw
+                     false, false, false] # Ax, Ay, Az
+      odom0_queue_size: 10
+      odom0_differential: false
+      odom0_relative: false
 
-    process_noise_covariance: [
-      # X, Y, Z
-      1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      # Roll, Pitch, Yaw
-      0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  1e-3, 0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      # Vx, Vy, Vz
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-3,   0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    1e-3,   0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    1e-3,   0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      # Vroll, Vpitch, Vyaw
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.001,   0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.001,   0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.001,   0.0,   0.0,   0.0,
-      # Ax, Ay, Az
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.01,  0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.01,  0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.01
-    ]
+      odom1: odometry/depth
+      odom1_config: [false, false, true,  # X, Y, Z
+                     false, false, false, # Roll, Pitch, Yaw
+                     false, false, false, # Vx, Vy, Vz
+                     false, false, false, # Vroll, Vpitch, Vyaw
+                     false, false, false] # Ax, Ay, Az
+      odom1_queue_size: 2
+      odom1_differential: false
+      odom1_relative: false # Absolute depth in the map frame.
 
-    odom0: odometry/local_ekf
-    odom0_config: [false, false, false, # X, Y, Z
-                   false, false, false, # Roll, Pitch, Yaw
-                   true,  true,  true,  # Vx, Vy, Vz
-                   true,  true,  true,  # Vroll, Vpitch, Vyaw
-                   false, false, false] # Ax, Ay, Az
-    odom0_queue_size: 10
-    odom0_differential: false
-    odom0_relative: false
+      # odom2: odometry/gps
+      # odom2_config: [true,  true,  false, # X, Y, Z
+      #                false, false, false, # Roll, Pitch, Yaw
+      #                false, false, false, # Vx, Vy, Vz
+      #                false, false, false, # Vroll, Vpitch, Vyaw
+      #                false, false, false] # Ax, Ay, Az
+      # odom2_queue_size: 2
+      # odom2_differential: false
+      # odom2_relative: false # Absolute GPS position in the map frame.
 
-    odom1: odometry/depth
-    odom1_config: [false, false, true,  # X, Y, Z
-                   false, false, false, # Roll, Pitch, Yaw
-                   false, false, false, # Vx, Vy, Vz
-                   false, false, false, # Vroll, Vpitch, Vyaw
-                   false, false, false] # Ax, Ay, Az
-    odom1_queue_size: 2
-    odom1_differential: false
-    odom1_relative: false # Absolute depth in the map frame.
-
-    # odom2: odometry/gps
-    # odom2_config: [true,  true,  false, # X, Y, Z
-    #                false, false, false, # Roll, Pitch, Yaw
-    #                false, false, false, # Vx, Vy, Vz
-    #                false, false, false, # Vroll, Vpitch, Vyaw
-    #                false, false, false] # Ax, Ay, Az
-    # odom2_queue_size: 2
-    # odom2_differential: false
-    # odom2_relative: false # Absolute GPS position in the map frame.
-
-    imu0: imu/ahrs
-    imu0_config: [false, false, false, # X, Y, Z
-                  false, false, true,  # Roll, Pitch, Yaw
-                  false, false, false, # Vx, Vy, Vz
-                  false, false, false, # Vroll, Vpitch, Vyaw
-                  false, false, false] # Ax, Ay, Az
-    imu0_queue_size: 2
-    imu0_differential: false
-    imu0_relative: false # Absolute heading in the map frame.
-
-/**/ukf_filter_node_map:
-  ros__parameters:
-    frequency: 20.0
-    two_d_mode: false
-    publish_tf: false # Published by FGO instead
-
-    initial_state: [0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0]
-
-    process_noise_covariance: [
-      # X, Y, Z
-      1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  1e-9, 0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      # Roll, Pitch, Yaw
-      0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  1e-6, 0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  1e-3, 0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      # Vx, Vy, Vz
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1e-3,   0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    1e-3,   0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    1e-3,   0.0,     0.0,     0.0,     0.0,   0.0,   0.0,
-      # Vroll, Vpitch, Vyaw
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.001,   0.0,     0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.001,   0.0,     0.0,   0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.001,   0.0,   0.0,   0.0,
-      # Ax, Ay, Az
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.01,  0.0,   0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.01,  0.0,
-      0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,   0.0,   0.01
-    ]
-
-    odom0: odometry/local_ekf
-    odom0_config: [false, false, false, # X, Y, Z
-                   false, false, false, # Roll, Pitch, Yaw
-                   true,  true,  true,  # Vx, Vy, Vz
-                   true,  true,  true,  # Vroll, Vpitch, Vyaw
-                   false, false, false] # Ax, Ay, Az
-    odom0_queue_size: 10
-    odom0_differential: false
-    odom0_relative: false
-
-    odom1: odometry/depth
-    odom1_config: [false, false, true,  # X, Y, Z
-                   false, false, false, # Roll, Pitch, Yaw
-                   false, false, false, # Vx, Vy, Vz
-                   false, false, false, # Vroll, Vpitch, Vyaw
-                   false, false, false] # Ax, Ay, Az
-    odom1_queue_size: 2
-    odom1_differential: false
-    odom1_relative: false # Absolute depth in the map frame.
-
-    # odom2: odometry/gps
-    # odom2_config: [true,  true,  false, # X, Y, Z
-    #                false, false, false, # Roll, Pitch, Yaw
-    #                false, false, false, # Vx, Vy, Vz
-    #                false, false, false, # Vroll, Vpitch, Vyaw
-    #                false, false, false] # Ax, Ay, Az
-    # odom2_queue_size: 2
-    # odom2_differential: false
-    # odom2_relative: false # Absolute GPS position in the map frame.
-
-    imu0: imu/ahrs
-    imu0_config: [false, false, false, # X, Y, Z
-                  false, false, true,  # Roll, Pitch, Yaw
-                  false, false, false, # Vx, Vy, Vz
-                  false, false, false, # Vroll, Vpitch, Vyaw
-                  false, false, false] # Ax, Ay, Az
-    imu0_queue_size: 2
-    imu0_differential: false
-    imu0_relative: false # Absolute heading in the map frame.
+      imu0: imu/ahrs
+      imu0_config: [false, false, false, # X, Y, Z
+                    false, false, true,  # Roll, Pitch, Yaw
+                    false, false, false, # Vx, Vy, Vz
+                    false, false, false, # Vroll, Vpitch, Vyaw
+                    false, false, false] # Ax, Ay, Az
+      imu0_queue_size: 2
+      imu0_differential: false
+      imu0_relative: false # Absolute heading in the map frame.
 
 /auv1/ekf_filter_node_map:
   ros__parameters:
