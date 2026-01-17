@@ -12,7 +12,8 @@
 
 set -e
 
-source $(dirname "$(readlink -f "$0")")/scripts/common.sh
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source "$SCRIPT_DIR/scripts/common.sh"
 
 PROFILES=""
 arch=$(uname -m)
@@ -23,7 +24,7 @@ fi
 case $1 in
     "down")
         printWarning "Stopping the cougars-ct container..."
-        docker compose -f $(dirname "$(readlink -f "$0")")/docker/docker-compose.yaml $PROFILES down
+        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" $PROFILES down
         ;;
     *)
         # Allow container to forward graphical displays to host
@@ -34,7 +35,7 @@ case $1 in
         export HOST_GID=$(id -g)
 
         printInfo "Loading the cougars-ct container..."
-        docker compose -f $(dirname "$(readlink -f "$0")")/docker/docker-compose.yaml $PROFILES up -d
+        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" $PROFILES up -d
 
         # Wait for './entrypoint.sh' to finish
         while [ "$(docker exec cougars-ct ps -p 1 -o uid= | tr -d ' ')" != "$HOST_UID" ]; do sleep 1; done

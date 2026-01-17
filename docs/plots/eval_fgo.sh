@@ -4,10 +4,10 @@
 # Generates APE/RPE metrics for FGO evaluation
 #
 # Usage:
-#   ./eval_fgo.sh [-b <bag_name>]
+#   ./eval_fgo.sh <bag_name>
 #
 # Arguments:
-#   -b <bag_name>: Evaluate ../../bags/<bag_name>
+#   <bag_name>: Evaluate ../../bags/<bag_name>
 
 set -e
 
@@ -15,28 +15,13 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/../../scripts/common.sh"
 source "$SCRIPT_DIR/../../.venv/bin/activate"
 
-BAG_PATH=""
-
-while getopts ":b:" opt; do
-    case $opt in
-        b)
-            BAG_PATH="$SCRIPT_DIR/../../bags/$OPTARG"
-            ;;
-        \?)
-            printError "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-        :)
-            printError "Option -$OPTARG requires an argument." >&2
-            exit 1
-            ;;
-    esac
-done
-
-if [ -z "$BAG_PATH" ]; then
-    printError "Bag path not specified"
+if [ "$#" -ne 1 ]; then
+    printError "Usage: $0 <bag_name>"
     exit 1
 fi
+
+BAG_NAME="$1"
+BAG_PATH="$SCRIPT_DIR/../../bags/$BAG_NAME"
 
 if [ ! -d "$BAG_PATH" ]; then
     printError "Bag directory not found: $BAG_PATH"

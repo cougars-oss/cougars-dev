@@ -14,12 +14,13 @@
 
 set -e
 
-source $(dirname "$(readlink -f "$0")")/../scripts/common.sh
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source "$SCRIPT_DIR/../scripts/common.sh"
 
 case $1 in
     "down")
         printWarning "Stopping the holoocean-ct container..."
-        docker compose -f $(dirname "$(readlink -f "$0")")/docker/docker-compose.yaml down
+        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" down
         ;;
     *)
         # Allow container to forward graphical displays to host
@@ -30,7 +31,7 @@ case $1 in
         export HOST_GID=$(id -g)
 
         printWarning "Starting the holoocean-ct container..."
-        docker compose -f $(dirname "$(readlink -f "$0")")/docker/docker-compose.yaml up -d
+        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" up -d
 
         PARAMS_FILE="/home/ue4/config/coug_holoocean_params.yaml"
         

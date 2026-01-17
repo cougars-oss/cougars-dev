@@ -12,7 +12,8 @@
 #   -m: Launch multi-agent CougUV scenario
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
 
-source $(dirname "$(readlink -f "$0")")/common.sh
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source "$SCRIPT_DIR/common.sh"
 source ~/coug_ws/install/setup.bash
 
 URDF="urdf/couguv_holoocean.urdf.xacro"
