@@ -166,7 +166,7 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: FGO (TM)
+    name: TM
     config:
       visible: false
       collapsed: true

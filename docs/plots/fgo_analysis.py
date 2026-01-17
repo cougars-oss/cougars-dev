@@ -24,8 +24,14 @@ from evo.tools import settings
 from evo.core import sync, metrics
 from evo.core.metrics import PoseRelation
 
+try:
+    from IPython.display import display
+except ImportError:
+    def display(*args):
+        print(*args)
+
 # %%
-BAG_PATH = "../../bags/name"
+BAG_PATH = "../../bags/bag"
 
 AGENT_NAMES = ["auv0", "auv1", "auv2"]
 TRUTH_SUBTOPIC = "/odometry/truth"
@@ -115,19 +121,33 @@ for agent_name, topics in AGENTS.items():
     else:
         print(f"No data found for {agent_name}")
 
+print("Calculating metrics & saving CSVs...")
 for agent_name, pairs in all_trajectory_pairs.items():
     df_metrics = calculate_metrics(pairs)
     
     csv_path = OUTPUT_DIR / f"metrics_{agent_name}.csv"
     df_metrics.to_csv(csv_path)
-    print(f"Metrics saved to: {csv_path}")
+    print(f"Saved: {csv_path.name}")
     display(df_metrics)
 
 # %%
+print("Generating plots...")
 settings.SETTINGS.plot_seaborn_style = "whitegrid"
 settings.SETTINGS.plot_usetex = True
 settings.SETTINGS.plot_fontfamily = "serif"
+settings.SETTINGS.plot_linewidth = 1.0
+settings.SETTINGS.plot_fontscale = 1.0
 plot.apply_settings(settings.SETTINGS)
+
+plt.rcParams.update({
+    'font.size': 10,
+    'axes.titlesize': 10,
+    'axes.labelsize': 10,
+    'xtick.labelsize': 8,
+    'ytick.labelsize': 8,
+    'legend.fontsize': 8,
+    'figure.figsize': (3.5, 2.5),
+})
 
 plot_mode = plot.PlotMode.xy 
 # plot_mode = plot.PlotMode.xz
@@ -137,14 +157,29 @@ plot_mode = plot.PlotMode.xy
 for agent_name, pairs in all_trajectory_pairs.items():
     truth_ref_raw = all_truth_refs[agent_name]
     
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(3.5, 3.0))
     ax = plot.prepare_axis(fig, plot_mode)
 
-    plot.traj(ax, plot_mode, truth_ref_raw, style="--", color="black", label=AGENTS[agent_name]["truth"])
-    est_trajectories = {k: v[1] for k, v in pairs.items()}
+    plot.traj(ax, plot_mode, truth_ref_raw, style="--", color="black", label="Truth")
+    est_trajectories = {}
+    
+    LABEL_MAPPING = {
+        "global": "FGO",
+        "global_tm": "TM",
+        "global_ekf": "EKF",
+        "global_ukf": "UKF",
+        "global_iekf": "IEKF",
+    }
+
+    for k, v in pairs.items():
+        algo_key = k.split("/")[-1]
+        label = LABEL_MAPPING.get(algo_key, algo_key)
+        est_trajectories[label] = v[1]
+        
     plot.trajectories(ax, est_trajectories, plot_mode)
 
     plot_path = OUTPUT_DIR / f"trajectories_{agent_name}.png"
     plt.savefig(plot_path, dpi=300)
-    print(f"Plot saved to: {plot_path.resolve()}")
+    print(f"Saved: {plot_path.name}")
+    print(f"Done with {Path(BAG_PATH).name}.")
     display(fig)

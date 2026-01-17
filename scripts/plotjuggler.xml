@@ -93,6 +93,7 @@
        <range bottom="-0.082545" left="25.940986" top="0.077060" right="30.956643"/>
        <limitY/>
        <curve color="#000000" name="/auv0/VelocitySensor/twist/twist/linear/x"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/velocity/twist/twist/linear/x"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/velocity/twist/twist/linear/x"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/velocity/twist/twist/linear/x"/>
       </plot>
@@ -102,6 +103,7 @@
        <range bottom="-0.108010" left="25.940986" top="0.093046" right="30.956643"/>
        <limitY/>
        <curve color="#000000" name="/auv0/VelocitySensor/twist/twist/linear/y"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/velocity/twist/twist/linear/y"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/velocity/twist/twist/linear/y"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/velocity/twist/twist/linear/y"/>
       </plot>
@@ -111,6 +113,7 @@
        <range bottom="-0.019873" left="25.940986" top="0.026462" right="30.956643"/>
        <limitY/>
        <curve color="#000000" name="/auv0/VelocitySensor/twist/twist/linear/z"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/velocity/twist/twist/linear/z"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/velocity/twist/twist/linear/z"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/velocity/twist/twist/linear/z"/>
       </plot>
@@ -126,6 +129,7 @@
        <range bottom="-0.003079" left="25.941049" top="0.000075" right="30.956488"/>
        <limitY/>
        <curve color="#000000" name="/auv0/IMUSensorBias/twist/twist/linear/x"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/imu_bias/twist/twist/linear/x"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/imu_bias/twist/twist/linear/x"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/imu_bias/twist/twist/linear/x"/>
       </plot>
@@ -135,6 +139,7 @@
        <range bottom="-0.004368" left="25.941049" top="0.000106" right="30.956488"/>
        <limitY/>
        <curve color="#000000" name="/auv0/IMUSensorBias/twist/twist/linear/y"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/imu_bias/twist/twist/linear/y"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/imu_bias/twist/twist/linear/y"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/imu_bias/twist/twist/linear/y"/>
       </plot>
@@ -144,6 +149,7 @@
        <range bottom="-0.000036" left="25.941049" top="0.000584" right="30.956488"/>
        <limitY/>
        <curve color="#000000" name="/auv0/IMUSensorBias/twist/twist/linear/z"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/imu_bias/twist/twist/linear/z"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/imu_bias/twist/twist/linear/z"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/imu_bias/twist/twist/linear/z"/>
       </plot>
@@ -159,6 +165,7 @@
        <range bottom="-0.001693" left="25.941049" top="0.000041" right="30.956488"/>
        <limitY/>
        <curve color="#000000" name="/auv0/IMUSensorBias/twist/twist/angular/x"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/imu_bias/twist/twist/angular/x"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/imu_bias/twist/twist/angular/x"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/imu_bias/twist/twist/angular/x"/>
       </plot>
@@ -168,6 +175,7 @@
        <range bottom="-0.000354" left="25.941049" top="0.000014" right="30.956488"/>
        <limitY/>
        <curve color="#000000" name="/auv0/IMUSensorBias/twist/twist/angular/y"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/imu_bias/twist/twist/angular/y"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/imu_bias/twist/twist/angular/y"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/imu_bias/twist/twist/angular/y"/>
       </plot>
@@ -177,6 +185,7 @@
        <range bottom="-0.001157" left="25.941049" top="0.000028" right="30.956488"/>
        <limitY/>
        <curve color="#000000" name="/auv0/IMUSensorBias/twist/twist/angular/z"/>
+       <curve color="#ff0000" name="/auv0/iekf_node/imu_bias/twist/twist/angular/z"/>
        <curve color="#00ff00" name="/auv0/factor_graph_node/imu_bias/twist/twist/angular/z"/>
        <curve color="#55aaff" name="/auv0/factor_graph_node_tm/imu_bias/twist/twist/angular/z"/>
       </plot>
@@ -209,7 +218,7 @@
    <max_array_size value="100"/>
    <boolean_strings_to_number value="true"/>
    <remove_suffix_from_strings value="true"/>
-   <selected_topics value="/auv0/IMUSensorBias;/auv0/VelocitySensor;/auv0/odometry/global;/auv0/odometry/global_ekf;/auv0/odometry/global_iekf;/auv0/odometry/global_tm;/auv0/odometry/global_ukf;/auv0/odometry/truth;/auv0/factor_graph_node/velocity;/auv0/factor_graph_node/imu_bias;/auv0/factor_graph_node_tm/imu_bias;/auv0/factor_graph_node_tm/velocity"/>
+   <selected_topics value="/auv0/IMUSensorBias;/auv0/VelocitySensor;/auv0/odometry/global;/auv0/odometry/global_ekf;/auv0/odometry/global_iekf;/auv0/odometry/global_tm;/auv0/odometry/global_ukf;/auv0/odometry/truth;/auv0/factor_graph_node/velocity;/auv0/factor_graph_node/imu_bias;/auv0/factor_graph_node_tm/imu_bias;/auv0/factor_graph_node_tm/velocity;/auv0/iekf_node/velocity;/auv0/iekf_node/imu_bias"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>
