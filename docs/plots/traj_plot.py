@@ -45,6 +45,8 @@ def load_trajectories(evo_agent_dir):
 
     zips = glob.glob(os.path.join(evo_agent_dir, "**", "*.zip"), recursive=True)
 
+    print(f"Found {len(zips)} trajectory files.")
+
     for z in zips:
         if "ape_trans" not in z:
             continue
@@ -131,7 +133,7 @@ def main():
         print(f"Error: {bags_root} does not exist.")
         return
 
-    print("Generating trajectory plots...")
+    print("Loading trajectory data and generating plots...")
 
     for bag_dir in bags_root.iterdir():
         if not bag_dir.is_dir():

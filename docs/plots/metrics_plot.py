@@ -137,10 +137,10 @@ def main():
         print(f"Error: {bags_dir} does not exist.")
         return
 
-    print("Loading data...")
+    print("Loading metrics data...")
     data = load_data(bags_dir)
 
-    print("Generating plots...")
+    print("Generating metrics plots...")
     generate_plots(data, bags_dir)
     print("Done.")
 
