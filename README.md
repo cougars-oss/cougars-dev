@@ -5,25 +5,25 @@
 
 [**Get Started**](#get-started) | [**Contributing**](#contributing) | [**Publications**](#publications)
 
-CoUGARS is a low-cost, configurable AUV platform designed for multi-agent autonomy research by the [Field Robotic Systems Lab (FRoSt Lab)](https://frostlab.byu.edu) at [Brigham Young University](https://byu.edu).
+CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autonomy research by the [Field Robotic Systems Lab (FRoSt Lab)](https://frostlab.byu.edu) at [Brigham Young University](https://byu.edu).
 
 --
 
 ## Get Started
 
-> **NOTE:** Per the official HoloOcean (and HoloOcean-ROS) documentation, your computer must have several gigabytes of storage available, 64-bit Linux or Windows, and a competent NVIDIA GPU.
+> Per the official HoloOcean (and HoloOcean-ROS) documentation, your computer must have several gigabytes of storage available, 64-bit Linux or Windows, and a competent NVIDIA GPU.
 
 - Install Docker and set up the Linux development environment.
+
+  **Linux (Recommended):**
+
+  - Install Docker Engine by following the instructions [here](https://docs.docker.com/engine/install/ubuntu/). Make sure to follow the post-installation steps to enable Docker commands without `sudo`.
 
   **Windows:**
 
   - Install WSL2 by following the instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install).
 
   - Install Docker Desktop by following the instructions [here](https://docs.docker.com/desktop/), and enable the WSL2 backend by following the instructions [here](https://docs.docker.com/desktop/windows/wsl/).
-
-  **Linux:**
-
-  - Install Docker Engine by following the instructions [here](https://docs.docker.com/engine/install/ubuntu/). Make sure to follow the post-installation steps to enable Docker commands without `sudo`.
 
 - Set up GitHub SSH keys by following the instructions [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
@@ -39,7 +39,7 @@ CoUGARS is a low-cost, configurable AUV platform designed for multi-agent autono
   cd coug_fgo_dev && ./compose.sh
   ```
 
-- Exit the container and follow the instructions [here](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker) to build a runtime Docker image for `holoocean-ros`. When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
+- Detatch from the container using `Ctrl+b d` and follow the instructions [here](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker) to build a runtime Docker image for `holoocean-ros`. When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
 
 - When finished, launch HoloOcean in the `holoocean-ct` container using `./compose.sh`.
 
@@ -62,7 +62,9 @@ CoUGARS is a low-cost, configurable AUV platform designed for multi-agent autono
 
 - **Make Changes:** Develop and debug your new feature. Add good documentation.
 
-  > **NOTE:** If you need to add dependencies, update the `package.xml` or `Dockerfile` in your branch and test building the image locally. The CI will automatically build and push the new image to Docker Hub upon merge.
+  > All code must pass linting checks before it can be merged. We recommend using `pre-commit` for code style and formatting during development. Set it up on your host machine using `pip install pre-commit && pre-commit install`.
+  >
+  > If you need to add dependencies, update the `package.xml` or `Dockerfile` in your branch and test building the image locally using `docker compose -f docker/docker-compose.yaml up -d --build`. The CI will automatically build and push the new image to Docker Hub upon merge.
 
 - **Sync Frequently:** Regularly rebase your branch against `main` (or merge `main` into your branch) to prevent conflicts.
 
@@ -72,7 +74,7 @@ CoUGARS is a low-cost, configurable AUV platform designed for multi-agent autono
 
 ## Publications
 
-Please cite our relevant publications if you find CoUGARs useful for your research:
+Please cite our relevant publications if you find this repository useful for your research:
 
 ### CoUGARs
 ```bibtex
