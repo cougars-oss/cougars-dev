@@ -21,10 +21,14 @@ from launch.actions import (
     GroupAction,
     ExecuteProcess,
     OpaqueFunction,
+    RegisterEventHandler,
+    EmitEvent,
 )
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import PushRosNamespace
+from launch_ros.actions import PushRosNamespace, Node
 
 
 def launch_setup(context, *args, **kwargs):
@@ -35,6 +39,7 @@ def launch_setup(context, *args, **kwargs):
     play_bag_path = LaunchConfiguration("play_bag_path")
     record_bag_path = LaunchConfiguration("record_bag_path")
     compare = LaunchConfiguration("compare")
+    bluerov_viz = LaunchConfiguration("bluerov_viz")
 
     play_bag_path_str = context.perform_substitution(play_bag_path)
     record_bag_path_str = context.perform_substitution(record_bag_path)
@@ -45,15 +50,54 @@ def launch_setup(context, *args, **kwargs):
     actions = []
 
     if play_bag_path_str:
+        play_process = ExecuteProcess(
+            cmd=[
+                "ros2",
+                "bag",
+                "play",
+                play_bag_path_str,
+                "--clock",
+                "--remap",
+                "/tf:=/tf_discard",
+                "/tf_static:=/tf_static_discard",
+            ],
+        )
+        actions.append(play_process)
+
         actions.append(
-            ExecuteProcess(
-                cmd=[
-                    "ros2",
-                    "bag",
-                    "play",
-                    play_bag_path_str,
-                    "--clock",
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=play_process,
+                    on_exit=[EmitEvent(event=Shutdown(reason="Bag playback finished"))],
+                )
+            )
+        )
+
+        # TODO: Remove this when BlueROV TF is fixed
+        actions.append(
+            Node(
+                package="tf2_ros",
+                executable="static_transform_publisher",
+                name="static_transform",
+                arguments=[
+                    "--x",
+                    "0",
+                    "--y",
+                    "0",
+                    "--z",
+                    "0",
+                    "--yaw",
+                    "0",
+                    "--pitch",
+                    "0",
+                    "--roll",
+                    "0",
+                    "--frame-id",
+                    "map",
+                    "--child-frame-id",
+                    "odom",
                 ],
+                parameters=[{"use_sim_time": use_sim_time}],
             )
         )
 
@@ -81,6 +125,7 @@ def launch_setup(context, *args, **kwargs):
             launch_arguments={
                 "use_sim_time": use_sim_time,
                 "multiagent_viz": "false",
+                "bluerov_viz": bluerov_viz,
             }.items(),
         )
     )
@@ -140,6 +185,11 @@ def generate_launch_description():
                 "compare",
                 default_value="false",
                 description="Launch additional localization nodes if true",
+            ),
+            DeclareLaunchArgument(
+                "bluerov_viz",
+                default_value="true",
+                description="Load BlueROV specific viz config if true",
             ),
             OpaqueFunction(function=launch_setup),
         ]

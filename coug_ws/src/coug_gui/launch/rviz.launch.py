@@ -24,12 +24,17 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration("use_sim_time", default="false")
     multiagent_viz = LaunchConfiguration("multiagent_viz", default="false")
+    bluerov_viz = LaunchConfiguration("bluerov_viz", default="false")
 
     pkg_share = get_package_share_directory("coug_gui")
 
     rviz_params_file = PythonExpression(
         [
             "'",
+            os.path.join(pkg_share, "config", "bluerov2_rviz_params.rviz"),
+            "' if '",
+            bluerov_viz,
+            "' == 'true' else '",
             os.path.join(pkg_share, "config", "multi_rviz_params.rviz"),
             "' if '",
             multiagent_viz,
@@ -45,6 +50,16 @@ def generate_launch_description():
                 "use_sim_time",
                 default_value="false",
                 description="Use simulation (HoloOcean) clock if true",
+            ),
+            DeclareLaunchArgument(
+                "multiagent_viz",
+                default_value="false",
+                description="Use multi-agent visualization config if true",
+            ),
+            DeclareLaunchArgument(
+                "bluerov_viz",
+                default_value="false",
+                description="Load BlueROV specific viz config if true",
             ),
             Node(
                 package="rviz2",
