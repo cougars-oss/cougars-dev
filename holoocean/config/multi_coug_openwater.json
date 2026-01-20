@@ -28,9 +28,9 @@
                     "socket": "COM",
                     "Hz": 1,
                     "configuration": {
-                        "Sigma": 0.2,
+                        "Sigma": 0.015,
                         "Depth": 0.5,
-                        "DepthSigma": 0.1
+                        "DepthSigma": 0.025
                     },
                     "ros_publish": true
                 },
@@ -127,9 +127,9 @@
                     "socket": "COM",
                     "Hz": 1,
                     "configuration": {
-                        "Sigma": 0.2,
+                        "Sigma": 0.015,
                         "Depth": 0.5,
-                        "DepthSigma": 0.1
+                        "DepthSigma": 0.025
                     },
                     "ros_publish": true
                 },
@@ -138,16 +138,16 @@
                     "socket": "DepthSocket",
                     "Hz": 10,
                     "configuration": {
-                        "Sigma": 0.2
+                        "Sigma": 0.02
                     },
                     "ros_publish": true
                 },
                 {
                     "sensor_type": "MagnetometerSensor",
                     "socket": "IMUSocket",
-                    "Hz": 50,
+                    "Hz": 100,
                     "configuration": {
-                        "Sigma": 0.006,
+                        "Sigma": 0.003,
                         "MagneticVector": [
                             0.41,
                             0.08,
@@ -226,9 +226,9 @@
                     "socket": "COM",
                     "Hz": 1,
                     "configuration": {
-                        "Sigma": 0.2,
+                        "Sigma": 0.015,
                         "Depth": 0.5,
-                        "DepthSigma": 0.1
+                        "DepthSigma": 0.025
                     },
                     "ros_publish": true
                 },
@@ -237,16 +237,16 @@
                     "socket": "DepthSocket",
                     "Hz": 10,
                     "configuration": {
-                        "Sigma": 0.2
+                        "Sigma": 0.02
                     },
                     "ros_publish": true
                 },
                 {
                     "sensor_type": "MagnetometerSensor",
                     "socket": "IMUSocket",
-                    "Hz": 50,
+                    "Hz": 100,
                     "configuration": {
-                        "Sigma": 0.006,
+                        "Sigma": 0.003,
                         "MagneticVector": [
                             0.41,
                             0.08,

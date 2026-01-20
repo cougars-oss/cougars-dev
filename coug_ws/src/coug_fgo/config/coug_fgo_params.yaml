@@ -54,7 +54,7 @@
       enable_gps: false
       use_parameter_covariance: true
       parameter_covariance:
-        position_noise_sigma: 1.0 # [m] GPS position uncertainty sigma.
+        position_noise_sigma: 0.015 # [m] GPS position uncertainty sigma.
         altitude_noise_sigma: 1e9 # [m] GPS altitude uncertainty sigma.
       robust_kernel: "None"
       robust_k: 1.345

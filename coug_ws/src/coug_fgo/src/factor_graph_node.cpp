@@ -105,9 +105,9 @@ void FactorGraphNode::loadParameters()
   gps_params_.use_parameter_covariance =
     declare_parameter<bool>("gps.use_parameter_covariance", false);
   gps_params_.position_noise_sigma =
-    declare_parameter<double>("gps.parameter_covariance.position_noise_sigma", 0.2);
+    declare_parameter<double>("gps.parameter_covariance.position_noise_sigma", 0.015);
   gps_params_.altitude_noise_sigma =
-    declare_parameter<double>("gps.parameter_covariance.altitude_noise_sigma", 0.4);
+    declare_parameter<double>("gps.parameter_covariance.altitude_noise_sigma", 0.025);
   gps_params_.robust_kernel = declare_parameter<std::string>("gps.robust_kernel", "None");
   gps_params_.robust_k = declare_parameter<double>("gps.robust_k", 1.345);
 

@@ -18,8 +18,8 @@
       origin_altitude: 1412.0
 
       override_covariance: true
-      position_noise_sigma: 0.2 # [m] Standard deviation of GPS position measurements.
-      altitude_noise_sigma: 0.4 # [m] Standard deviation of GPS altitude measurements.
+      position_noise_sigma: 0.015 # [m] Standard deviation of GPS position measurements.
+      altitude_noise_sigma: 0.025 # [m] Standard deviation of GPS altitude measurements.
 
   depth_converter_node:
     ros__parameters:
