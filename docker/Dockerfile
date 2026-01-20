@@ -64,10 +64,12 @@ RUN vcs import . < cougars.repos \
     && sudo rm -rf /var/lib/apt/lists/* \
     && sudo rm -rf ./*
 
-WORKDIR /home/frostlab-docker
-
+USER root
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+USER frostlab-docker
+WORKDIR /home/frostlab-docker
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]
