@@ -88,6 +88,10 @@ void FactorGraphNode::loadParameters()
   base_frame_ = declare_parameter<std::string>("base_frame", "base_link");
 
   // --- Sensor Settings ---
+  imu_params_.use_parameter_frame =
+    declare_parameter<bool>("imu.use_parameter_frame", false);
+  imu_params_.parameter_frame =
+    declare_parameter<std::string>("imu.parameter_frame", "imu_link");
   imu_params_.use_parameter_covariance =
     declare_parameter<bool>("imu.use_parameter_covariance", false);
   imu_params_.accel_noise_sigma =
@@ -102,6 +106,10 @@ void FactorGraphNode::loadParameters()
   imu_params_.gravity = declare_parameter<std::vector<double>>("imu.gravity", {0.0, 0.0, -9.8});
 
   gps_params_.enable = declare_parameter<bool>("gps.enable_gps", false);
+  gps_params_.use_parameter_frame =
+    declare_parameter<bool>("gps.use_parameter_frame", false);
+  gps_params_.parameter_frame =
+    declare_parameter<std::string>("gps.parameter_frame", "gps_link");
   gps_params_.use_parameter_covariance =
     declare_parameter<bool>("gps.use_parameter_covariance", false);
   gps_params_.position_noise_sigma =
@@ -111,6 +119,10 @@ void FactorGraphNode::loadParameters()
   gps_params_.robust_kernel = declare_parameter<std::string>("gps.robust_kernel", "None");
   gps_params_.robust_k = declare_parameter<double>("gps.robust_k", 1.345);
 
+  depth_params_.use_parameter_frame =
+    declare_parameter<bool>("depth.use_parameter_frame", false);
+  depth_params_.parameter_frame =
+    declare_parameter<std::string>("depth.parameter_frame", "depth_link");
   depth_params_.use_parameter_covariance =
     declare_parameter<bool>("depth.use_parameter_covariance", false);
   depth_params_.position_z_noise_sigma =
@@ -120,6 +132,10 @@ void FactorGraphNode::loadParameters()
 
   mag_params_.enable = declare_parameter<bool>("mag.enable_mag", false);
   mag_params_.constrain_yaw_only = declare_parameter<bool>("mag.constrain_yaw_only", true);
+  mag_params_.use_parameter_frame =
+    declare_parameter<bool>("mag.use_parameter_frame", false);
+  mag_params_.parameter_frame =
+    declare_parameter<std::string>("mag.parameter_frame", "mag_link");
   mag_params_.use_parameter_covariance =
     declare_parameter<bool>("mag.use_parameter_covariance", false);
   mag_params_.magnetic_field_noise_sigma =
@@ -130,6 +146,10 @@ void FactorGraphNode::loadParameters()
   mag_params_.robust_k = declare_parameter<double>("mag.robust_k", 1.345);
 
   ahrs_params_.enable_ahrs = declare_parameter<bool>("ahrs.enable_ahrs", false);
+  ahrs_params_.use_parameter_frame =
+    declare_parameter<bool>("ahrs.use_parameter_frame", false);
+  ahrs_params_.parameter_frame =
+    declare_parameter<std::string>("ahrs.parameter_frame", "ahrs_link");
   ahrs_params_.use_parameter_covariance =
     declare_parameter<bool>("ahrs.use_parameter_covariance", false);
   ahrs_params_.yaw_noise_sigma =
@@ -139,6 +159,10 @@ void FactorGraphNode::loadParameters()
   ahrs_params_.robust_kernel = declare_parameter<std::string>("ahrs.robust_kernel", "None");
   ahrs_params_.robust_k = declare_parameter<double>("ahrs.robust_k", 1.345);
 
+  dvl_params_.use_parameter_frame =
+    declare_parameter<bool>("dvl.use_parameter_frame", false);
+  dvl_params_.parameter_frame =
+    declare_parameter<std::string>("dvl.parameter_frame", "dvl_link");
   dvl_params_.use_parameter_covariance =
     declare_parameter<bool>("dvl.use_parameter_covariance", false);
   dvl_params_.velocity_noise_sigma =
@@ -287,8 +311,17 @@ FactorGraphNode::FactorGraphNode()
 bool FactorGraphNode::lookupInitialTransforms()
 {
   try {
-    dvl_frame_ = initial_dvl_->header.frame_id;
-    imu_frame_ = initial_imu_->header.frame_id;
+    if (dvl_params_.use_parameter_frame) {
+      dvl_frame_ = dvl_params_.parameter_frame;
+    } else {
+      dvl_frame_ = initial_dvl_->header.frame_id;
+    }
+
+    if (imu_params_.use_parameter_frame) {
+      imu_frame_ = imu_params_.parameter_frame;
+    } else {
+      imu_frame_ = initial_imu_->header.frame_id;
+    }
 
     auto lookup = [&](const std::string & parent, const std::string & child) {
         return tf_buffer_->lookupTransform(
@@ -301,23 +334,35 @@ bool FactorGraphNode::lookupInitialTransforms()
       have_dvl_to_base_tf_ = true;
     }
     if (!have_imu_to_dvl_tf_) {
-      imu_to_dvl_tf_ = lookup(dvl_frame_, initial_imu_->header.frame_id);
+      std::string child_frame = imu_frame_;
+      if (!imu_params_.use_parameter_frame) {
+        child_frame = initial_imu_->header.frame_id;
+      }
+      imu_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
       have_imu_to_dvl_tf_ = true;
     }
     if (gps_params_.enable && !have_gps_to_dvl_tf_) {
-      gps_to_dvl_tf_ = lookup(dvl_frame_, initial_gps_->child_frame_id);
+      std::string child_frame = gps_params_.use_parameter_frame ?
+        gps_params_.parameter_frame : initial_gps_->child_frame_id;
+      gps_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
       have_gps_to_dvl_tf_ = true;
     }
     if (!have_depth_to_dvl_tf_) {
-      depth_to_dvl_tf_ = lookup(dvl_frame_, initial_depth_->child_frame_id);
+      std::string child_frame = depth_params_.use_parameter_frame ?
+        depth_params_.parameter_frame : initial_depth_->child_frame_id;
+      depth_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
       have_depth_to_dvl_tf_ = true;
     }
     if (mag_params_.enable && !have_mag_to_dvl_tf_) {
-      mag_to_dvl_tf_ = lookup(dvl_frame_, initial_mag_->header.frame_id);
+      std::string child_frame = mag_params_.use_parameter_frame ?
+        mag_params_.parameter_frame : initial_mag_->header.frame_id;
+      mag_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
       have_mag_to_dvl_tf_ = true;
     }
     if (ahrs_params_.enable_ahrs && !have_ahrs_to_dvl_tf_) {
-      ahrs_to_dvl_tf_ = lookup(dvl_frame_, initial_ahrs_->header.frame_id);
+      std::string child_frame = ahrs_params_.use_parameter_frame ?
+        ahrs_params_.parameter_frame : initial_ahrs_->header.frame_id;
+      ahrs_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
       have_ahrs_to_dvl_tf_ = true;
     }
   } catch (const tf2::TransformException & ex) {

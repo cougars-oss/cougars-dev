@@ -41,6 +41,7 @@
     # - "Tukey": Ignores large errors completely. Best for sensors with distinct 'bad' readings. (k=4.685 standard)
 
     imu:
+      use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
         accel_noise_sigma: 0.0078 # [m/s^2] Accelerometer measurement noise sigma.
@@ -52,6 +53,7 @@
 
     gps:
       enable_gps: false
+      use_parameter_frame: false
       use_parameter_covariance: true
       parameter_covariance:
         position_noise_sigma: 0.015 # [m] GPS position uncertainty sigma.
@@ -60,6 +62,7 @@
       robust_k: 1.345
 
     depth:
+      use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
         position_z_noise_sigma: 0.02 # [m] Depth sensor Z-position uncertainty sigma.
@@ -69,6 +72,7 @@
     mag:
       enable_mag: false
       constrain_yaw_only: true
+      use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
         magnetic_field_noise_sigma: 0.003 # [normalized] Magnetic field uncertainty sigma.
@@ -80,6 +84,7 @@
 
     ahrs:
       enable_ahrs: true
+      use_parameter_frame: false
       use_parameter_covariance: true
       parameter_covariance:
         yaw_noise_sigma: 0.01745 # [rad] AHRS sensor yaw uncertainty sigma.
@@ -88,6 +93,7 @@
       robust_k: 1.345
 
     dvl:
+      use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
         velocity_noise_sigma: 0.02 # [m/s] DVL body-velocity uncertainty sigma.
@@ -156,3 +162,24 @@
       parameter_priors:
         initial_position: [0.0, 40.0, 0.0] # [m]
         initial_orientation: [0.0, 0.0, 0.0] # [rad]
+
+/bluerov2/**:
+  ros__parameters:
+    imu_topic: "/imu/data"
+    depth_odom_topic: "/shallow/depth_data"
+    dvl_topic: "/dvl/twist"
+
+    ahrs:
+      enable_ahrs: false
+
+    imu:
+      use_parameter_frame: true
+      parameter_frame: "bluerov2/imu_link"
+
+    depth:
+      use_parameter_frame: true
+      parameter_frame: "bluerov2/imu_link"
+
+    dvl:
+      use_parameter_frame: true
+      parameter_frame: "bluerov2/dvl_link"

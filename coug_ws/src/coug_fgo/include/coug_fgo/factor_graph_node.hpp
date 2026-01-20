@@ -75,6 +75,10 @@ public:
   /// @{
   struct ImuParams
   {
+    /// If true, use the frame ID parameter below instead of the header frame.
+    bool use_parameter_frame;
+    /// The frame ID to use if use_parameter_frame is true.
+    std::string parameter_frame;
     /// Use fixed sigma values instead of message covariance.
     bool use_parameter_covariance;
     /// Accelerometer noise sigma (continuous-time) [m/s^2].
@@ -95,6 +99,10 @@ public:
   {
     /// Enable/disable GPS factor processing.
     bool enable;
+    /// If true, use the frame ID parameter below instead of the header frame.
+    bool use_parameter_frame;
+    /// The frame ID to use if use_parameter_frame is true.
+    std::string parameter_frame;
     /// Use fixed sigma values instead of message covariance.
     bool use_parameter_covariance;
     /// Horizontal position noise sigma [m].
@@ -109,6 +117,10 @@ public:
 
   struct DepthParams
   {
+    /// If true, use the frame ID parameter below instead of the header frame.
+    bool use_parameter_frame;
+    /// The frame ID to use if use_parameter_frame is true.
+    std::string parameter_frame;
     /// Use fixed sigma values instead of message covariance.
     bool use_parameter_covariance;
     /// Depth (Z) noise sigma [m].
@@ -123,6 +135,10 @@ public:
   {
     /// Enable/disable magnetic factor processing.
     bool enable;
+    /// If true, use the frame ID parameter below instead of the header frame.
+    bool use_parameter_frame;
+    /// The frame ID to use if use_parameter_frame is true.
+    std::string parameter_frame;
     /// Flag to constrain only the yaw angle.
     bool constrain_yaw_only;
     /// Use fixed sigma values instead of message covariance.
@@ -141,6 +157,10 @@ public:
   {
     /// Enable/disable AHRS factor processing.
     bool enable_ahrs;
+    /// If true, use the frame ID parameter below instead of the header frame.
+    bool use_parameter_frame;
+    /// The frame ID to use if use_parameter_frame is true.
+    std::string parameter_frame;
     /// Use fixed sigma values instead of message covariance.
     bool use_parameter_covariance;
     /// Yaw noise sigma [rad].
@@ -157,6 +177,10 @@ public:
   {
     /// Use fixed sigma values instead of message covariance.
     bool use_parameter_covariance;
+    /// If true, use the frame ID parameter below instead of the header frame.
+    bool use_parameter_frame;
+    /// The frame ID to use if use_parameter_frame is true.
+    std::string parameter_frame;
     /// Velocity noise sigma [m/s].
     double velocity_noise_sigma;
     /// Timeout threshold (DVL dropout detection) [s].

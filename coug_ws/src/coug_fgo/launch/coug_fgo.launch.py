@@ -34,13 +34,63 @@ def generate_launch_description():
         ["'", auv_ns, "/odom' if '", auv_ns, "' != '' else 'odom'"]
     )
 
-    base_frame = PythonExpression(
+    base_link_frame = PythonExpression(
         [
             "'",
             auv_ns,
             "/base_link' if '",
             auv_ns,
             "' != '' else 'base_link'",
+        ]
+    )
+
+    imu_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/imu_link' if '",
+            auv_ns,
+            "' != '' else 'imu_link'",
+        ]
+    )
+
+    dvl_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/dvl_link' if '",
+            auv_ns,
+            "' != '' else 'dvl_link'",
+        ]
+    )
+
+    depth_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/depth_link' if '",
+            auv_ns,
+            "' != '' else 'depth_link'",
+        ]
+    )
+
+    com_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/com_link' if '",
+            auv_ns,
+            "' != '' else 'com_link'",
+        ]
+    )
+
+    modem_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/modem_link' if '",
+            auv_ns,
+            "' != '' else 'modem_link'",
         ]
     )
 
@@ -78,7 +128,13 @@ def generate_launch_description():
                         "use_sim_time": use_sim_time,
                         "map_frame": "map",
                         "odom_frame": odom_frame,
-                        "base_frame": base_frame,
+                        "base_frame": base_link_frame,
+                        "imu.parameter_frame": imu_link_frame,
+                        "dvl.parameter_frame": dvl_link_frame,
+                        "depth.parameter_frame": depth_link_frame,
+                        "gps.parameter_frame": com_link_frame,
+                        "mag.parameter_frame": imu_link_frame,
+                        "ahrs.parameter_frame": modem_link_frame,
                     },
                 ],
             ),
@@ -94,7 +150,13 @@ def generate_launch_description():
                         "use_sim_time": use_sim_time,
                         "map_frame": "map",
                         "odom_frame": odom_frame,
-                        "base_frame": base_frame,
+                        "base_frame": base_link_frame,
+                        "imu.parameter_frame": imu_link_frame,
+                        "dvl.parameter_frame": dvl_link_frame,
+                        "depth.parameter_frame": depth_link_frame,
+                        "gps.parameter_frame": com_link_frame,
+                        "mag.parameter_frame": imu_link_frame,
+                        "ahrs.parameter_frame": modem_link_frame,
                         "global_odom_topic": "odometry/global_tm",
                         "smoothed_path_topic": "smoothed_path_tm",
                         "publish_global_tf": False,
@@ -136,7 +198,7 @@ def generate_launch_description():
                     "--frame-id",
                     odom_frame,
                     "--child-frame-id",
-                    base_frame,
+                    base_link_frame,
                 ],
                 parameters=[{"use_sim_time": use_sim_time}],
             ),

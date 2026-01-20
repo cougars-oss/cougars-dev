@@ -54,6 +54,8 @@ def generate_launch_description():
                     {"config": mapviz_params_file},
                     {"use_sim_time": use_sim_time},
                 ],
+                # Remove if needed, but mapviz spams warnings
+                arguments=["--ros-args", "--log-level", "error"],
             ),
             Node(
                 package="swri_transform_util",
