@@ -43,6 +43,8 @@ RUN apt update && apt install -y --no-install-recommends \
     ros-humble-joy ros-humble-teleop-twist-joy ros-humble-teleop-twist-keyboard ros-humble-topic-tools \
     # Better rosbag2 storage format - Nelson Durrant, Jan 2026
     ros-humble-rosbag2-storage-mcap \
+    # TODO: Add this to the coug_bringup deps
+    ros-humble-sbg-driver \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /home/frostlab-docker/coug_ws/src && chown -R frostlab-docker:frostlab-docker /home/frostlab-docker/coug_ws

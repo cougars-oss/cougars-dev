@@ -3,11 +3,19 @@ repositories:
     type: zip
     url: https://github.com/byu-holoocean/holoocean-ros/archive/refs/heads/main.zip
     version: holoocean-ros-main/holoocean_interfaces
+  dvl_msgs:
+    type: git
+    url: https://github.com/paagutie/dvl_msgs.git
+    version: master
+  # pressure_sensor_ros2:
+  #   type: git
+  #   url: https://github.com/BYU-FRoSt-Lab/pressure_sensor_ros2.git
+  #   version: main
   # dvl-a50:
   #   type: git
   #   url: https://github.com/paagutie/dvl-a50.git
   #   version: master
-  # dvl_msgs:
+  # seatrac-ros2
   #   type: git
-  #   url: https://github.com/paagutie/dvl_msgs.git
-  #   version: master
+  #   url: https://github.com/BYU-FRoSt-Lab/seatrac-ros2.git
+  #   version: main
