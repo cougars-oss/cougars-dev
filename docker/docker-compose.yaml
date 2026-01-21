@@ -33,7 +33,7 @@ services:
 
   cougars:
     image: snelsondurrant/cougars:latest
-    build: 
+    build:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: cougars-ct
@@ -60,4 +60,3 @@ services:
     stdin_open: true
     tty: true
     restart: always
-    entrypoint: ["/entrypoint.sh"]
