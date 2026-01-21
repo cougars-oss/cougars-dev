@@ -33,6 +33,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <atomic>
 #include <deque>
 #include <map>
 #include <memory>
@@ -435,7 +436,7 @@ private:
   /// True if the initialization averaging phase is complete.
   bool data_averaged_ = false;
   /// True if the smoother and graph have been initialized.
-  bool graph_initialized_ = false;
+  std::atomic<bool> graph_initialized_{false};
   /// Start time of the initialization averaging phase.
   double start_avg_time_ = 0.0;
 
@@ -446,7 +447,7 @@ private:
   /// Timestamp of the last processed data (seconds).
   double prev_time_ = 0.0;
   /// Timestamp of the last DVL message (seconds).
-  double last_dvl_time_ = 0.0;
+  std::atomic<double> last_dvl_time_{0.0};
   /// Mapping between timestamps and GTSAM pose keys.
   std::map<rclcpp::Time, gtsam::Key> time_to_key_;
 
@@ -497,6 +498,8 @@ private:
   /// Separate callback group for sensor subscribers.
   rclcpp::CallbackGroup::SharedPtr sensor_cb_group_;
 
+  /// Lock for the initialization phase.
+  std::mutex initialization_mutex_;
   /// Lock for the main optimization loop.
   std::mutex optimization_mutex_;
   /// Lock for the IMU message queue.
@@ -566,8 +569,6 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr ahrs_sub_;
   /// Body-frame DVL twist subscriber.
   rclcpp::Subscription<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr dvl_sub_;
-  /// Timer for the main factor graph optimization loop.
-  rclcpp::TimerBase::SharedPtr factor_graph_timer_;
 
   /// ROS 2 TF transform broadcaster.
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;

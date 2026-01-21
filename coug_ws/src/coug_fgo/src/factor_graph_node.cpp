@@ -26,6 +26,8 @@
 #include <gtsam/navigation/NavState.h>
 #include <gtsam/slam/PriorFactor.h>
 
+#include <algorithm>
+
 #include "coug_fgo/factors/depth_factor_arm.hpp"
 #include "coug_fgo/factors/dvl_factor.hpp"
 #include "coug_fgo/factors/dvl_preintegrated_factor.hpp"
@@ -33,6 +35,7 @@
 #include "coug_fgo/factors/ahrs_factor.hpp"
 #include "coug_fgo/factors/mag_factor_arm.hpp"
 #include "coug_fgo/utils/conversion_utils.hpp"
+
 
 using coug_fgo::factors::CustomDepthFactorArm;
 using coug_fgo::factors::CustomDVLFactor;
@@ -249,21 +252,21 @@ void FactorGraphNode::setupRosInterfaces()
         depth_queue_.push_back(msg);
       }
 
-      // IMPORTANT! Detect DVL dropouts and use depth as the driver
       double time_since_dvl = this->get_clock()->now().seconds() - last_dvl_time_;
       bool dvl_timed_out = time_since_dvl > dvl_params_.timeout_threshold;
 
-      if (dvl_timed_out && !experimental_params_.enable_dvl_preintegration) {
-        RCLCPP_WARN_THROTTLE(
-          get_logger(), *get_clock(), 5000,
-          "DVL timed out (%.2fs)! Using depth sensor to trigger optimization.",
-          time_since_dvl);
-      }
-
-      if (experimental_params_.enable_dvl_preintegration || dvl_timed_out) {
+      if (experimental_params_.enable_dvl_preintegration) {
         if (!graph_initialized_) {
           initializeGraph();
         } else {
+          optimizeGraph();
+        }
+      } else {
+        if (graph_initialized_ && dvl_timed_out) {
+          RCLCPP_WARN_THROTTLE(
+            get_logger(), *get_clock(), 5000,
+            "DVL timed out (%.2fs)! Using depth sensor to trigger optimization.",
+            time_since_dvl);
           optimizeGraph();
         }
       }
@@ -569,7 +572,7 @@ gtsam::Rot3 FactorGraphNode::computeInitialOrientation()
       initial_mag_->magnetic_field.z);
     gtsam::Vector3 mag_base = R_base_sensor * mag_sensor;
 
-    // IMPORTANT! Use the tilt-compensated magnetic vector to calculate yaw
+    // Use the tilt-compensated magnetic vector to calculate yaw
     gtsam::Rot3 R_rp = gtsam::Rot3::Ypr(0.0, pitch, roll);
     gtsam::Vector3 mag_horizontal = R_rp.unrotate(mag_base);
 
@@ -722,6 +725,11 @@ void FactorGraphNode::addPriorFactors(gtsam::NonlinearFactorGraph & graph, gtsam
 
 void FactorGraphNode::initializeGraph()
 {
+  std::lock_guard<std::mutex> init_lock(initialization_mutex_);
+  if (graph_initialized_) {
+    return;
+  }
+
   // --- Wait for Sensor Data ---
   if (!sensors_ready_) {
     std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
@@ -962,7 +970,7 @@ void FactorGraphNode::addMagFactor(
     } else {
       double B_mag = ref_vec.norm();
       if (B_mag > 1e-6) {
-        // IMPORTANT! Convert to angular uncertainty (rad) from magnetic field uncertainty
+        // Convert to angular uncertainty (rad) from magnetic field uncertainty
         double sigma_B = sqrt(mag_msg->magnetic_field_covariance[0]);
         mag_sigma << sigma_B / B_mag;
       } else {
@@ -1060,10 +1068,17 @@ void FactorGraphNode::addPreintegratedImuFactor(
       continue;
     }
 
+    if (current_imu_time <= last_imu_time) {
+      RCLCPP_WARN_THROTTLE(
+        get_logger(), *get_clock(), 1000, "IMU message older than last integrated time. Skipping.");
+      continue;
+    }
+
+    last_acc = toGtsam(imu_msg->linear_acceleration);
+    last_gyr = toGtsam(imu_msg->angular_velocity);
+
     double dt = current_imu_time - last_imu_time;
     if (dt > 1e-9) {
-      last_acc = toGtsam(imu_msg->linear_acceleration);
-      last_gyr = toGtsam(imu_msg->angular_velocity);
       imu_preintegrator_->integrateMeasurement(last_acc, last_gyr, dt);
     }
     last_imu_time = current_imu_time;
@@ -1091,6 +1106,11 @@ void FactorGraphNode::addPreintegratedImuFactor(
 gtsam::Rot3 FactorGraphNode::getInterpolatedOrientation(
   const std::deque<sensor_msgs::msg::Imu::SharedPtr> & imu_msgs, double target_time)
 {
+  if (imu_msgs.empty()) {
+    RCLCPP_WARN(get_logger(), "IMU queue empty. Returning identity rotation.");
+    return gtsam::Rot3();
+  }
+
   auto it_after = std::lower_bound(
     imu_msgs.begin(), imu_msgs.end(), target_time,
     [](const auto & msg, double t) {return rclcpp::Time(msg->header.stamp).seconds() < t;});
@@ -1105,7 +1125,13 @@ gtsam::Rot3 FactorGraphNode::getInterpolatedOrientation(
 
   double t1 = rclcpp::Time((*(it_after - 1))->header.stamp).seconds();
   double t2 = rclcpp::Time((*it_after)->header.stamp).seconds();
-  double alpha = (target_time - t1) / (t2 - t1);
+  double denominator = t2 - t1;
+
+  if (std::abs(denominator) < 1e-9) {
+    return toGtsam((*(it_after - 1))->orientation);
+  }
+
+  double alpha = (target_time - t1) / denominator;
 
   // Use Slerp for quaternion interpolation (handles alpha > 1.0 for extrapolation)
   return toGtsam((*(it_after - 1))->orientation).slerp(alpha, toGtsam((*it_after)->orientation));
@@ -1139,6 +1165,12 @@ void FactorGraphNode::addPreintegratedDvlFactor(
     double current_dvl_time = rclcpp::Time(dvl_msg->header.stamp).seconds();
     if (current_dvl_time > target_time) {
       unused_dvl_msgs.push_back(dvl_msg);
+      continue;
+    }
+
+    if (current_dvl_time <= last_dvl_time) {
+      RCLCPP_WARN_THROTTLE(
+        get_logger(), *get_clock(), 1000, "DVL message older than last integrated time. Skipping.");
       continue;
     }
 
@@ -1315,6 +1347,43 @@ void FactorGraphNode::optimizeGraph()
   std::unique_lock<std::mutex> opt_lock(optimization_mutex_, std::try_to_lock);
   if (!opt_lock.owns_lock()) {return;}
 
+  rclcpp::Time target_stamp;
+  bool should_abort = false;
+
+  {
+    std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
+      mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_);
+
+    if (imu_queue_.empty()) {
+      return;
+    }
+
+    if (experimental_params_.enable_dvl_preintegration) {
+      if (depth_queue_.empty()) {return;}
+      target_stamp = depth_queue_.back()->header.stamp;
+    } else {
+      if (dvl_queue_.empty() && depth_queue_.empty()) {return;}
+
+      if (!dvl_queue_.empty()) {
+        target_stamp = dvl_queue_.back()->header.stamp;
+      } else {
+        target_stamp = depth_queue_.back()->header.stamp;
+      }
+    }
+
+    if (target_stamp.seconds() <= prev_time_ + 1e-6) {
+      RCLCPP_WARN(get_logger(), "Duplicate or out-of-order timestamp detected. Skipping.");
+      if (experimental_params_.enable_dvl_preintegration) {
+        depth_queue_.pop_back();
+      } else {
+        if (!dvl_queue_.empty()) {dvl_queue_.pop_back();} else {depth_queue_.pop_back();}
+      }
+      should_abort = true;
+    }
+  }
+
+  if (should_abort) {return;}
+
   std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_msgs;
   std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_msgs;
   std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_msgs;
@@ -1348,22 +1417,15 @@ void FactorGraphNode::optimizeGraph()
     }
   }
 
-  // Sort IMU messages -- should already be in order, but just in case
+  // Sort IMU (and DVL) messages
   auto by_time = [](const auto & a, const auto & b) {
       return rclcpp::Time(a->header.stamp) < rclcpp::Time(b->header.stamp);
     };
   std::sort(imu_msgs.begin(), imu_msgs.end(), by_time);
-
-  rclcpp::Time target_stamp;
   if (experimental_params_.enable_dvl_preintegration) {
-    target_stamp = depth_msgs.back()->header.stamp;
-  } else {
-    if (!dvl_msgs.empty()) {
-      target_stamp = dvl_msgs.back()->header.stamp;
-    } else {
-      target_stamp = depth_msgs.back()->header.stamp;
-    }
+    std::sort(dvl_msgs.begin(), dvl_msgs.end(), by_time);
   }
+
   double target_time = target_stamp.seconds();
 
   // --- Create New Factor Graph ---
@@ -1438,8 +1500,8 @@ void FactorGraphNode::optimizeGraph()
     prev_time_ = target_time;
     prev_step_ = current_step_;
     current_step_++;
-  } catch (const gtsam::IndeterminantLinearSystemException & e) {
-    RCLCPP_FATAL(get_logger(), "GTSAM IndeterminantLinearSystemException: %s", e.what());
+  } catch (const std::exception & e) {
+    RCLCPP_FATAL(get_logger(), "%s", e.what());
     rclcpp::shutdown();
   }
 }

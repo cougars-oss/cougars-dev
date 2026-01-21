@@ -54,25 +54,25 @@ def generate_launch_description():
         ]
     )
 
-    dvl_link_frame = PythonExpression(
-        [
-            "'",
-            auv_ns,
-            "/dvl_link' if '",
-            auv_ns,
-            "' != '' else 'dvl_link'",
-        ]
-    )
+    # dvl_link_frame = PythonExpression(
+    #     [
+    #         "'",
+    #         auv_ns,
+    #         "/dvl_link' if '",
+    #         auv_ns,
+    #         "' != '' else 'dvl_link'",
+    #     ]
+    # )
 
-    depth_link_frame = PythonExpression(
-        [
-            "'",
-            auv_ns,
-            "/depth_link' if '",
-            auv_ns,
-            "' != '' else 'depth_link'",
-        ]
-    )
+    # depth_link_frame = PythonExpression(
+    #     [
+    #         "'",
+    #         auv_ns,
+    #         "/depth_link' if '",
+    #         auv_ns,
+    #         "' != '' else 'depth_link'",
+    #     ]
+    # )
 
     com_link_frame = PythonExpression(
         [
