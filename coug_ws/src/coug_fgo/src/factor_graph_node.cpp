@@ -253,6 +253,13 @@ void FactorGraphNode::setupRosInterfaces()
       double time_since_dvl = this->get_clock()->now().seconds() - last_dvl_time_;
       bool dvl_timed_out = time_since_dvl > dvl_params_.timeout_threshold;
 
+      if (dvl_timed_out && !experimental_params_.enable_dvl_preintegration) {
+        RCLCPP_WARN_THROTTLE(
+          get_logger(), *get_clock(), 5000,
+          "DVL timed out (%.2fs)! Using depth sensor to trigger optimization.",
+          time_since_dvl);
+      }
+
       if (experimental_params_.enable_dvl_preintegration || dvl_timed_out) {
         if (!graph_initialized_) {
           initializeGraph();

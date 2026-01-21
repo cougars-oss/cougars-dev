@@ -16,15 +16,6 @@ _coug_tab_completion() {
         return 0
     fi
 
-    if [[ "$cur" == -* ]]; then
-        if [[ "$script_name" == *"bag_launch.sh"* ]]; then
-            COMPREPLY=($(compgen -W "-c -r" -- "$cur"))
-        elif [[ "$script_name" == *"sim_launch.sh"* ]]; then
-            COMPREPLY=($(compgen -W "-b -c -m -r" -- "$cur"))
-        fi
-        return 0
-    fi
-
     if [[ "$script_name" == *"bag_launch.sh"* ]]; then
         if [[ -d "$bags_dir" ]]; then
             COMPREPLY=($(compgen -W "$(ls "$bags_dir")" -- "$cur"))
