@@ -17,7 +17,7 @@ FROM snelsondurrant/cougars:gtsam
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
-ENV RCLUTILS_COLORIZED_OUTPUT=1
+ENV RCUTILS_COLORIZED_OUTPUT=1
 
 # ROS_BUILD_ARCH is used to skip building architecture-incompatible packages
 ENV ROS_BUILD_ARCH=$TARGETARCH
