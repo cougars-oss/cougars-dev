@@ -165,9 +165,7 @@
 
 /bluerov2/**:
   ros__parameters:
-    imu_topic: "/imu/data"
-    depth_odom_topic: "/shallow/depth_data"
-    dvl_topic: "/dvl/twist"
+    gps_odom_topic: "odometry/truth"
 
     ahrs:
       enable_ahrs: false
@@ -183,3 +181,6 @@
     dvl:
       use_parameter_frame: true
       parameter_frame: "bluerov2/dvl_link"
+
+    odom_output_topic: "odometry/truth"
+    use_parameter_origin: false
