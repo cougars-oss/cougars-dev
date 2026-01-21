@@ -31,7 +31,7 @@ fi
 
 RECORD_BAG_PATH=""
 COMPARE="false"
-DELAY="5.0"
+DELAY="0.0"
 
 while getopts ":cd:r:" opt; do
     case $opt in

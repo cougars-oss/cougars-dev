@@ -172,7 +172,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "start_delay",
-                default_value="5.0",
+                default_value="0.0",
                 description="Delay in seconds before starting the processing nodes",
             ),
             DeclareLaunchArgument(
