@@ -180,7 +180,7 @@
     gps:
       # enable_gps: true
       use_parameter_frame: true
-      parameter_frame: "bluerov2/imu_link"
+      parameter_frame: "bluerov2/gps_link"
 
     depth:
       use_parameter_frame: true
