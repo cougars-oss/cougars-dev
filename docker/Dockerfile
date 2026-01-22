@@ -43,6 +43,8 @@ RUN apt update && apt install -y --no-install-recommends \
     ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy ros-${ROS_DISTRO}-teleop-twist-keyboard \
     # Better rosbag2 storage format - Nelson Durrant, Jan 2026
     ros-${ROS_DISTRO}-rosbag2-storage-mcap \
+    # TODO: Remove this, temporary fix for ARM CI
+    --reinstall ros-${ROS_DISTRO}-rcutils \
     # TODO: Add this to the sensor_bridge deps
     ros-${ROS_DISTRO}-sbg-driver ros-${ROS_DISTRO}-ntrip-client \
     && rm -rf /var/lib/apt/lists/*
