@@ -187,7 +187,7 @@
       parameter_frame: "bluerov2/imu_link"
 
     ahrs:
-      # enable_ahrs: false
+      enable_ahrs: false
       use_parameter_frame: true
       parameter_frame: "bluerov2/imu_link"
       mag_declination_radians: 0.1876

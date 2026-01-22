@@ -101,7 +101,7 @@ displays:
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: true
+      show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -121,7 +121,7 @@ displays:
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: true
+      show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -141,7 +141,7 @@ displays:
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: true
+      show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -161,7 +161,7 @@ displays:
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: true
+      show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -181,7 +181,7 @@ displays:
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: true
+      show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
