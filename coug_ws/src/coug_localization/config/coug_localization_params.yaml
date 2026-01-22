@@ -5,7 +5,7 @@
       two_d_mode: false
       publish_tf: false # Published by IEKF instead
 
-      twist0: dvl/data
+      twist0: dvl/twist
       twist0_config: [false, false, false, # X, Y, Z
                       false, false, false, # Roll, Pitch, Yaw
                       true,  true,  true,  # Vx, Vy, Vz

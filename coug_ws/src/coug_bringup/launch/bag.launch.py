@@ -68,7 +68,7 @@ def launch_setup(context, *args, **kwargs):
                 "/imu/nav_sat_fix:=/bluerov2/gps/fix",
                 "/imu/data:=/bluerov2/imu/data",
                 "/imu/mag:=/bluerov2/imu/mag",
-                "/dvl/twist:=/bluerov2/dvl/data",
+                "/dvl/twist:=/bluerov2/dvl/twist",
                 "/shallow/depth_data:=/bluerov2/odometry/depth",
             ],
         )

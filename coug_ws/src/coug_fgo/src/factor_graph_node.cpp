@@ -80,7 +80,7 @@ void FactorGraphNode::loadParameters()
   depth_odom_topic_ = declare_parameter<std::string>("depth_odom_topic", "odometry/depth");
   mag_topic_ = declare_parameter<std::string>("mag_topic", "imu/mag");
   ahrs_topic_ = declare_parameter<std::string>("ahrs_topic", "imu/ahrs");
-  dvl_topic_ = declare_parameter<std::string>("dvl_topic", "dvl/data");
+  dvl_topic_ = declare_parameter<std::string>("dvl_topic", "dvl/twist");
   global_odom_topic_ = declare_parameter<std::string>("global_odom_topic", "odometry/global");
   smoothed_path_topic_ = declare_parameter<std::string>("smoothed_path_topic", "smoothed_path");
   velocity_topic_ = declare_parameter<std::string>("velocity_topic", "~/velocity");

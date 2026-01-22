@@ -22,7 +22,7 @@
     depth_odom_topic: "odometry/depth"
     mag_topic: "imu/mag"
     ahrs_topic: "imu/ahrs"
-    dvl_topic: "dvl/data"
+    dvl_topic: "dvl/twist"
     global_odom_topic: "odometry/global"
     smoothed_path_topic: "smoothed_path"
     velocity_topic: "~/velocity" # Published at the DVL frame.
