@@ -1083,7 +1083,7 @@ void FactorGraphNode::addPreintegratedImuFactor(
     }
 
     if (current_imu_time <= last_imu_time) {
-      RCLCPP_WARN_THROTTLE(
+      RCLCPP_DEBUG_THROTTLE(
         get_logger(), *get_clock(), 5000, "IMU message older than last integrated time. Skipping.");
       continue;
     }
@@ -1183,7 +1183,7 @@ void FactorGraphNode::addPreintegratedDvlFactor(
     }
 
     if (current_dvl_time <= last_dvl_time) {
-      RCLCPP_WARN_THROTTLE(
+      RCLCPP_DEBUG_THROTTLE(
         get_logger(), *get_clock(), 5000, "DVL message older than last integrated time. Skipping.");
       continue;
     }
@@ -1248,12 +1248,33 @@ void FactorGraphNode::publishGlobalOdom(
   odom_msg.child_frame_id = base_frame_;
   odom_msg.pose.pose = toPoseMsg(current_pose);
 
+  gtsam::Matrix cov_to_pub = pose_covariance;
+
+  if (publish_pose_cov_) {
+    gtsam::Pose3 T_base_dvl = toGtsam(dvl_to_base_tf_.transform);
+    
+    // Account for DVL lever arm 
+    gtsam::Matrix Ad = T_base_dvl.AdjointMap();
+    gtsam::Matrix cov_base = Ad * pose_covariance * Ad.transpose();
+    
+    gtsam::Rot3 R_map_base = current_pose.rotation(); 
+    gtsam::Matrix66 Rot = gtsam::Matrix66::Zero();
+    Rot.block<3, 3>(0, 0) = R_map_base.matrix();
+    Rot.block<3, 3>(3, 3) = R_map_base.matrix();
+    
+    cov_to_pub = Rot * cov_base * Rot.transpose();
+
+    // Numerical stability adjustments
+    cov_to_pub = 0.5 * (cov_to_pub + cov_to_pub.transpose());
+    cov_to_pub += 1e-6 * gtsam::Matrix::Identity(6, 6);
+  }
+
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      odom_msg.pose.covariance[i * 6 + j] = pose_covariance(i + 3, j + 3);
-      odom_msg.pose.covariance[(i + 3) * 6 + (j + 3)] = pose_covariance(i, j);
-      odom_msg.pose.covariance[i * 6 + (j + 3)] = pose_covariance(i + 3, j);
-      odom_msg.pose.covariance[(i + 3) * 6 + j] = pose_covariance(i, j + 3);
+      odom_msg.pose.covariance[i * 6 + j] = cov_to_pub(i + 3, j + 3);
+      odom_msg.pose.covariance[(i + 3) * 6 + (j + 3)] = cov_to_pub(i, j);
+      odom_msg.pose.covariance[i * 6 + (j + 3)] = cov_to_pub(i + 3, j);
+      odom_msg.pose.covariance[(i + 3) * 6 + j] = cov_to_pub(i, j + 3);
     }
   }
   odom_msg.twist.covariance[0] = -1.0;

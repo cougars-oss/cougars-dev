@@ -10,8 +10,8 @@ show_capture_tools: true
 window_width: 1600
 window_height: 900
 view_scale: 0.117128991
-offset_x: 8.28480911
-offset_y: -5.92338276
+offset_x: 9.10471153
+offset_y: 1.57287228
 use_latest_transforms: true
 background: "#a0a0a4"
 image_transport: raw
