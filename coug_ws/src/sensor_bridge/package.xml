@@ -20,6 +20,8 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>python3-numpy</depend>
   <depend>python3-scipy</depend>
+  <depend>sbg_driver</depend>
+  <depend>ntrip_client</depend>
 
   <export>
     <build_type>ament_python</build_type>
