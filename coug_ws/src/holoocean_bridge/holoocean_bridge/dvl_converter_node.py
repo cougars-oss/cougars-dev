@@ -84,6 +84,10 @@ class DvlConverterNode(Node):
 
             cycle_period = 1.0 / self.dropout_frequency
             if (current_time % cycle_period) < self.dropout_duration:
+                self.get_logger().warn(
+                    "Simulating DVL dropout...",
+                    throttle_duration_sec=cycle_period,
+                )
                 return
 
         msg.header.frame_id = self.frame_id

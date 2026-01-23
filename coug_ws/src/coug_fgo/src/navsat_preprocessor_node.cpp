@@ -44,6 +44,11 @@ NavsatPreprocessorNode::NavsatPreprocessorNode()
   std::string origin_topic =
     declare_parameter<std::string>("origin_topic", "/origin");
   initialization_duration_ = declare_parameter<double>("initialization_duration", 10.0);
+
+  simulate_dropout_ = declare_parameter<bool>("simulate_dropout", false);
+  dropout_frequency_ = declare_parameter<double>("dropout_frequency", 1.0 / 30.0);
+  dropout_duration_ = declare_parameter<double>("dropout_duration", 5.0);
+
   map_frame_ = declare_parameter<std::string>("map_frame", "map");
 
   use_parameter_child_frame_ = declare_parameter<bool>("use_parameter_child_frame", false);
@@ -131,6 +136,17 @@ void NavsatPreprocessorNode::originCallback(const sensor_msgs::msg::NavSatFix::S
 
 void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
 {
+  if (simulate_dropout_ && dropout_frequency_ > 0) {
+    double current_time = this->get_clock()->now().seconds();
+    double cycle_period = 1.0 / dropout_frequency_;
+    if (fmod(current_time, cycle_period) < dropout_duration_) {
+      RCLCPP_WARN_THROTTLE(
+        get_logger(), *get_clock(), (int)(cycle_period * 1000),
+        "Simulating GPS dropout...");
+      return;
+    }
+  }
+
   if (msg->status.status == sensor_msgs::msg::NavSatStatus::STATUS_NO_FIX) {
     RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 5000, "Received NavSatFix with no fix.");
     return;

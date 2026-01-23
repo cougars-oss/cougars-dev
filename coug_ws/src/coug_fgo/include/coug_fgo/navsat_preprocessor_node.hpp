@@ -113,6 +113,13 @@ private:
   std::string parameter_child_frame_;
   /// Duration to average GPS measurements before setting origin.
   double initialization_duration_;
+
+  /// Whether to simulate GPS dropout.
+  bool simulate_dropout_;
+  /// Dropout frequency (Hz).
+  double dropout_frequency_;
+  /// Dropout duration (s).
+  double dropout_duration_;
 };
 
 }  // namespace coug_fgo

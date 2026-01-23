@@ -34,6 +34,9 @@ class DvlTwistConverterNode(Node):
         self.declare_parameter("input_topic", "dvl/data")
         self.declare_parameter("output_topic", "dvl/twist")
         self.declare_parameter("frame_id", "dvl_link")
+        self.declare_parameter("simulate_dropout", False)
+        self.declare_parameter("dropout_frequency", 1.0 / 30.0)
+        self.declare_parameter("dropout_duration", 5.0)
 
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
@@ -43,6 +46,15 @@ class DvlTwistConverterNode(Node):
         )
         self.frame_id = (
             self.get_parameter("frame_id").get_parameter_value().string_value
+        )
+        self.simulate_dropout = (
+            self.get_parameter("simulate_dropout").get_parameter_value().bool_value
+        )
+        self.dropout_frequency = (
+            self.get_parameter("dropout_frequency").get_parameter_value().double_value
+        )
+        self.dropout_duration = (
+            self.get_parameter("dropout_duration").get_parameter_value().double_value
         )
 
         self.subscription = self.create_subscription(
@@ -63,6 +75,17 @@ class DvlTwistConverterNode(Node):
 
         :param msg: DVL message containing velocity data.
         """
+        if self.simulate_dropout and self.dropout_frequency > 0:
+            current_time = self.get_clock().now().nanoseconds / 1e9
+
+            cycle_period = 1.0 / self.dropout_frequency
+            if (current_time % cycle_period) < self.dropout_duration:
+                self.get_logger().warn(
+                    "Simulating DVL dropout...",
+                    throttle_duration_sec=cycle_period,
+                )
+                return
+
         if not msg.velocity_valid:
             self.get_logger().warn(
                 "Received invalid DVL velocity", throttle_duration_sec=1.0

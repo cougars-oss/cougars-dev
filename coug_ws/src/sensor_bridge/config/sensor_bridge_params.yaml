@@ -3,6 +3,10 @@
     ros__parameters:
       input_topic: "dvl/data"
       output_topic: "dvl/twist"
+      
+      simulate_dropout: false
+      dropout_frequency: 0.033 # [Hz] Frequency of the dropout cycle (1/30).
+      dropout_duration: 5.0 # [s] Duration of the dropout.
     
   dvl_odom_converter_node:
     ros__parameters:

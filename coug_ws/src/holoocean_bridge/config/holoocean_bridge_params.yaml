@@ -43,8 +43,8 @@
       output_topic: "dvl/twist"
 
       simulate_dropout: false
-      dropout_frequency: 0.033333333 # [Hz] 1/30 seconds
-      dropout_duration: 5.0 # [s]
+      dropout_frequency: 0.033 # [Hz] Frequency of the dropout cycle (1/30).
+      dropout_duration: 5.0 # [s] Duration of the dropout.
 
       override_covariance: true
       noise_sigma: 0.02 # [m/s] Standard deviation of DVL body-frame velocity measurements.
