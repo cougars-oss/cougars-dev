@@ -17,7 +17,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 def generate_launch_description():
@@ -29,25 +29,27 @@ def generate_launch_description():
     coug_gui_dir = get_package_share_directory("coug_gui")
     coug_gui_launch_dir = os.path.join(coug_gui_dir, "launch")
 
-    coug_mapviz_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(coug_gui_launch_dir, "mapviz.launch.py")
-        ),
-        launch_arguments={
-            "use_sim_time": use_sim_time,
-            "multiagent_viz": multiagent_viz,
-            "bluerov_viz": bluerov_viz,
-        }.items(),
+    use_plotjuggler = PythonExpression(
+        [
+            "'",
+            bluerov_viz,
+            "' == 'false' and '",
+            multiagent_viz,
+            "' == 'false'",
+        ]
     )
 
-    coug_rviz_cmd = IncludeLaunchDescription(
+    coug_gui_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coug_gui_launch_dir, "rviz.launch.py")
+            os.path.join(coug_gui_launch_dir, "coug_gui.launch.py")
         ),
         launch_arguments={
             "use_sim_time": use_sim_time,
             "multiagent_viz": multiagent_viz,
             "bluerov_viz": bluerov_viz,
+            "use_rviz": "true",
+            "use_mapviz": "true",
+            "use_plotjuggler": use_plotjuggler,
         }.items(),
     )
 
@@ -73,7 +75,6 @@ def generate_launch_description():
             description="Load BlueROV specific viz config if true",
         )
     )
-    ld.add_action(coug_mapviz_cmd)
-    ld.add_action(coug_rviz_cmd)
+    ld.add_action(coug_gui_cmd)
 
     return ld
