@@ -97,15 +97,10 @@ public:
   gtsam::Matrix3 covariance() const {return covariance_;}
 
 private:
-  /// Orientation at the start of integration.
   gtsam::Rot3 initial_orientation_;
-  /// Accumulated rotation delta.
   gtsam::Rot3 delta_rotation_;
-  /// Accumulated translation delta.
   gtsam::Vector3 integrated_translation_;
-  /// Estimated uncertainty of the accumulated translation.
   gtsam::Matrix3 covariance_;
-  /// Total integration duration.
   double dt_sum_;
 };
 

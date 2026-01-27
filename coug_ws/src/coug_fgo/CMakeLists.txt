@@ -25,6 +25,12 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(geodesy REQUIRED)
+find_package(generate_parameter_library REQUIRED)
+
+generate_parameter_library(
+  factor_graph_parameters
+  "params/factor_graph_params.yaml"
+)
 
 get_target_property(GTSAM_TARGET_INC gtsam INTERFACE_INCLUDE_DIRECTORIES)
 find_path(GTSAM_EIGEN_INCLUDE_DIR Eigen/Core
@@ -49,6 +55,12 @@ ament_target_dependencies(factor_graph
 target_link_libraries(factor_graph
   gtsam
   gtsam_unstable
+  factor_graph_parameters
+)
+
+generate_parameter_library(
+  navsat_preprocessor_parameters
+  "params/navsat_preprocessor_params.yaml"
 )
 
 add_executable(navsat_preprocessor src/navsat_preprocessor_node.cpp)
@@ -61,6 +73,9 @@ ament_target_dependencies(navsat_preprocessor
   geographic_msgs
   tf2_geometry_msgs
   geodesy
+)
+target_link_libraries(navsat_preprocessor
+  navsat_preprocessor_parameters
 )
 
 install(TARGETS factor_graph navsat_preprocessor

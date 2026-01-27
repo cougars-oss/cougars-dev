@@ -35,56 +35,34 @@ NavsatPreprocessorNode::NavsatPreprocessorNode()
 {
   RCLCPP_INFO(get_logger(), "Starting NavSat Preprocessor Node...");
 
-  // --- Parameters ---
-  double origin_pub_rate = declare_parameter<double>("origin_pub_rate", 1.0);
-  set_origin_ = declare_parameter<bool>("set_origin", true);
-  std::string input_topic = declare_parameter<std::string>("input_topic", "gps/fix");
-  std::string odom_output_topic =
-    declare_parameter<std::string>("odom_output_topic", "odometry/gps");
-  std::string origin_topic =
-    declare_parameter<std::string>("origin_topic", "/origin");
-  initialization_duration_ = declare_parameter<double>("initialization_duration", 10.0);
-
-  simulate_dropout_ = declare_parameter<bool>("simulate_dropout", false);
-  dropout_frequency_ = declare_parameter<double>("dropout_frequency", 1.0 / 30.0);
-  dropout_duration_ = declare_parameter<double>("dropout_duration", 5.0);
-
-  map_frame_ = declare_parameter<std::string>("map_frame", "map");
-
-  use_parameter_child_frame_ = declare_parameter<bool>("use_parameter_child_frame", false);
-  parameter_child_frame_ =
-    declare_parameter<std::string>("parameter_child_frame", "gps_link");
-
-  bool use_parameter_origin = declare_parameter<bool>("use_parameter_origin", false);
-  double parameter_origin_lat = declare_parameter<double>("parameter_origin.latitude", 40.33940);
-  double parameter_origin_lon =
-    declare_parameter<double>("parameter_origin.longitude", -111.90721);
-  double parameter_origin_alt = declare_parameter<double>("parameter_origin.altitude", 1412.0);
+  param_listener_ = std::make_shared<navsat_preprocessor_node::ParamListener>(
+    get_node_parameters_interface());
+  params_ = param_listener_->get_params();
 
   // --- ROS Interfaces ---
-  odom_pub_ = create_publisher<nav_msgs::msg::Odometry>(odom_output_topic, 10);
+  odom_pub_ = create_publisher<nav_msgs::msg::Odometry>(params_.odom_output_topic, 10);
 
-  if (set_origin_) {
-    origin_pub_ = create_publisher<sensor_msgs::msg::NavSatFix>(origin_topic, 10);
+  if (params_.set_origin) {
+    origin_pub_ = create_publisher<sensor_msgs::msg::NavSatFix>(params_.origin_topic, 10);
   } else {
     origin_sub_ = create_subscription<sensor_msgs::msg::NavSatFix>(
-      origin_topic, 10,
+      params_.origin_topic, 10,
       [this](const sensor_msgs::msg::NavSatFix::SharedPtr msg) {originCallback(msg);});
   }
 
-  if (use_parameter_origin && set_origin_) {
+  if (params_.use_parameter_origin && params_.set_origin) {
     try {
       geographic_msgs::msg::GeoPoint pt;
-      pt.latitude = parameter_origin_lat;
-      pt.longitude = parameter_origin_lon;
-      pt.altitude = parameter_origin_alt;
+      pt.latitude = params_.parameter_origin.latitude;
+      pt.longitude = params_.parameter_origin.longitude;
+      pt.altitude = params_.parameter_origin.altitude;
       origin_utm_ = geodesy::UTMPoint(pt);
 
-      origin_navsat_.header.frame_id = map_frame_;
+      origin_navsat_.header.frame_id = params_.map_frame;
       origin_navsat_.status.status = sensor_msgs::msg::NavSatStatus::STATUS_FIX;
-      origin_navsat_.latitude = parameter_origin_lat;
-      origin_navsat_.longitude = parameter_origin_lon;
-      origin_navsat_.altitude = parameter_origin_alt;
+      origin_navsat_.latitude = params_.parameter_origin.latitude;
+      origin_navsat_.longitude = params_.parameter_origin.longitude;
+      origin_navsat_.altitude = params_.parameter_origin.altitude;
 
       origin_set_ = true;
 
@@ -98,12 +76,12 @@ NavsatPreprocessorNode::NavsatPreprocessorNode()
   }
 
   navsat_sub_ = create_subscription<sensor_msgs::msg::NavSatFix>(
-    input_topic, 10,
+    params_.input_topic, 10,
     [this](const sensor_msgs::msg::NavSatFix::SharedPtr msg) {navsatCallback(msg);});
 
-  if (set_origin_) {
+  if (params_.set_origin) {
     origin_timer_ = create_wall_timer(
-      std::chrono::milliseconds(static_cast<int>(1000.0 / origin_pub_rate)),
+      std::chrono::milliseconds(static_cast<int>(1000.0 / params_.origin_pub_rate)),
       [this]() {
         if (origin_set_) {origin_pub_->publish(origin_navsat_);}
       });
@@ -136,10 +114,10 @@ void NavsatPreprocessorNode::originCallback(const sensor_msgs::msg::NavSatFix::S
 
 void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
 {
-  if (simulate_dropout_ && dropout_frequency_ > 0) {
+  if (params_.simulate_dropout && params_.dropout_frequency > 0) {
     double current_time = this->get_clock()->now().seconds();
-    double cycle_period = 1.0 / dropout_frequency_;
-    if (fmod(current_time, cycle_period) < dropout_duration_) {
+    double cycle_period = 1.0 / params_.dropout_frequency;
+    if (fmod(current_time, cycle_period) < params_.dropout_duration) {
       RCLCPP_WARN_THROTTLE(
         get_logger(), *get_clock(), (int)(cycle_period * 1000),
         "Simulating GPS dropout...");
@@ -153,7 +131,7 @@ void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::S
   }
 
   if (!origin_set_) {
-    if (!set_origin_) {
+    if (!params_.set_origin) {
       RCLCPP_WARN_THROTTLE(
         get_logger(), *get_clock(), 5000,
         "Waiting for origin from external source...");
@@ -166,17 +144,17 @@ void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::S
       gps_samples_.clear();
       RCLCPP_INFO(
         get_logger(), "Starting GPS origin averaging (%.1fs)...",
-        initialization_duration_);
+        params_.initialization_duration);
     }
 
     gps_samples_.push_back(*msg);
 
     double elapsed = this->get_clock()->now().seconds() - start_collection_time_;
-    if (elapsed < initialization_duration_) {
+    if (elapsed < params_.initialization_duration) {
       RCLCPP_INFO_THROTTLE(
         get_logger(), *get_clock(), 500,
         "Averaging GPS data (%.2fs / %.2fs)...", elapsed,
-        initialization_duration_);
+        params_.initialization_duration);
       return;
     }
 
@@ -218,10 +196,10 @@ void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::S
 
   nav_msgs::msg::Odometry odom_msg;
   odom_msg.header.stamp = msg->header.stamp;
-  odom_msg.header.frame_id = map_frame_;
+  odom_msg.header.frame_id = params_.map_frame;
 
-  if (use_parameter_child_frame_) {
-    odom_msg.child_frame_id = parameter_child_frame_;
+  if (params_.use_parameter_child_frame) {
+    odom_msg.child_frame_id = params_.parameter_child_frame;
   } else {
     odom_msg.child_frame_id = msg->header.frame_id;
   }

@@ -43,13 +43,9 @@ namespace coug_fgo::factors
  */
 class CustomMagFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
-  /// Measured magnetic field vector in the sensor frame.
   gtsam::Point3 measured_field_;
-  /// Reference magnetic field vector in the world frame.
   gtsam::Point3 reference_field_;
-  /// Sensor rotation in base frame.
   gtsam::Rot3 R_base_sensor_;
-  /// Flag to constrain only the yaw angle (1D residual).
   bool constrain_yaw_only_;
 
 public:

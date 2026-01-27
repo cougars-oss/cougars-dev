@@ -51,6 +51,7 @@
 
 #include "coug_fgo/utils/conversion_utils.hpp"
 #include "coug_fgo/utils/dvl_preintegrator.hpp"
+#include <coug_fgo/factor_graph_parameters.hpp>
 
 
 namespace coug_fgo
@@ -72,169 +73,6 @@ public:
    */
   FactorGraphNode();
 
-  /** @name Parameter Structures */
-  /// @{
-  struct ImuParams
-  {
-    /// If true, use the frame ID parameter below instead of the header frame.
-    bool use_parameter_frame;
-    /// The frame ID to use if use_parameter_frame is true.
-    std::string parameter_frame;
-    /// Use fixed sigma values instead of message covariance.
-    bool use_parameter_covariance;
-    /// Accelerometer noise sigma (continuous-time) [m/s^2].
-    double accel_noise_sigma;
-    /// Gyroscope noise sigma (continuous-time) [rad/s].
-    double gyro_noise_sigma;
-    /// Accelerometer bias random walk sigma [m/s^3].
-    double accel_bias_rw_sigma;
-    /// Gyroscope bias random walk sigma [rad/s^2].
-    double gyro_bias_rw_sigma;
-    /// Covariance for IMU integration step.
-    double integration_covariance;
-    /// Gravity vector in world frame [m/s^2].
-    std::vector<double> gravity;
-  };
-
-  struct GpsParams
-  {
-    /// Enable/disable GPS factor processing.
-    bool enable;
-    /// Enable/disable altitude (Z) data from GPS.
-    bool enable_altitude;
-    /// If true, use the frame ID parameter below instead of the header frame.
-    bool use_parameter_frame;
-    /// The frame ID to use if use_parameter_frame is true.
-    std::string parameter_frame;
-    /// Use fixed sigma values instead of message covariance.
-    bool use_parameter_covariance;
-    /// Horizontal position noise sigma [m].
-    double position_noise_sigma;
-    /// Vertical position noise sigma [m] (can be set high to ignore GPS altitude).
-    double altitude_noise_sigma;
-    /// Type of robust cost function (e.g., "Huber").
-    std::string robust_kernel;
-    /// Threshold for the robust kernel.
-    double robust_k;
-  };
-
-  struct DepthParams
-  {
-    /// If true, use the frame ID parameter below instead of the header frame.
-    bool use_parameter_frame;
-    /// The frame ID to use if use_parameter_frame is true.
-    std::string parameter_frame;
-    /// Use fixed sigma values instead of message covariance.
-    bool use_parameter_covariance;
-    /// Depth (Z) noise sigma [m].
-    double position_z_noise_sigma;
-    /// Type of robust cost function.
-    std::string robust_kernel;
-    /// Threshold for the robust kernel.
-    double robust_k;
-  };
-
-  struct MagParams
-  {
-    /// Enable/disable magnetic factor processing.
-    bool enable;
-    /// If true, use the frame ID parameter below instead of the header frame.
-    bool use_parameter_frame;
-    /// The frame ID to use if use_parameter_frame is true.
-    std::string parameter_frame;
-    /// Flag to constrain only the yaw angle.
-    bool constrain_yaw_only;
-    /// Use fixed sigma values instead of message covariance.
-    bool use_parameter_covariance;
-    /// Magnetic field noise sigma.
-    double magnetic_field_noise_sigma;
-    /// Reference magnetic field vector (world frame).
-    std::vector<double> reference_field;
-    /// Type of robust cost function.
-    std::string robust_kernel;
-    /// Threshold for the robust kernel.
-    double robust_k;
-  };
-
-  struct AhrsParams
-  {
-    /// Enable/disable AHRS factor processing.
-    bool enable;
-    /// Enable/disable roll and pitch data from AHRS sensor.
-    bool enable_roll_pitch;
-    /// If true, use the frame ID parameter below instead of the header frame.
-    bool use_parameter_frame;
-    /// The frame ID to use if use_parameter_frame is true.
-    std::string parameter_frame;
-    /// Use fixed sigma values instead of message covariance.
-    bool use_parameter_covariance;
-    /// Yaw noise sigma [rad].
-    double yaw_noise_sigma;
-    /// Roll/Pitch noise sigma [rad] (can be set high to ignore).
-    double roll_pitch_noise_sigma;
-    /// Magnetic declination to add to the AHRS yaw [rad].
-    double mag_declination_radians;
-    /// Type of robust cost function.
-    std::string robust_kernel;
-    /// Threshold for the robust kernel.
-    double robust_k;
-  };
-
-  struct DvlParams
-  {
-    /// Use fixed sigma values instead of message covariance.
-    bool use_parameter_covariance;
-    /// If true, use the frame ID parameter below instead of the header frame.
-    bool use_parameter_frame;
-    /// The frame ID to use if use_parameter_frame is true.
-    std::string parameter_frame;
-    /// Velocity noise sigma [m/s].
-    double velocity_noise_sigma;
-    /// Timeout threshold (DVL dropout detection) [s].
-    double timeout_threshold;
-    /// Type of robust cost function.
-    std::string robust_kernel;
-    /// Threshold for the robust kernel.
-    double robust_k;
-  };
-
-  struct PriorParams
-  {
-    /// Warm-up period for sensor data averaging (seconds).
-    double initialization_duration;
-
-    /// If true, use parameter values for priors instead of initial sensor data.
-    bool use_parameter_priors;
-    /// Static initial position prior [x,y,z].
-    std::vector<double> initial_position;
-    /// Static initial orientation prior [r,p,y].
-    std::vector<double> initial_orientation;
-    /// Static initial velocity prior [x,y,z].
-    std::vector<double> initial_velocity;
-    /// Static initial accelerometer bias prior [x,y,z].
-    std::vector<double> initial_accel_bias;
-    /// Static initial gyroscope bias prior [x,y,z].
-    std::vector<double> initial_gyro_bias;
-    /// Uncertainty sigma for initial position.
-    double initial_position_sigma;
-    /// Uncertainty sigma for initial orientation.
-    double initial_orientation_sigma;
-    /// Uncertainty sigma for initial velocity.
-    double initial_velocity_sigma;
-
-    /// Uncertainty sigma for initial accelerometer bias.
-    double initial_accel_bias_sigma;
-    /// Uncertainty sigma for initial gyroscope bias.
-    double initial_gyro_bias_sigma;
-  };
-
-  struct ExperimentalParams
-  {
-    /// Enable iterative preintegration of DVL measurements between IMU poses.
-    bool enable_dvl_preintegration;
-  };
-
-  /// Container for averaged sensor data used during initialization.
   struct AveragedMeasurements
   {
     sensor_msgs::msg::Imu::SharedPtr imu;
@@ -246,7 +84,6 @@ public:
   };
 
 private:
-  // --- Main Logic ---
   /**
    * @brief Initializes the factor graph using averaged sensor data or parameters.
    */
@@ -255,12 +92,6 @@ private:
    * @brief Main optimization loop; adds factors to the graph and invokes the smoother.
    */
   void optimizeGraph();
-
-  // --- Setup & Helpers ---
-  /**
-   * @brief Loads ROS 2 parameters into local structures.
-   */
-  void loadParameters();
   /**
    * @brief Initializes publishers, subscribers, and timers.
    */
@@ -437,220 +268,92 @@ private:
     const gtsam::Matrix & imu_bias_covariance, const rclcpp::Time & timestamp);
 
   // --- Graph State ---
-  /// True if all required sensors have published initial data.
   bool sensors_ready_ = false;
-  /// True if the initialization averaging phase is complete.
   bool data_averaged_ = false;
-  /// True if the smoother and graph have been initialized.
   std::atomic<bool> graph_initialized_{false};
-  /// Start time of the initialization averaging phase.
   double start_avg_time_ = 0.0;
 
-  /// Index of the previous optimization step/key.
   size_t prev_step_ = 0;
-  /// Index of the current optimization step/key.
   size_t current_step_ = 1;
-  /// Timestamp of the last processed data (seconds).
   double prev_time_ = 0.0;
-  /// Timestamp of the last DVL message (seconds).
   std::atomic<double> last_dvl_time_{0.0};
-  /// Mapping between timestamps and GTSAM pose keys.
   std::map<rclcpp::Time, gtsam::Key> time_to_key_;
 
   // --- GTSAM Objects ---
-  /// Core GTSAM smoother (fixed-lag ISAM2).
   std::unique_ptr<gtsam::IncrementalFixedLagSmoother> smoother_;
-  /// GTSAM preintegrator for IMU measurements.
   std::unique_ptr<gtsam::PreintegratedCombinedMeasurements> imu_preintegrator_;
-  /// Helper for DVL preintegration.
   std::unique_ptr<utils::DVLPreintegrator> dvl_preintegrator_;
 
-  /// Most recent estimated pose.
   gtsam::Pose3 prev_pose_;
-  /// Most recent estimated velocity.
   gtsam::Vector3 prev_vel_;
-  /// Most recent estimated IMU bias.
   gtsam::imuBias::ConstantBias prev_imu_bias_;
 
   // --- Initial Averaged Measurements ---
-  /// Averaged IMU data used for orientation initialization.
   sensor_msgs::msg::Imu::SharedPtr initial_imu_;
-  /// Averaged GPS data used for position initialization.
   nav_msgs::msg::Odometry::SharedPtr initial_gps_;
-  /// Averaged depth data used for position initialization.
   nav_msgs::msg::Odometry::SharedPtr initial_depth_;
-  /// Averaged AHRS data used for orientation initialization.
   sensor_msgs::msg::Imu::SharedPtr initial_ahrs_;
-  /// Averaged magnetic data used for orientation initialization.
   sensor_msgs::msg::MagneticField::SharedPtr initial_mag_;
-  /// Averaged DVL data used for velocity initialization.
   geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr initial_dvl_;
 
   // --- Message Queues ---
-  /// Queue of incoming IMU messages.
   std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_queue_;
-  /// Queue of incoming GPS messages.
   std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_queue_;
-  /// Queue of incoming depth messages.
   std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_queue_;
-  /// Queue of incoming Mag messages.
   std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_queue_;
-  /// Queue of incoming AHRS messages.
   std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_queue_;
-  /// Queue of incoming DVL messages.
   std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_queue_;
 
   // --- Multithreading ---
-  /// Separate callback group for sensor subscribers.
   rclcpp::CallbackGroup::SharedPtr sensor_cb_group_;
 
-  /// Lock for the initialization phase.
   std::mutex initialization_mutex_;
-  /// Lock for the main optimization loop.
   std::mutex optimization_mutex_;
-  /// Lock for the IMU message queue.
   std::mutex imu_queue_mutex_;
-  /// Lock for the GPS message queue.
   std::mutex gps_queue_mutex_;
-  /// Lock for the depth message queue.
   std::mutex depth_queue_mutex_;
-  /// Lock for the Mag message queue.
   std::mutex mag_queue_mutex_;
-  /// Lock for the AHRS message queue.
   std::mutex ahrs_queue_mutex_;
-  /// Lock for the DVL message queue.
   std::mutex dvl_queue_mutex_;
 
   // --- Transformations ---
-  /// Frame ID of the DVL sensor.
   std::string dvl_frame_;
-  /// Frame ID of the IMU sensor.
   std::string imu_frame_;
 
-  /// True if the DVL-to-base transform has been successfully looked up.
   bool have_dvl_to_base_tf_ = false;
-  /// True if the IMU-to-DVL transform has been successfully looked up.
   bool have_imu_to_dvl_tf_ = false;
-  /// True if the GPS-to-DVL transform has been successfully looked up.
   bool have_gps_to_dvl_tf_ = false;
-  /// True if the depth-to-DVL transform has been successfully looked up.
   bool have_depth_to_dvl_tf_ = false;
-  /// True if the Mag-to-DVL transform has been successfully looked up.
   bool have_mag_to_dvl_tf_ = false;
-  /// True if the AHRS-to-DVL transform has been successfully looked up.
   bool have_ahrs_to_dvl_tf_ = false;
 
-  /// Transformation from the DVL frame to the base link frame.
   geometry_msgs::msg::TransformStamped dvl_to_base_tf_;
-  /// Transformation from the IMU frame to the DVL frame.
   geometry_msgs::msg::TransformStamped imu_to_dvl_tf_;
-  /// Transformation from the GPS frame to the DVL frame.
   geometry_msgs::msg::TransformStamped gps_to_dvl_tf_;
-  /// Transformation from the depth sensor frame to the DVL frame.
   geometry_msgs::msg::TransformStamped depth_to_dvl_tf_;
-  /// Transformation from the Mag sensor frame to the DVL frame.
   geometry_msgs::msg::TransformStamped mag_to_dvl_tf_;
-  /// Transformation from the AHRS sensor frame to the DVL frame.
   geometry_msgs::msg::TransformStamped ahrs_to_dvl_tf_;
 
   // --- ROS Interfaces ---
-  /// Optimized global odometry publisher.
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr global_odom_pub_;
-  /// Optimized path/trajectory publisher.
   rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr smoothed_path_pub_;
-  /// Body-frame velocity publisher.
   rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr velocity_pub_;
-  /// IMU bias estimates publisher.
   rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr imu_bias_pub_;
 
-  /// Raw IMU data subscriber.
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
-  /// Preprocessed GPS ENU subscriber.
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr gps_odom_sub_;
-  /// Depth odom subscriber.
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr depth_odom_sub_;
-  /// Magnetic field subscriber.
   rclcpp::Subscription<sensor_msgs::msg::MagneticField>::SharedPtr mag_sub_;
-  /// AHRS IMU subscriber.
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr ahrs_sub_;
-  /// Body-frame DVL twist subscriber.
   rclcpp::Subscription<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr dvl_sub_;
 
-  /// ROS 2 TF transform broadcaster.
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-  /// ROS 2 TF transform listener.
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};
-  /// ROS 2 TF buffer.
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
   // --- Parameters ---
-  /// Enable/disable broadcasting the map->odom transform.
-  bool publish_global_tf_;
-  /// Enable/disable publishing the optimized trajectory.
-  bool publish_smoothed_path_;
-  /// Enable/disable publishing body-frame velocity.
-  bool publish_velocity_;
-  /// Enable/disable publishing IMU bias estimates.
-  bool publish_imu_bias_;
-
-  /// Include pose covariance in odometry messages.
-  bool publish_pose_cov_;
-  /// Include velocity covariance in twist messages.
-  bool publish_velocity_cov_;
-  /// Include bias covariance in bias messages.
-  bool publish_imu_bias_cov_;
-
-  /// Fixed-lag smoothing window (seconds).
-  double smoother_lag_;
-  /// ISAM2 relinearization threshold.
-  double gtsam_relinearize_threshold_;
-  /// ISAM2 relinearization skip count.
-  int gtsam_relinearize_skip_;
-
-  /// Raw IMU data topic name.
-  std::string imu_topic_;
-  /// Preprocessed GPS ENU topic name.
-  std::string gps_odom_topic_;
-  /// Depth odom topic name.
-  std::string depth_odom_topic_;
-  /// Magnetic field topic name.
-  std::string mag_topic_;
-  /// AHRS IMU topic name.
-  std::string ahrs_topic_;
-  /// Body-frame DVL twist topic name.
-  std::string dvl_topic_;
-  /// Optimized global odometry topic name.
-  std::string global_odom_topic_;
-  /// Optimized trajectory topic name.
-  std::string smoothed_path_topic_;
-  /// Optimized velocity topic name.
-  std::string velocity_topic_;
-  /// Optimized IMU bias topic name.
-  std::string imu_bias_topic_;
-
-  /// Global world frame (ENU).
-  std::string map_frame_;
-  /// Dead-reckoning frame.
-  std::string odom_frame_;
-  /// AUV body-fixed frame.
-  std::string base_frame_;
-
-  /// Configuration for IMU processing.
-  ImuParams imu_params_;
-  /// Configuration for GPS processing.
-  GpsParams gps_params_;
-  /// Configuration for depth processing.
-  DepthParams depth_params_;
-  /// Configuration for Mag processing.
-  MagParams mag_params_;
-  /// Configuration for AHRS processing.
-  AhrsParams ahrs_params_;
-  /// Configuration for DVL processing.
-  DvlParams dvl_params_;
-  /// Configuration for priors and initialization.
-  PriorParams prior_params_;
-  /// Configuration for experimental features.
-  ExperimentalParams experimental_params_;
+  std::shared_ptr<factor_graph_node::ParamListener> param_listener_;
+  factor_graph_node::Params params_;
 };
 
 }  // namespace coug_fgo

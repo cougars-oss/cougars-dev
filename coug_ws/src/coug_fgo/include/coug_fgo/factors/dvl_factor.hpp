@@ -46,7 +46,6 @@ namespace coug_fgo::factors
  */
 class CustomDVLFactor : public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Vector3>
 {
-  /// Measured velocity in base frame.
   gtsam::Vector3 measured_velocity_base_;
 
 public:

@@ -42,9 +42,7 @@ namespace coug_fgo::factors
  */
 class CustomGPSFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
-  /// Measured position in world frame.
   gtsam::Point3 measured_position_;
-  /// Sensor pose in base frame.
   gtsam::Pose3 T_base_sensor_;
 
 public:

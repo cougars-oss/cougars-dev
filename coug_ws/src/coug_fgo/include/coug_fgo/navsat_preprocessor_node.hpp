@@ -26,10 +26,13 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
+
+#include <coug_fgo/navsat_preprocessor_parameters.hpp>
 
 namespace coug_fgo
 {
@@ -75,51 +78,24 @@ private:
     nav_msgs::msg::Odometry & odom_msg);
 
   // --- ROS Interfaces ---
-  /// ENU odometry publisher.
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
-  /// Origin publisher.
   rclcpp::Publisher<sensor_msgs::msg::NavSatFix>::SharedPtr origin_pub_;
-  /// GPS fix subscriber.
   rclcpp::Subscription<sensor_msgs::msg::NavSatFix>::SharedPtr navsat_sub_;
-  /// External origin subscriber.
   rclcpp::Subscription<sensor_msgs::msg::NavSatFix>::SharedPtr origin_sub_;
-  /// Timer for periodic origin publication.
   rclcpp::TimerBase::SharedPtr origin_timer_;
 
   // --- State ---
-  /// Flag indicating if the origin has been established.
   bool origin_set_ = false;
-  /// The geographic coordinates of the origin.
   sensor_msgs::msg::NavSatFix origin_navsat_;
-  /// The UTM coordinates of the origin.
   geodesy::UTMPoint origin_utm_;
 
-  /// Flag indicating if we are currently collecting samples for averaging.
   bool collecting_samples_ = false;
-  /// Start time of the collection period.
   double start_collection_time_ = 0.0;
-  /// Buffer for GPS samples.
   std::vector<sensor_msgs::msg::NavSatFix> gps_samples_;
 
   // --- Parameters ---
-  /// If true, this node establishes and publishes the origin.
-  /// If false, it subscribes to an external origin topic.
-  bool set_origin_;
-  /// The local ENU map frame ID.
-  std::string map_frame_;
-  /// Whether to use the parameter child frame or the one from the NavSatFix message.
-  bool use_parameter_child_frame_;
-  /// The child frame ID to use if use_parameter_child_frame_ is true.
-  std::string parameter_child_frame_;
-  /// Duration to average GPS measurements before setting origin.
-  double initialization_duration_;
-
-  /// Whether to simulate GPS dropout.
-  bool simulate_dropout_;
-  /// Dropout frequency (Hz).
-  double dropout_frequency_;
-  /// Dropout duration (s).
-  double dropout_duration_;
+  std::shared_ptr<navsat_preprocessor_node::ParamListener> param_listener_;
+  navsat_preprocessor_node::Params params_;
 };
 
 }  // namespace coug_fgo

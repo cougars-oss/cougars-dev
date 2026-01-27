@@ -40,7 +40,6 @@ namespace coug_fgo::factors
  */
 class CustomDVLPreintegratedFactor : public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Pose3>
 {
-  /// Preintegrated translation measurement.
   gtsam::Vector3 measured_translation_;
 
 public:

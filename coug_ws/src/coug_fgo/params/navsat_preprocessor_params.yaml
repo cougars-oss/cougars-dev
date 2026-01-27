@@ -1,0 +1,54 @@
+navsat_preprocessor_node:
+  origin_pub_rate:
+    type: double
+    default_value: 1.0
+  set_origin:
+    type: bool
+    default_value: true
+  input_topic:
+    type: string
+    default_value: "gps/fix"
+  odom_output_topic:
+    type: string
+    default_value: "odometry/gps"
+  origin_topic:
+    type: string
+    default_value: "/origin"
+  initialization_duration:
+    type: double
+    default_value: 10.0
+  
+  simulate_dropout:
+    type: bool
+    default_value: false
+  dropout_frequency:
+    type: double
+    default_value: 0.0333333
+  dropout_duration:
+    type: double
+    default_value: 5.0
+  
+  map_frame:
+    type: string
+    default_value: "map"
+  
+  use_parameter_child_frame:
+    type: bool
+    default_value: false
+  parameter_child_frame:
+    type: string
+    default_value: "gps_link"
+  
+  use_parameter_origin:
+    type: bool
+    default_value: false
+  parameter_origin:
+    latitude:
+      type: double
+      default_value: 40.33940
+    longitude:
+      type: double
+      default_value: -111.90721
+    altitude:
+      type: double
+      default_value: 1412.0

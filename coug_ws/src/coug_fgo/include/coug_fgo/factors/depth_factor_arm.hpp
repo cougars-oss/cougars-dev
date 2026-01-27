@@ -41,9 +41,7 @@ namespace coug_fgo::factors
  */
 class CustomDepthFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
-  /// Measured Z in world frame.
   double measured_depth_;
-  /// Sensor pose in base frame.
   gtsam::Pose3 T_base_sensor_;
 
 public:

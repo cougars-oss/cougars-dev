@@ -42,11 +42,8 @@ namespace coug_fgo::factors
  */
 class CustomAHRSFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
-  /// Measured world-to-sensor rotation.
   gtsam::Rot3 measured_rot_sensor_;
-  /// Sensor rotation in base frame.
   gtsam::Rot3 R_base_sensor_;
-  /// Magnetic declination [rad].
   double mag_declination_;
 
 public:
