@@ -41,7 +41,7 @@ using coug_fgo::factors::CustomDepthFactorArm;
 using coug_fgo::factors::CustomDVLFactor;
 using coug_fgo::factors::CustomDVLPreintegratedFactor;
 using coug_fgo::factors::CustomGPSFactorArm;
-using coug_fgo::factors::AhrsFactor;
+using coug_fgo::factors::CustomAHRSFactor;
 using coug_fgo::factors::CustomMagFactorArm;
 using coug_fgo::utils::toGtsam;
 using coug_fgo::utils::toQuatMsg;
@@ -957,7 +957,7 @@ void FactorGraphNode::addAhrsFactor(
       gtsam::noiseModel::mEstimator::Tukey::Create(ahrs_params_.robust_k), ahrs_noise);
   }
 
-  graph.emplace_shared<AhrsFactor>(
+  graph.emplace_shared<CustomAHRSFactor>(
     X(current_step_), toGtsam(ahrs_msg->orientation),
     toGtsam(ahrs_to_dvl_tf_.transform.rotation),
     ahrs_params_.mag_declination_radians,

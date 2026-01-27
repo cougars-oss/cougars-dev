@@ -28,21 +28,22 @@
 #include "coug_fgo/factors/ahrs_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the AhrsFactor.
+ * @brief Test the error evaluation logic of the CustomAHRSFactor.
  *
- * Computes rotation residual: `error = measured_rot - (body_rot * calibration_rot)`.
+ * Verifies that the factor correctly accounts for the mounting rotation (offset)
+ * between the vehicle's body frame and the AHRS sensor frame.
  *
  * Cases tested:
  * 1.  **Identity**: Everything aligned. Zero error.
  * 2.  **Mounting Rotation**: Sensor rotated 90 deg relative to body.
  * 3.  **Error Magnitude**: Small angular error verification.
  */
-TEST(AhrsFactorTest, ErrorEvaluation) {
+TEST(CustomAHRSFactorTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
 
   // Case 1: Identity alignment
-  coug_fgo::factors::AhrsFactor factor1(poseKey, gtsam::Rot3::Identity(),
+  coug_fgo::factors::CustomAHRSFactor factor1(poseKey, gtsam::Rot3::Identity(),
     gtsam::Rot3::Identity(), 0.0, model);
   EXPECT_TRUE(
     gtsam::assert_equal(
@@ -50,7 +51,7 @@ TEST(AhrsFactorTest, ErrorEvaluation) {
       factor1.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
   // Case 2: Mounting Rotation (Sensor rotated 90 deg wrt Base)
-  coug_fgo::factors::AhrsFactor factor2(poseKey, gtsam::Rot3::Yaw(M_PI_2),
+  coug_fgo::factors::CustomAHRSFactor factor2(poseKey, gtsam::Rot3::Yaw(M_PI_2),
     gtsam::Rot3::Yaw(M_PI_2), 0.0, model);
   EXPECT_TRUE(
     gtsam::assert_equal(
@@ -65,19 +66,19 @@ TEST(AhrsFactorTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the AhrsFactor using numerical differentiation.
+ * @brief Verify Jacobians of the CustomAHRSFactor using numerical differentiation.
  *
  * Validates analytical derivatives for rotational error, ensuring proper handling of SE(3) manifolds.
  */
-TEST(AhrsFactorTest, Jacobians) {
-  coug_fgo::factors::AhrsFactor factor(gtsam::symbol_shorthand::X(1),
+TEST(CustomAHRSFactorTest, Jacobians) {
+  coug_fgo::factors::CustomAHRSFactor factor(gtsam::symbol_shorthand::X(1),
     gtsam::Rot3::Ypr(0.5, 0.1, -0.1),
     gtsam::Rot3::Ypr(0.1, 0, 0), 0.0, gtsam::noiseModel::Isotropic::Sigma(3, 0.1));
   gtsam::Pose3 pose = gtsam::Pose3(gtsam::Rot3::Ypr(0.4, 0.05, -0.05), gtsam::Point3(1, 1, 1));
 
   gtsam::Matrix expectedH = gtsam::numericalDerivative11<gtsam::Vector, gtsam::Pose3>(
     boost::bind(
-      &coug_fgo::factors::AhrsFactor::evaluateError, &factor,
+      &coug_fgo::factors::CustomAHRSFactor::evaluateError, &factor,
       boost::placeholders::_1, boost::none), pose, 1e-5);
 
   gtsam::Matrix actualH;

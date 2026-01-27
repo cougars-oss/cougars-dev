@@ -47,7 +47,7 @@ class CustomMagFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
   gtsam::Point3 measured_field_;
   /// Reference magnetic field vector in the world frame.
   gtsam::Point3 reference_field_;
-  /// Rotation from body/base frame to sensor frame (R_bs).
+  /// Sensor rotation in base frame.
   gtsam::Rot3 R_base_sensor_;
   /// Flag to constrain only the yaw angle (1D residual).
   bool constrain_yaw_only_;
@@ -77,22 +77,20 @@ public:
    * @brief Evaluates the error and Jacobians for the factor.
    * @param pose The AUV pose estimate.
    * @param H Optional Jacobian matrix.
-   * @return The error vector (3D vector or 1D yaw error).
+   * @return The 3D error vector (measured - predicted).
    */
   gtsam::Vector evaluateError(
     const gtsam::Pose3 & pose,
     boost::optional<gtsam::Matrix &> H = boost::none) const override
   {
-    // Unrotate reference from World to Body
+    // Predict the magnetic field in the sensor frame
     gtsam::Matrix3 H_unrotate;
     gtsam::Point3 b_body =
       pose.rotation().unrotate(reference_field_, H ? &H_unrotate : 0);
-
-    // Unrotate from Body to Sensor
     gtsam::Point3 b_sensor = R_base_sensor_.unrotate(b_body);
 
     if (constrain_yaw_only_) {
-      // 1D Residual (yaw)
+      // 1D yaw residual
       double yaw_pred = std::atan2(b_sensor.y(), b_sensor.x());
       double yaw_meas = std::atan2(measured_field_.y(), measured_field_.x());
 
@@ -127,7 +125,7 @@ public:
         *H = (gtsam::Matrix(3, 6) << H_rot, H_pos).finished();
       }
 
-      // Residual = predicted - measured
+      // 3D magnetic field residual
       return b_sensor - measured_field_;
     }
   }

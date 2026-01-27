@@ -4,11 +4,12 @@
 # Sets up a quick CoUGARs development environment
 #
 # Usage:
-#   ./compose.sh [down|up]
+#   ./compose.sh [down|up|command]
 #
 # Arguments:
 #   down: Stop the cougars-ct container
 #   up: Start the cougars-ct container (default)
+#   command: Any other arguments will be passed to the container (e.g. bash)
 
 set -e
 

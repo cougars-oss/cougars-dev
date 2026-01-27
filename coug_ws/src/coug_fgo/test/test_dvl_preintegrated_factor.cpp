@@ -38,7 +38,7 @@
  * 2.  **Correct Translation**: Standard translation check.
  * 3.  **Rotation + Translation**: Rotated frame check.
  */
-TEST(DVLPreintegratedFactorTest, ErrorEvaluation) {
+TEST(CustomDVLPreintegratedFactorTest, ErrorEvaluation) {
   gtsam::Key poseIKey = gtsam::symbol_shorthand::X(1);
   gtsam::Key poseJKey = gtsam::symbol_shorthand::X(2);
   gtsam::Vector3 measured_translation(1.0, 0.0, 0.0);
@@ -75,7 +75,7 @@ TEST(DVLPreintegratedFactorTest, ErrorEvaluation) {
  * Validates the derivatives with respect to both Pose `i` and Pose `j`, which is complex
  * due to the coupling of rotation at `i` with the relative translation.
  */
-TEST(DVLPreintegratedFactorTest, Jacobians) {
+TEST(CustomDVLPreintegratedFactorTest, Jacobians) {
   gtsam::Key poseIKey = gtsam::symbol_shorthand::X(1);
   gtsam::Key poseJKey = gtsam::symbol_shorthand::X(2);
   gtsam::Vector3 measured_translation(1.0, 0.5, -0.2);

@@ -40,25 +40,25 @@ namespace coug_fgo::factors
  * This factor constrains the 3D orientation of the AUV based on AHRS/IMU measurements,
  * accounting for the rotation between the AUV base and the sensor.
  */
-class AhrsFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
+class CustomAHRSFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
   /// Measured world-to-sensor rotation.
   gtsam::Rot3 measured_rot_sensor_;
-  /// Body-to-sensor rotation.
+  /// Sensor rotation in base frame.
   gtsam::Rot3 R_base_sensor_;
   /// Magnetic declination [rad].
   double mag_declination_;
 
 public:
   /**
-   * @brief Constructor for AhrsFactor.
+   * @brief Constructor for CustomAHRSFactor.
    * @param poseKey GTSAM key for the AUV pose.
    * @param measured_rot_sensor The measured orientation of the sensor in the world frame.
    * @param R_base_sensor The static rotation from base to sensor.
    * @param mag_declination Magnetic declination to add to the measurement [rad].
    * @param model The noise model for the measurement.
    */
-  AhrsFactor(
+  CustomAHRSFactor(
     gtsam::Key poseKey, const gtsam::Rot3 & measured_rot_sensor,
     const gtsam::Rot3 & R_base_sensor, double mag_declination,
     const gtsam::SharedNoiseModel & model)
@@ -71,7 +71,7 @@ public:
    * @brief Evaluates the error and Jacobians for the factor.
    * @param pose The AUV pose estimate.
    * @param H Optional Jacobian matrix.
-   * @return The 3D orientation residual vector.
+   * @return The 3D error vector (measured - predicted).
    */
   gtsam::Vector evaluateError(
     const gtsam::Pose3 & pose,
@@ -81,10 +81,10 @@ public:
     gtsam::Rot3 R_decl = gtsam::Rot3::Yaw(mag_declination_);
     gtsam::Rot3 measured_rot_sensor_true = R_decl * measured_rot_sensor_;
 
-    // Predict the base-frame rotation from the measurement
+    // Compute the measured base-frame orientation
     gtsam::Rot3 measured_rot_base = measured_rot_sensor_true * R_base_sensor_.inverse();
 
-    // Relative rotation error
+    // Rotation residual
     gtsam::Rot3 error_rot = measured_rot_base.inverse() * pose.rotation();
 
     // 3D orientation residual

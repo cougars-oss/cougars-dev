@@ -38,7 +38,7 @@
  * 2.  **Lever Arm Offset**: Antenna offset relative to body.
  * 3.  **Rotation + Lever Arm**: Body orientation affecting antenna position.
  */
-TEST(GPSFactorArmTest, ErrorEvaluation) {
+TEST(CustomGPSFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
 
@@ -71,7 +71,7 @@ TEST(GPSFactorArmTest, ErrorEvaluation) {
  * Validates the derivatives, ensuring correct optimization when both translation
  * and rotation (due to lever arm) are involved.
  */
-TEST(GPSFactorArmTest, Jacobians) {
+TEST(CustomGPSFactorArmTest, Jacobians) {
   coug_fgo::factors::CustomGPSFactorArm factor(gtsam::symbol_shorthand::X(1),
     gtsam::Point3(5, 5, 5),
     gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(0.2, -0.1, 0.5)),

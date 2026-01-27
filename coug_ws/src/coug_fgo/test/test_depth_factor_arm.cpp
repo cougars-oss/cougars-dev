@@ -37,7 +37,7 @@
  * 2.  **Lever Arm Offset**: Depth sensor vertically offset.
  * 3.  **Rotation + Lever Arm**: AUV orientation affecting sensor depth.
  */
-TEST(DepthFactorArmTest, ErrorEvaluation) {
+TEST(CustomDepthFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(1, 0.1);
 
@@ -83,7 +83,7 @@ TEST(DepthFactorArmTest, ErrorEvaluation) {
  * matches the numerical derivative of the error function. This is critical for
  * correct convergence of the factor graph.
  */
-TEST(DepthFactorArmTest, Jacobians) {
+TEST(CustomDepthFactorArmTest, Jacobians) {
   coug_fgo::factors::CustomDepthFactorArm factor(gtsam::symbol_shorthand::X(1), 5.0,
     gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(0.5, 0.5, 0.5)),
     gtsam::noiseModel::Isotropic::Sigma(1, 0.1));

@@ -38,7 +38,7 @@
  * 2.  **90-degree Yaw**: Body frame rotated 90 deg.
  * 3.  **Error Check**: Verifies non-zero error.
  */
-TEST(DVLFactorTest, ErrorEvaluation) {
+TEST(CustomDVLFactorTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::Key velKey = gtsam::symbol_shorthand::V(1);
   gtsam::Vector3 measured_vel(1.0, 0.0, 0.0);
@@ -72,7 +72,7 @@ TEST(DVLFactorTest, ErrorEvaluation) {
  * 1.  **Pose** (orientation affects the world-to-body projection).
  * 2.  **Velocity** (linear relationship).
  */
-TEST(DVLFactorTest, Jacobians) {
+TEST(CustomDVLFactorTest, Jacobians) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::Key velKey = gtsam::symbol_shorthand::V(1);
   coug_fgo::factors::CustomDVLFactor factor(poseKey, velKey, gtsam::Vector3(1.0, 0.5, -0.2),

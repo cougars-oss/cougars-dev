@@ -30,7 +30,8 @@
 /**
  * @brief Test the error evaluation logic of the CustomMagFactorArm.
  *
- * Computes magnetic field residual: `error = measured_field - (body_rot * calibration_rot).unrotate(reference_field)`.
+ * Verifies that the factor correctly accounts for the mounting rotation (offset)
+ * between the vehicle's body frame and the magnetometer frame.
  *
  * Cases tested:
  * 1.  **Identity**: Everything aligned. Zero error.
@@ -38,7 +39,7 @@
  * 3.  **Non-zero Error**: Small perturbation yields expected residual.
  * 4.  **Mounting Rotation**: Sensor mounted with 90 deg offset.
  */
-TEST(MagFactorArmTest, ErrorEvaluation) {
+TEST(CustomMagFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
   gtsam::Vector3 reference_field(1.0, 0.0, 0.0);
@@ -79,7 +80,7 @@ TEST(MagFactorArmTest, ErrorEvaluation) {
 /**
  * @brief Test the error evaluation logic of the CustomMagFactorArm (Yaw Only).
  *
- * Computes yaw residual: `error = yaw_measured - yaw_predicted` (wrapped).
+ * Verifies that the factor correctly accounts for yaw differences, wrapping angles appropriately.
  *
  * Cases tested:
  * 1.  **Identity**: Everything aligned. Zero error.
@@ -89,7 +90,7 @@ TEST(MagFactorArmTest, ErrorEvaluation) {
  * 5.  **Ignore Dip/Mag**: Measurement matches Yaw but differs in Dip/Mag.
  * 6.  **Yaw Error**: Identity pose but measurement rotated 90 deg.
  */
-TEST(MagFactorArmTest, ErrorEvaluationYawOnly) {
+TEST(CustomMagFactorArmTest, ErrorEvaluationYawOnly) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(1, 0.1);
   gtsam::Vector3 ref(1.0, 0.0, 0.0);
@@ -150,7 +151,7 @@ TEST(MagFactorArmTest, ErrorEvaluationYawOnly) {
  *
  * Validates analytical derivatives for magnetic field error, ensuring proper handling of SE(3) manifolds.
  */
-TEST(MagFactorArmTest, Jacobians) {
+TEST(CustomMagFactorArmTest, Jacobians) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::Vector3 reference_field(0.5, 0.8, -0.2);
   gtsam::Vector3 measured_field(0.4, 0.7, -0.1);
@@ -176,7 +177,7 @@ TEST(MagFactorArmTest, Jacobians) {
  *
  * Validates analytical derivatives for yaw error, ensuring proper handling of SE(3) manifolds.
  */
-TEST(MagFactorArmTest, JacobiansYawOnly) {
+TEST(CustomMagFactorArmTest, JacobiansYawOnly) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::Vector3 reference_field(0.5, 0.8, -0.2);
   gtsam::Vector3 measured_field(0.4, 0.7, -0.1);

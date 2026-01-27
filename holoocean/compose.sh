@@ -4,13 +4,14 @@
 # Launches the configured scenario in HoloOcean
 #
 # Usage:
-#   ./holoocean/compose.sh [down|up] [-b] [-m]
+#   ./holoocean/compose.sh [down|up|command] [-b] [-m]
 #
 # Arguments:
 #   down: Stop the holoocean-ct container
 #   up: Start the holoocean-ct container (default)
 #   -b: Launch the BlueROV2 scenario
 #   -m: Launch the multi-CougUV scenario
+#   command: Any other arguments will be passed to the container (e.g. bash)
 
 set -e
 
