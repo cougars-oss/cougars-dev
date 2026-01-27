@@ -90,6 +90,16 @@ def generate_launch_description():
         ]
     )
 
+    truth_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/truth_link' if '",
+            auv_ns,
+            "' != '' else 'truth_link'",
+        ]
+    )
+
     agent_name = PythonExpression(
         ["'", auv_ns, "' if '", auv_ns, "' != '' else 'auv0'"]
     )
@@ -176,7 +186,8 @@ def generate_launch_description():
                     params_file,
                     {
                         "use_sim_time": use_sim_time,
-                        "com_frame": com_link_frame,
+                        # Fix for HoloOcean offset bug
+                        "com_frame": truth_link_frame,
                         "base_frame": base_link_frame,
                         "map_frame": "map",
                     },

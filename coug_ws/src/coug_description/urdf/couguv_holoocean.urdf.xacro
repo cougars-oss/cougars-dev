@@ -141,7 +141,7 @@
   <joint name="com_joint" type="fixed">
     <parent link="base_link"/>
     <child link="com_link"/>
-    <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
   <link name="com_link"/>
   
@@ -176,5 +176,13 @@
     <origin xyz="0.475 0 -0.035" rpy="${pi} 0 0"/>
   </joint>
   <link name="dvl_link"/>
+
+  <!-- TODO: Fix this in HoloOcean -->
+  <joint name="truth_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="truth_link"/>
+    <origin xyz="-0.1 0 -0.1" rpy="0 0 0"/>
+  </joint>
+  <link name="truth_link"/>
 
 </robot>

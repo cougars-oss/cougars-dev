@@ -72,12 +72,19 @@
   </joint>
   <link name="sonar_link"/>
 
-  <!-- Fix for matching CougUV URDF -->
+  <!-- Fixes for matching CougUV URDF -->
   <joint name="modem_joint" type="fixed">
     <parent link="com_link"/>
     <child link="modem_link"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
   <link name="modem_link"/>
+
+  <joint name="truth_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="truth_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  <link name="truth_link"/>
 
 </robot>
