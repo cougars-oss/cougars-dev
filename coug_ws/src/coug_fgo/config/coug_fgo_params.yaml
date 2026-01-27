@@ -134,7 +134,7 @@
   ros__parameters:
     # --- Node Settings ---
     origin_pub_rate: 1.0 # [Hz] Rate at which to publish the GPS origin.
-    initialization_duration: 10.0 # [s] Time duration to average GPS data before setting origin.
+    initialization_duration: 0.0 # [s] Time duration to average GPS data before setting origin.
 
     simulate_dropout: false
     dropout_frequency: 0.0333 # [Hz] Frequency of the dropout cycle (1/30).
@@ -179,19 +179,17 @@
 
     imu:
       use_parameter_frame: true
-      parameter_frame: "bluerov2/imu_link"
 
     depth:
       use_parameter_frame: true
-      parameter_frame: "bluerov2/imu_link"
+
+    mag:
+      use_parameter_frame: true
 
     ahrs:
       enable_ahrs: false
       use_parameter_frame: true
-      parameter_frame: "bluerov2/imu_link"
       mag_declination_radians: 0.1876
 
-    initialization_duration: 0.0
     use_parameter_child_frame: true
-    parameter_child_frame: "bluerov2/gps_link"
     use_parameter_origin: false

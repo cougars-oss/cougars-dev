@@ -84,14 +84,18 @@ public:
   };
 
 private:
+  // --- Main Logic ---
   /**
    * @brief Initializes the factor graph using averaged sensor data or parameters.
    */
   void initializeGraph();
+
   /**
    * @brief Main optimization loop; adds factors to the graph and invokes the smoother.
    */
   void optimizeGraph();
+
+  // --- Setup & Helpers ---
   /**
    * @brief Initializes publishers, subscribers, and timers.
    */
@@ -131,18 +135,21 @@ private:
    * @return The initial GTSAM rotation.
    */
   gtsam::Rot3 computeInitialOrientation();
+
   /**
    * @brief Computes initial position using GPS and depth sensor.
    * @param initial_orientation The previously computed initial orientation.
    * @return The initial GTSAM translation.
    */
   gtsam::Point3 computeInitialPosition(const gtsam::Rot3 & initial_orientation);
+
   /**
    * @brief Computes initial velocity using DVL measurements.
    * @param initial_orientation The previously computed initial orientation.
    * @return The initial GTSAM velocity.
    */
   gtsam::Vector3 computeInitialVelocity(const gtsam::Rot3 & initial_orientation);
+
   /**
    * @brief Computes initial IMU biases from averaged data or parameters.
    * @return The initial GTSAM bias estimate.
@@ -156,6 +163,7 @@ private:
    * @param values The initial value estimates.
    */
   void addPriorFactors(gtsam::NonlinearFactorGraph & graph, gtsam::Values & values);
+
   /**
    * @brief Adds a GPS position factor to the graph.
    * @param graph The target factor graph.
@@ -164,6 +172,7 @@ private:
   void addGpsFactor(
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<nav_msgs::msg::Odometry::SharedPtr> & gps_msgs);
+
   /**
    * @brief Adds a depth (Z) factor to the graph.
    * @param graph The target factor graph.
@@ -172,6 +181,7 @@ private:
   void addDepthFactor(
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<nav_msgs::msg::Odometry::SharedPtr> & depth_msgs);
+
   /**
    * @brief Adds a magnetic orientation factor to the graph.
    * @param graph The target factor graph.
@@ -180,6 +190,7 @@ private:
   void addMagFactor(
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<sensor_msgs::msg::MagneticField::SharedPtr> & mag_msgs);
+
   /**
    * @brief Adds a AHRS orientation factor to the graph.
    * @param graph The target factor graph.
@@ -188,6 +199,7 @@ private:
   void addAhrsFactor(
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<sensor_msgs::msg::Imu::SharedPtr> & ahrs_msgs);
+
   /**
    * @brief Adds a velocity (DVL) factor to the graph.
    * @param graph The target factor graph.
@@ -196,6 +208,7 @@ private:
   void addDvlFactor(
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> & dvl_msgs);
+
   /**
    * @brief Integrates and adds a combined IMU factor to the graph.
    * @param graph The target factor graph.
@@ -206,6 +219,7 @@ private:
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<sensor_msgs::msg::Imu::SharedPtr> & imu_msgs,
     double target_time);
+
   /**
    * @brief Interpolates orientation between IMU messages.
    * @param imu_msgs IMU message history.
@@ -214,6 +228,7 @@ private:
    */
   gtsam::Rot3 getInterpolatedOrientation(
     const std::deque<sensor_msgs::msg::Imu::SharedPtr> & imu_msgs, double target_time);
+
   /**
    * @brief [EXPERIMENTAL] Adds a preintegrated DVL translation factor.
    * @param graph The target factor graph.
@@ -236,18 +251,21 @@ private:
   void publishGlobalOdom(
     const gtsam::Pose3 & current_pose, const gtsam::Matrix & pose_covariance,
     const rclcpp::Time & timestamp);
+
   /**
    * @brief Broadcasts the map-to-odom transform.
    * @param current_pose The estimated pose.
    * @param timestamp The transform timestamp.
    */
   void broadcastGlobalTf(const gtsam::Pose3 & current_pose, const rclcpp::Time & timestamp);
+
   /**
    * @brief Publishes the full optimized trajectory path.
    * @param results The final optimized values.
    * @param timestamp The path timestamp.
    */
   void publishSmoothedPath(const gtsam::Values & results, const rclcpp::Time & timestamp);
+
   /**
    * @brief Publishes the optimized body-frame velocity.
    * @param current_vel The estimated velocity.
@@ -257,6 +275,7 @@ private:
   void publishVelocity(
     const gtsam::Vector3 & current_vel, const gtsam::Matrix & vel_covariance,
     const rclcpp::Time & timestamp);
+
   /**
    * @brief Publishes the optimized IMU biases.
    * @param current_imu_bias The estimated biases.

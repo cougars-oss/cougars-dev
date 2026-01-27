@@ -16,7 +16,7 @@ navsat_preprocessor_node:
     default_value: "/origin"
   initialization_duration:
     type: double
-    default_value: 10.0
+    default_value: 0.0
   
   simulate_dropout:
     type: bool

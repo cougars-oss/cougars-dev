@@ -44,45 +44,45 @@ def generate_launch_description():
         ]
     )
 
-    # gps_link_frame = PythonExpression(
-    #     [
-    #         "'",
-    #         auv_ns,
-    #         "/gps_link' if '",
-    #         auv_ns,
-    #         "' != '' else 'gps_link'",
-    #     ]
-    # )
+    gps_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/gps_link' if '",
+            auv_ns,
+            "' != '' else 'gps_link'",
+        ]
+    )
 
-    # imu_link_frame = PythonExpression(
-    #     [
-    #         "'",
-    #         auv_ns,
-    #         "/imu_link' if '",
-    #         auv_ns,
-    #         "' != '' else 'imu_link'",
-    #     ]
-    # )
+    imu_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/imu_link' if '",
+            auv_ns,
+            "' != '' else 'imu_link'",
+        ]
+    )
 
-    # dvl_link_frame = PythonExpression(
-    #     [
-    #         "'",
-    #         auv_ns,
-    #         "/dvl_link' if '",
-    #         auv_ns,
-    #         "' != '' else 'dvl_link'",
-    #     ]
-    # )
+    dvl_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/dvl_link' if '",
+            auv_ns,
+            "' != '' else 'dvl_link'",
+        ]
+    )
 
-    # depth_link_frame = PythonExpression(
-    #     [
-    #         "'",
-    #         auv_ns,
-    #         "/depth_link' if '",
-    #         auv_ns,
-    #         "' != '' else 'depth_link'",
-    #     ]
-    # )
+    depth_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/depth_link' if '",
+            auv_ns,
+            "' != '' else 'depth_link'",
+        ]
+    )
 
     # com_link_frame = PythonExpression(
     #     [
@@ -139,12 +139,12 @@ def generate_launch_description():
                         "map_frame": "map",
                         "odom_frame": odom_frame,
                         "base_frame": base_link_frame,
-                        # "imu.parameter_frame": imu_link_frame,
-                        # "dvl.parameter_frame": dvl_link_frame,
-                        # "depth.parameter_frame": depth_link_frame,
-                        # "gps.parameter_frame": com_link_frame,
-                        # "mag.parameter_frame": imu_link_frame,
-                        # "ahrs.parameter_frame": modem_link_frame,
+                        "imu.parameter_frame": imu_link_frame,
+                        "dvl.parameter_frame": dvl_link_frame,
+                        "depth.parameter_frame": depth_link_frame,
+                        "gps.parameter_frame": gps_link_frame,
+                        "mag.parameter_frame": imu_link_frame,
+                        "ahrs.parameter_frame": imu_link_frame,
                     },
                 ],
             ),
@@ -161,12 +161,12 @@ def generate_launch_description():
                         "map_frame": "map",
                         "odom_frame": odom_frame,
                         "base_frame": base_link_frame,
-                        # "imu.parameter_frame": imu_link_frame,
-                        # "dvl.parameter_frame": dvl_link_frame,
-                        # "depth.parameter_frame": depth_link_frame,
-                        # "gps.parameter_frame": com_link_frame,
-                        # "mag.parameter_frame": imu_link_frame,
-                        # "ahrs.parameter_frame": modem_link_frame,
+                        "imu.parameter_frame": imu_link_frame,
+                        "dvl.parameter_frame": dvl_link_frame,
+                        "depth.parameter_frame": depth_link_frame,
+                        "gps.parameter_frame": gps_link_frame,
+                        "mag.parameter_frame": imu_link_frame,
+                        "ahrs.parameter_frame": imu_link_frame,
                         "global_odom_topic": "odometry/global_tm",
                         "smoothed_path_topic": "smoothed_path_tm",
                         "publish_global_tf": False,
@@ -184,7 +184,7 @@ def generate_launch_description():
                         "use_sim_time": use_sim_time,
                         "map_frame": "map",
                         "set_origin": set_origin,
-                        # "parameter_child_frame": gps_link_frame,
+                        "parameter_child_frame": gps_link_frame,
                     },
                 ],
             ),
