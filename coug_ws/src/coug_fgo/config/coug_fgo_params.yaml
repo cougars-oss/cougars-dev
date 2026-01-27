@@ -181,11 +181,6 @@
       use_parameter_frame: true
       parameter_frame: "bluerov2/imu_link"
 
-    gps:
-      # enable_gps: true
-      use_parameter_frame: true
-      parameter_frame: "bluerov2/gps_link"
-
     depth:
       use_parameter_frame: true
       parameter_frame: "bluerov2/imu_link"
@@ -195,10 +190,6 @@
       use_parameter_frame: true
       parameter_frame: "bluerov2/imu_link"
       mag_declination_radians: 0.1876
-
-    dvl:
-      use_parameter_frame: true
-      parameter_frame: "bluerov2/dvl_link"
 
     initialization_duration: 0.0
     use_parameter_child_frame: true
