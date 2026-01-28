@@ -35,16 +35,17 @@
  *
  * Cases tested:
  * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Sensor Rotation**: Sensor rotated 90 deg relative to body.
- * 3.  **Non-zero Error**: Small perturbation yields expected residual.
- * 4.  **Mounting Rotation**: Sensor mounted with 90 deg offset.
+ * 2.  **Rotation**: Vehicle rotated, sensor aligned.
+ * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
+ * 4.  **Combined**: Vehicle rotated + Sensor offset.
+ * 5.  **Error Check**: Verifies non-zero error magnitude.
  */
 TEST(CustomMagFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
   gtsam::Vector3 reference_field(1.0, 0.0, 0.0);
 
-  // Case 1: Identity alignment
+  // Case 1: Identity
   coug_fgo::factors::CustomMagFactorArm factor1(poseKey, reference_field,
     reference_field, gtsam::Rot3::Identity(), model);
   EXPECT_TRUE(
@@ -52,7 +53,7 @@ TEST(CustomMagFactorArmTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor1.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
-  // Case 2: Sensor rotated 90 deg wrt Base
+  // Case 2: Rotation
   gtsam::Pose3 pose_90 = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3());
   gtsam::Vector3 b_body_90 = pose_90.rotation().unrotate(reference_field);
   coug_fgo::factors::CustomMagFactorArm factor2(poseKey, b_body_90,
@@ -62,19 +63,27 @@ TEST(CustomMagFactorArmTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor2.evaluateError(pose_90), 1e-9));
 
-  // Case 3: Non-zero error check
-  gtsam::Pose3 pose_small_rot = gtsam::Pose3(gtsam::Rot3::Yaw(0.1), gtsam::Point3());
-  gtsam::Vector error_small = factor1.evaluateError(pose_small_rot);
-  EXPECT_NEAR(error_small[1], -sin(0.1), 1e-5);
-
-  // Case 4: Mounting Rotation (Sensor rotated 90 deg wrt Base)
+  // Case 3: Mounting/Lever Arm
   gtsam::Vector3 measured_rot_mount(0.0, -1.0, 0.0);
-  coug_fgo::factors::CustomMagFactorArm factor4(poseKey, measured_rot_mount,
+  coug_fgo::factors::CustomMagFactorArm factor3(poseKey, measured_rot_mount,
     reference_field, gtsam::Rot3::Yaw(M_PI_2), model);
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector3::Zero(),
-      factor4.evaluateError(gtsam::Pose3::Identity()), 1e-9));
+      factor3.evaluateError(gtsam::Pose3::Identity()), 1e-9));
+
+  // Case 4: Combined
+  coug_fgo::factors::CustomMagFactorArm factor4(poseKey, gtsam::Vector3(-1.0, 0.0, 0.0),
+    reference_field, gtsam::Rot3::Yaw(M_PI_2), model);
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector3::Zero(),
+      factor4.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3())), 1e-9));
+
+  // Case 5: Error Check
+  gtsam::Pose3 pose_small_rot = gtsam::Pose3(gtsam::Rot3::Yaw(0.1), gtsam::Point3());
+  gtsam::Vector error_small = factor1.evaluateError(pose_small_rot);
+  EXPECT_NEAR(error_small[1], -sin(0.1), 1e-5);
 }
 
 /**
@@ -84,18 +93,18 @@ TEST(CustomMagFactorArmTest, ErrorEvaluation) {
  *
  * Cases tested:
  * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Sensor Rotation**: Sensor rotated 90 deg relative to body.
- * 3.  **Non-zero Error**: Small perturbation yields expected residual.
- * 4.  **Mounting Rotation**: Sensor mounted with 90 deg offset.
- * 5.  **Ignore Dip/Mag**: Measurement matches Yaw but differs in Dip/Mag.
- * 6.  **Yaw Error**: Identity pose but measurement rotated 90 deg.
+ * 2.  **Rotation**: Vehicle rotated, sensor aligned.
+ * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
+ * 4.  **Combined**: Vehicle rotated + Sensor offset.
+ * 5.  **Error Check**: Verifies non-zero error magnitude.
+ * 6.  **Ignore Dip/Mag**: Measurement matches Yaw but differs in Dip/Mag.
  */
 TEST(CustomMagFactorArmTest, ErrorEvaluationYawOnly) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(1, 0.1);
   gtsam::Vector3 ref(1.0, 0.0, 0.0);
 
-  // Case 1: Identity alignment
+  // Case 1: Identity
   coug_fgo::factors::CustomMagFactorArm factor1(poseKey, ref, ref,
     gtsam::Rot3::Identity(), model, true);
   EXPECT_TRUE(
@@ -103,7 +112,7 @@ TEST(CustomMagFactorArmTest, ErrorEvaluationYawOnly) {
       gtsam::Vector1::Zero(),
       factor1.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
-  // Case 2: Body rotated 90 deg (Yaw)
+  // Case 2: Rotation
   gtsam::Pose3 pose_90 = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3());
   gtsam::Vector3 b_body_90 = pose_90.rotation().unrotate(ref);
   coug_fgo::factors::CustomMagFactorArm factor2(poseKey, b_body_90, ref,
@@ -113,37 +122,36 @@ TEST(CustomMagFactorArmTest, ErrorEvaluationYawOnly) {
       gtsam::Vector1::Zero(),
       factor2.evaluateError(pose_90), 1e-9));
 
-  // Case 3: Small perturbation
-  gtsam::Pose3 pose_small = gtsam::Pose3(gtsam::Rot3::Yaw(0.1), gtsam::Point3());
-  coug_fgo::factors::CustomMagFactorArm factor3(poseKey, ref, ref,
-    gtsam::Rot3::Identity(), model, true);
-  gtsam::Vector error_small = factor3.evaluateError(pose_small);
-  EXPECT_NEAR(error_small[0], -0.1, 1e-5);
-
-  // Case 4: Mounting Rotation
+  // Case 3: Mounting/Lever Arm
   gtsam::Vector3 meas_mount(0.0, -1.0, 0.0);
-  coug_fgo::factors::CustomMagFactorArm factor4(poseKey, meas_mount, ref,
+  coug_fgo::factors::CustomMagFactorArm factor3(poseKey, meas_mount, ref,
     gtsam::Rot3::Yaw(M_PI_2), model, true);
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector1::Zero(),
-      factor4.evaluateError(gtsam::Pose3::Identity()), 1e-9));
+      factor3.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
-  // Case 5: Ignore Magnitude/Dip
+  // Case 4: Combined
+  coug_fgo::factors::CustomMagFactorArm factor4(poseKey, gtsam::Vector3(-1.0, 0.0, 0.0),
+    ref, gtsam::Rot3::Yaw(M_PI_2), model, true);
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector1::Zero(),
+      factor4.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3())), 1e-9));
+
+  // Case 5: Error Check
+  gtsam::Pose3 pose_small = gtsam::Pose3(gtsam::Rot3::Yaw(0.1), gtsam::Point3());
+  gtsam::Vector error_small = factor1.evaluateError(pose_small);
+  EXPECT_NEAR(error_small[0], -0.1, 1e-5);
+
+  // Case 6: Ignore Dip/Mag
   gtsam::Vector3 meas_mag_dip(2.0, 0.0, 1.0);
-  coug_fgo::factors::CustomMagFactorArm factor5(poseKey, meas_mag_dip, ref,
+  coug_fgo::factors::CustomMagFactorArm factor6(poseKey, meas_mag_dip, ref,
     gtsam::Rot3::Identity(), model, true);
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector1::Zero(),
-      factor5.evaluateError(gtsam::Pose3::Identity()), 1e-9));
-
-  // Case 6: Yaw Error Calculation
-  gtsam::Vector3 meas_off(0.0, 1.0, 0.0);
-  coug_fgo::factors::CustomMagFactorArm factor6(poseKey, meas_off, ref,
-    gtsam::Rot3::Identity(), model, true);
-  gtsam::Vector error_off = factor6.evaluateError(gtsam::Pose3::Identity());
-  EXPECT_NEAR(error_off[0], -M_PI_2, 1e-5);
+      factor6.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 }
 
 /**

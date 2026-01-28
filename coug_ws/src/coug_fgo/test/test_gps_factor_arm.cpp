@@ -34,15 +34,17 @@
  * the vehicle's body origin (Pose) and the GPS antenna location.
  *
  * Cases tested:
- * 1.  **No Lever Arm**: Simple position match.
- * 2.  **Lever Arm Offset**: Antenna offset relative to body.
- * 3.  **Rotation + Lever Arm**: Body orientation affecting antenna position.
+ * 1.  **Identity**: Everything aligned. Zero error.
+ * 2.  **Rotation**: Vehicle rotated, sensor aligned.
+ * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
+ * 4.  **Combined**: Vehicle rotated + Sensor offset.
+ * 5.  **Error Check**: Verifies non-zero error magnitude.
  */
 TEST(CustomGPSFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
 
-  // Case 1: No Lever Arm
+  // Case 1: Identity
   coug_fgo::factors::CustomGPSFactorArm factor1(poseKey, gtsam::Point3(1, 2, 3),
     gtsam::Pose3::Identity(), model);
   EXPECT_TRUE(
@@ -50,7 +52,13 @@ TEST(CustomGPSFactorArmTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor1.evaluateError(gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(1, 2, 3))), 1e-9));
 
-  // Case 2: Lever Arm (1, 0, 0)
+  // Case 2: Rotation
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector3::Zero(),
+      factor1.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3(1, 2, 3))), 1e-9));
+
+  // Case 3: Mounting/Lever Arm
   coug_fgo::factors::CustomGPSFactorArm factor2(poseKey, gtsam::Point3(1, 2, 3),
     gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(1, 0, 0)), model);
   EXPECT_TRUE(
@@ -58,11 +66,17 @@ TEST(CustomGPSFactorArmTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor2.evaluateError(gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(0, 2, 3))), 1e-9));
 
-  // Case 3: 90 deg yaw with Lever Arm
+  // Case 4: Combined
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector3::Zero(),
       factor2.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3(1, 1, 3))), 1e-9));
+
+  // Case 5: Error Check
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector3(0, 0, 1),
+      factor1.evaluateError(gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(1, 2, 4))), 1e-9));
 }
 
 /**

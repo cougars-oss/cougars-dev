@@ -34,9 +34,9 @@
  * and the estimated velocity (converted from world to body frame via pose orientation).
  *
  * Cases tested:
- * 1.  **Identity Pose**: Body frame aligns with World frame.
- * 2.  **90-degree Yaw**: Body frame rotated 90 deg.
- * 3.  **Error Check**: Verifies non-zero error.
+ * 1.  **Identity**: Everything aligned. Zero error.
+ * 2.  **Rotation**: Vehicle rotated, sensor aligned.
+ * 3.  **Error Check**: Verifies non-zero error magnitude.
  */
 TEST(CustomDVLFactorTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
@@ -45,13 +45,13 @@ TEST(CustomDVLFactorTest, ErrorEvaluation) {
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
   coug_fgo::factors::CustomDVLFactor factor(poseKey, velKey, measured_vel, model);
 
-  // Case 1: Identity Pose
+  // Case 1: Identity
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector3::Zero(),
       factor.evaluateError(gtsam::Pose3::Identity(), gtsam::Vector3(1, 0, 0)), 1e-9));
 
-  // Case 2: 90-degree Yaw
+  // Case 2: Rotation
   gtsam::Pose3 pose = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3(0, 0, 0));
   EXPECT_TRUE(
     gtsam::assert_equal(

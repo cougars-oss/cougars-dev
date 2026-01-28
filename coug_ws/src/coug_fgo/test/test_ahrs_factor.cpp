@@ -35,14 +35,16 @@
  *
  * Cases tested:
  * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Mounting Rotation**: Sensor rotated 90 deg relative to body.
- * 3.  **Error Magnitude**: Small angular error verification.
+ * 2.  **Rotation**: Vehicle rotated, sensor aligned.
+ * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
+ * 4.  **Combined**: Vehicle rotated + Sensor offset.
+ * 5.  **Error Check**: Verifies non-zero error magnitude.
  */
 TEST(CustomAHRSFactorTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
 
-  // Case 1: Identity alignment
+  // Case 1: Identity
   coug_fgo::factors::CustomAHRSFactor factor1(poseKey, gtsam::Rot3::Identity(),
     gtsam::Rot3::Identity(), 0.0, model);
   EXPECT_TRUE(
@@ -50,7 +52,16 @@ TEST(CustomAHRSFactorTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor1.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
-  // Case 2: Mounting Rotation (Sensor rotated 90 deg wrt Base)
+  // Case 2: Rotation
+  gtsam::Pose3 pose_rot = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3());
+  coug_fgo::factors::CustomAHRSFactor factor_rot(poseKey, gtsam::Rot3::Yaw(M_PI_2),
+    gtsam::Rot3::Identity(), 0.0, model);
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector3::Zero(),
+      factor_rot.evaluateError(pose_rot), 1e-9));
+
+  // Case 3: Mounting/Lever Arm
   coug_fgo::factors::CustomAHRSFactor factor2(poseKey, gtsam::Rot3::Yaw(M_PI_2),
     gtsam::Rot3::Yaw(M_PI_2), 0.0, model);
   EXPECT_TRUE(
@@ -58,7 +69,15 @@ TEST(CustomAHRSFactorTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor2.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
-  // Case 3: Error Magnitude check (10 deg)
+  // Case 4: Combined
+  coug_fgo::factors::CustomAHRSFactor factor_comb(poseKey, gtsam::Rot3::Yaw(M_PI),
+    gtsam::Rot3::Yaw(M_PI_2), 0.0, model);
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector3::Zero(),
+      factor_comb.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3())), 1e-9));
+
+  // Case 5: Error Check
   double angle = 0.174533;
   gtsam::Vector error =
     factor2.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(angle), gtsam::Point3()));

@@ -38,7 +38,8 @@ protected:
 /**
  * @brief Verify initialization state.
  *
- * Ensures that a fresh integrator starts with zero delta (displacement) and zero covariance.
+ * Cases tested:
+ * 1.  **Identity**: Initial state check.
  */
 TEST_F(DVLPreintegratorTest, Initialization) {
   EXPECT_TRUE(integrator.delta().isZero());
@@ -48,7 +49,8 @@ TEST_F(DVLPreintegratorTest, Initialization) {
 /**
  * @brief Verify integration of stationary measurements.
  *
- * Integrating zero velocity over time should result in zero accumulated displacement.
+ * Cases tested:
+ * 1.  **Zero Velocity**: Integration of zero vector.
  */
 TEST_F(DVLPreintegratorTest, StationaryIntegration) {
   gtsam::Vector3 vel(0, 0, 0);
@@ -60,9 +62,10 @@ TEST_F(DVLPreintegratorTest, StationaryIntegration) {
 }
 
 /**
- * @brief Verify constant velocity integration (Dead Reckoning).
+ * @brief Verify constant velocity integration.
  *
- * Integrating 1.0 m/s for 1.0 second (10 * 0.1s) should result in exactly 1.0 meter displacement.
+ * Cases tested:
+ * 1.  **Constant Velocity**: Dead reckoning check.
  */
 TEST_F(DVLPreintegratorTest, ConstantVelocityX) {
   gtsam::Vector3 vel(1.0, 0, 0);
@@ -79,11 +82,10 @@ TEST_F(DVLPreintegratorTest, ConstantVelocityX) {
 /**
  * @brief Verify integration with orientation changes.
  *
- * A sensor moving in Body-X, but rotated 90 degrees (Yaw), should accumulate
- * displacement in the Global-Y axis.
+ * Cases tested:
+ * 1.  **Rotated Integration**: Integration in rotated frame.
  */
 TEST_F(DVLPreintegratorTest, RotatedIntegration) {
-  // Moving 1 m/s in body X, but body is rotated 90 deg around Z -> Global motion in Y
   gtsam::Vector3 vel(1.0, 0, 0);
   gtsam::Rot3 orient = gtsam::Rot3::Yaw(M_PI_2);
 
@@ -97,8 +99,8 @@ TEST_F(DVLPreintegratorTest, RotatedIntegration) {
 /**
  * @brief Verify reset functionality.
  *
- * After integration, calling `reset()` should return the integrator to its
- * original zeroed state.
+ * Cases tested:
+ * 1.  **Reset**: Check state clearing.
  */
 TEST_F(DVLPreintegratorTest, Reset) {
   integrator.integrateMeasurement(gtsam::Vector3(1, 0, 0), gtsam::Rot3(), 1.0, measured_cov);

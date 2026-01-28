@@ -34,9 +34,10 @@
  * nodes `i` and `j` to the preintegrated DVL measurement.
  *
  * Cases tested:
- * 1.  **Identity Poses**: Identity alignment check.
+ * 1.  **Identity**: Everything aligned. Zero error.
  * 2.  **Correct Translation**: Standard translation check.
  * 3.  **Rotation + Translation**: Rotated frame check.
+ * 4.  **Error Check**: Verifies non-zero error magnitude.
  */
 TEST(CustomDVLPreintegratedFactorTest, ErrorEvaluation) {
   gtsam::Key poseIKey = gtsam::symbol_shorthand::X(1);
@@ -46,13 +47,13 @@ TEST(CustomDVLPreintegratedFactorTest, ErrorEvaluation) {
   coug_fgo::factors::CustomDVLPreintegratedFactor factor(
     poseIKey, poseJKey, measured_translation, model);
 
-  // Case 1: Identity Poses
+  // Case 1: Identity
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector3(-1, 0, 0),
       factor.evaluateError(gtsam::Pose3::Identity(), gtsam::Pose3::Identity()), 1e-9));
 
-  // Case 2: One frame translation
+  // Case 2: Correct Translation
   gtsam::Pose3 pose_i = gtsam::Pose3::Identity();
   gtsam::Pose3 pose_j = gtsam::Pose3(gtsam::Rot3::Identity(), gtsam::Point3(1, 0, 0));
   EXPECT_TRUE(
@@ -60,13 +61,19 @@ TEST(CustomDVLPreintegratedFactorTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor.evaluateError(pose_i, pose_j), 1e-9));
 
-  // Case 3: 90 deg yaw
+  // Case 3: Rotation + Translation
   pose_i = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3(0, 0, 0));
   pose_j = gtsam::Pose3(gtsam::Rot3::Identity(), gtsam::Point3(0, 1, 0));
   EXPECT_TRUE(
     gtsam::assert_equal(
       gtsam::Vector3::Zero(),
       factor.evaluateError(pose_i, pose_j), 1e-9));
+
+  // Case 4: Error Check
+  EXPECT_TRUE(
+    gtsam::assert_equal(
+      gtsam::Vector3(-1, 0, 0),
+      factor.evaluateError(gtsam::Pose3::Identity(), gtsam::Pose3::Identity()), 1e-9));
 }
 
 /**

@@ -33,15 +33,17 @@
  * Verifies the factor's residual calculation: `error = measured_depth - (pose.z + lever_arm_z)`.
  *
  * Cases tested:
- * 1.  **No Lever Arm**: Simple depth match.
- * 2.  **Lever Arm Offset**: Depth sensor vertically offset.
- * 3.  **Rotation + Lever Arm**: AUV orientation affecting sensor depth.
+ * 1.  **Identity**: Everything aligned. Zero error.
+ * 2.  **Rotation**: Vehicle rotated, sensor aligned.
+ * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
+ * 4.  **Combined**: Vehicle rotated + Sensor offset.
+ * 5.  **Error Check**: Verifies non-zero error magnitude.
  */
 TEST(CustomDepthFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
   gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(1, 0.1);
 
-  // Case 1: No Lever Arm
+  // Case 1: Identity
   coug_fgo::factors::CustomDepthFactorArm factor1(poseKey, 5.0, gtsam::Pose3::Identity(), model);
   EXPECT_NEAR(
     factor1.evaluateError(
@@ -49,14 +51,16 @@ TEST(CustomDepthFactorArmTest, ErrorEvaluation) {
         gtsam::Rot3(), gtsam::Point3(
           0, 0,
           5)))[0], 0.0, 1e-9);
+
+  // Case 2: Rotation
   EXPECT_NEAR(
     factor1.evaluateError(
       gtsam::Pose3(
-        gtsam::Rot3(), gtsam::Point3(
+        gtsam::Rot3::Rx(M_PI), gtsam::Point3(
           0, 0,
-          6)))[0], 1.0, 1e-9);
+          5)))[0], 0.0, 1e-9);
 
-  // Case 2: Lever Arm (0, 0, 1)
+  // Case 3: Mounting/Lever Arm
   coug_fgo::factors::CustomDepthFactorArm factor2(poseKey, 5.0,
     gtsam::Pose3(gtsam::Rot3(), gtsam::Point3(0, 0, 1)), model);
   EXPECT_NEAR(
@@ -66,7 +70,7 @@ TEST(CustomDepthFactorArmTest, ErrorEvaluation) {
           0, 0,
           4)))[0], 0.0, 1e-9);
 
-  // Case 3: Upside down AUV with Lever Arm
+  // Case 4: Combined
   EXPECT_NEAR(
     factor2.evaluateError(
       gtsam::Pose3(
@@ -74,6 +78,14 @@ TEST(CustomDepthFactorArmTest, ErrorEvaluation) {
           0, 0,
           6)))[0], 0.0,
     1e-9);
+
+  // Case 5: Error Check
+  EXPECT_NEAR(
+    factor1.evaluateError(
+      gtsam::Pose3(
+        gtsam::Rot3(), gtsam::Point3(
+          0, 0,
+          6)))[0], 1.0, 1e-9);
 }
 
 /**
