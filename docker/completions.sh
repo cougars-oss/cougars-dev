@@ -3,7 +3,7 @@
 #
 # Script tab completions
 
-_coug_tab_completion() {
+_bag_tab_completion() {
     local cur=${COMP_WORDS[COMP_CWORD]}
     local prev=${COMP_WORDS[COMP_CWORD-1]}
     local script_name=${COMP_WORDS[0]}
@@ -24,5 +24,5 @@ _coug_tab_completion() {
     fi
 }
 
-complete -F _coug_tab_completion bag_launch.sh scripts/bag_launch.sh ./scripts/bag_launch.sh
-complete -F _coug_tab_completion sim_launch.sh scripts/sim_launch.sh ./scripts/sim_launch.sh
+complete -F _bag_tab_completion bag_launch.sh scripts/bag_launch.sh ./scripts/bag_launch.sh
+complete -F _bag_tab_completion sim_launch.sh scripts/sim_launch.sh ./scripts/sim_launch.sh

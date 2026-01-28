@@ -20,15 +20,15 @@ services:
       dockerfile: Dockerfile
     container_name: holoocean-ct
     user: root
-    runtime: nvidia # NVIDIA GPU access
+    runtime: nvidia
     network_mode: host
     environment:
-      - HOST_UID=${HOST_UID:-1000} # Permission fix on Linux
-      - HOST_GID=${HOST_GID:-1000} # Permission fix on Linux
+      - HOST_UID=${HOST_UID:-1000}
+      - HOST_GID=${HOST_GID:-1000}
       - DISPLAY=$DISPLAY
       - QT_X11_NO_MITSHM=1
-      - NVIDIA_DRIVER_CAPABILITIES=all # NVIDIA GPU access
-      - NVIDIA_VISIBLE_DEVICES=all # NVIDIA GPU access
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
     volumes:
       - ../config:/home/ue4/config
       - ./entrypoint.sh:/entrypoint.sh

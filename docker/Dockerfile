@@ -38,7 +38,7 @@ ENV ROS_BUILD_ARCH=$TARGETARCH
 USER root
 RUN apt update && apt install -y --no-install-recommends \
     # Helpful ROS GUI tools - Nelson Durrant, Jan 2026
-    ros-${ROS_DISTRO}-rqt* ros-${ROS_DISTRO}-plotjuggler-ros \
+    ros-${ROS_DISTRO}-rqt* \
     # Drive the AUV with a joystick or keyboard - Nelson Durrant, Jan 2026
     ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy ros-${ROS_DISTRO}-teleop-twist-keyboard \
     # Better rosbag2 storage format - Nelson Durrant, Jan 2026
