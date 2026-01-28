@@ -90,7 +90,7 @@ if [ -n "$RECORD_BAG_PATH" ]; then
     fi
 
     mkdir -p "$RECORD_BAG_PATH/config"
-    find -L ~/coug_ws/install -type f -path "*/config/*" -name "*.yaml" -exec cp {} "$RECORD_BAG_PATH/config/" \;
+    find -L ~/coug_ws/install -type f \( -path "*/config/*" -o -path "*/rviz/*" -o -path "*/mapviz/*" -o -path "*/plotjuggler/*" \) -exec cp {} "$RECORD_BAG_PATH/config/" \;
 else
     ros2 launch coug_bringup bag.launch.py "${ARGS[@]}"
 fi

@@ -32,20 +32,20 @@ def generate_launch_description():
 
     pkg_share = get_package_share_directory("coug_gui")
 
-    plotjuggler_layout_file = os.path.join(pkg_share, "config", "plotjuggler.xml")
+    plotjuggler_layout_file = os.path.join(pkg_share, "plotjuggler", "plotjuggler.xml")
 
     mapviz_config_file = PythonExpression(
         [
             "'",
-            os.path.join(pkg_share, "config", "bluerov2_mapviz_config.mvc"),
+            os.path.join(pkg_share, "mapviz", "bluerov2_mapviz_config.mvc"),
             "' if '",
             bluerov_viz,
             "' == 'true' else '",
-            os.path.join(pkg_share, "config", "multi_mapviz_config.mvc"),
+            os.path.join(pkg_share, "mapviz", "multi_mapviz_config.mvc"),
             "' if '",
             multiagent_viz,
             "' == 'true' else '",
-            os.path.join(pkg_share, "config", "mapviz_config.mvc"),
+            os.path.join(pkg_share, "mapviz", "mapviz_config.mvc"),
             "'",
         ]
     )
@@ -53,15 +53,15 @@ def generate_launch_description():
     rviz_config_file = PythonExpression(
         [
             "'",
-            os.path.join(pkg_share, "config", "bluerov2_rviz_config.rviz"),
+            os.path.join(pkg_share, "rviz", "bluerov2_rviz_config.rviz"),
             "' if '",
             bluerov_viz,
             "' == 'true' else '",
-            os.path.join(pkg_share, "config", "multi_rviz_config.rviz"),
+            os.path.join(pkg_share, "rviz", "multi_rviz_config.rviz"),
             "' if '",
             multiagent_viz,
             "' == 'true' else '",
-            os.path.join(pkg_share, "config", "rviz_config.rviz"),
+            os.path.join(pkg_share, "rviz", "rviz_config.rviz"),
             "'",
         ]
     )
