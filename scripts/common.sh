@@ -12,5 +12,5 @@ function printWarning {
 }
 
 function printError {
-    echo -e "\033[0m\033[31m[ 🐙 ] $1\033[0m"
+    echo -e "\033[0m\033[31m[ 🦀 ] $1\033[0m"
 }
