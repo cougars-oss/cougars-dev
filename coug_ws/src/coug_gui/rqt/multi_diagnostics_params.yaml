@@ -21,6 +21,13 @@ diagnostic_aggregator:
         find_and_remove_prefix: ['navsat_preprocessor_node: [/auv0] ']
         timeout: 5.0
 
+      hsd_commander_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: 'hsd_commander_node'
+        regex: ['.*hsd_commander_node.*auv0.*']
+        find_and_remove_prefix: ['hsd_commander_node: [/auv0] ']
+        timeout: 5.0
+
     auv1:
       type: diagnostic_aggregator/AnalyzerGroup
       path: auv1
@@ -40,6 +47,13 @@ diagnostic_aggregator:
         find_and_remove_prefix: ['navsat_preprocessor_node: [/auv1] ']
         timeout: 5.0
 
+      hsd_commander_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: 'hsd_commander_node'
+        regex: ['.*hsd_commander_node.*auv1.*']
+        find_and_remove_prefix: ['hsd_commander_node: [/auv1] ']
+        timeout: 5.0
+
     auv2:
       type: diagnostic_aggregator/AnalyzerGroup
       path: auv2
@@ -57,4 +71,11 @@ diagnostic_aggregator:
         path: 'navsat_preprocessor_node'
         regex: ['.*navsat_preprocessor_node.*auv2.*']
         find_and_remove_prefix: ['navsat_preprocessor_node: [/auv2] ']
+        timeout: 5.0
+
+      hsd_commander_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: 'hsd_commander_node'
+        regex: ['.*hsd_commander_node.*auv2.*']
+        find_and_remove_prefix: ['hsd_commander_node: [/auv2] ']
         timeout: 5.0

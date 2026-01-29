@@ -27,7 +27,8 @@ namespace coug_navigation
 {
 
 HsdCommanderNode::HsdCommanderNode()
-: Node("hsd_commander_node")
+: Node("hsd_commander_node"),
+  diagnostic_updater_(this)
 {
   RCLCPP_INFO(get_logger(), "Starting HSD Commander Node...");
 
@@ -52,8 +53,22 @@ HsdCommanderNode::HsdCommanderNode()
     std::chrono::milliseconds(1000),
     std::bind(&HsdCommanderNode::checkOdomTimeout, this));
 
+  // --- ROS Diagnostics ---
+  std::string ns = this->get_namespace();
+  std::string clean_ns = (ns == "/") ? "" : ns;
+  diagnostic_updater_.setHardwareID(clean_ns + "/hsd_commander_node");
+
+  std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
+
+  std::string mission_task = prefix + "Mission Status";
+  diagnostic_updater_.add(mission_task, this, &HsdCommanderNode::checkMissionStatus);
+
+  std::string odom_task = prefix + "Odometry Link";
+  diagnostic_updater_.add(odom_task, this, &HsdCommanderNode::checkOdometryStatus);
+
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for mission...");
 }
+
 
 void HsdCommanderNode::waypointCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
@@ -64,9 +79,11 @@ void HsdCommanderNode::waypointCallback(const geometry_msgs::msg::PoseArray::Sha
   }
 
   waypoints_ = msg->poses;
+  total_waypoints_ = waypoints_.size();
   current_waypoint_index_ = 0;
   state_ = MissionState::ACTIVE;
   previous_distance_ = -1.0;
+  current_dist_to_target_ = -1.0;
 
   std::stringstream ss;
   ss << "Started mission with " << msg->poses.size() << " waypoints: ";
@@ -82,7 +99,7 @@ void HsdCommanderNode::waypointCallback(const geometry_msgs::msg::PoseArray::Sha
 
 void HsdCommanderNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
 {
-  last_odom_time_ = this->get_clock()->now();
+  last_odom_time_seconds_ = this->get_clock()->now().seconds();
 
   if (state_ == MissionState::IDLE) {
     return;
@@ -101,6 +118,7 @@ void HsdCommanderNode::processWaypointLogic(double current_x, double current_y)
 {
   const auto & target = waypoints_[current_waypoint_index_];
   double distance = calculateDistance(current_x, current_y, target.position.x, target.position.y);
+  current_dist_to_target_ = distance;
 
   if (distance < params_.capture_radius) {
     current_waypoint_index_++;
@@ -132,12 +150,12 @@ double HsdCommanderNode::calculateDistance(double x1, double y1, double x2, doub
 
 void HsdCommanderNode::checkOdomTimeout()
 {
-  if (state_ == MissionState::IDLE || last_odom_time_.nanoseconds() == 0) {
+  if (state_ == MissionState::IDLE || last_odom_time_seconds_ == 0.0) {
     return;
   }
 
-  auto now = this->get_clock()->now();
-  if ((now - last_odom_time_).seconds() > params_.odom_timeout_sec) {
+  double now = this->get_clock()->now().seconds();
+  if ((now - last_odom_time_seconds_) > params_.odom_timeout_sec) {
     RCLCPP_ERROR(get_logger(), "Odometry timeout. Stopping mission.");
     stopMission();
   }
@@ -161,7 +179,42 @@ void HsdCommanderNode::stopMission()
 {
   state_ = MissionState::IDLE;
   waypoints_.clear();
+  total_waypoints_ = 0;
+  current_dist_to_target_ = 0.0;
   publishCommands(0.0, 0.0, 0.0);
+}
+
+void HsdCommanderNode::checkMissionStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
+{
+  if (state_ == MissionState::IDLE) {
+    stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "No mission recieved.");
+  } else {
+    stat.summary(
+      diagnostic_msgs::msg::DiagnosticStatus::OK,
+      "Mission recieved. Navigating to waypoint " + std::to_string(current_waypoint_index_ + 1) +
+      "/" + std::to_string(total_waypoints_.load()));
+
+    stat.add("Distance to Target (m)", current_dist_to_target_.load());
+  }
+}
+
+void HsdCommanderNode::checkOdometryStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
+{
+  if (last_odom_time_seconds_ == 0.0) {
+    stat.summary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "No Odometry recieved.");
+    return;
+  }
+
+  double time_since = this->get_clock()->now().seconds() - last_odom_time_seconds_;
+  stat.add("Time Since Last (s)", time_since);
+
+  if (time_since > params_.odom_timeout_sec) {
+    stat.summary(
+      diagnostic_msgs::msg::DiagnosticStatus::ERROR,
+      "Odometry link lost. Mission stopped.");
+  } else {
+    stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Odometry link online.");
+  }
 }
 
 }  // namespace coug_navigation
@@ -170,7 +223,9 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<coug_navigation::HsdCommanderNode>();
-  rclcpp::spin(node);
+  rclcpp::executors::MultiThreadedExecutor executor;
+  executor.add_node(node);
+  executor.spin();
   rclcpp::shutdown();
   return 0;
 }

@@ -24,6 +24,7 @@
 #include <math.h>
 #include <geodesy/utm.h>
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <memory>
@@ -92,12 +93,12 @@ private:
   void checkNavSatFix(diagnostic_updater::DiagnosticStatusWrapper & stat);
 
   // --- State ---
-  bool origin_set_ = false;
+  std::atomic<bool> origin_set_{false};
   sensor_msgs::msg::NavSatFix origin_navsat_;
   geodesy::UTMPoint origin_utm_;
 
-  double last_navsat_time_ = 0.0;
-  int last_fix_status_ = -1;
+  std::atomic<double> last_navsat_time_{0.0};
+  std::atomic<int> last_fix_status_{-1};
 
   bool collecting_samples_ = false;
   double start_collection_time_ = 0.0;

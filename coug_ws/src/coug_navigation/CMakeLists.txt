@@ -15,6 +15,7 @@ find_package(rclcpp REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(diagnostic_updater REQUIRED)
 
 find_package(generate_parameter_library REQUIRED)
 
@@ -32,6 +33,7 @@ ament_target_dependencies(hsd_commander
   nav_msgs
   geometry_msgs
   std_msgs
+  diagnostic_updater
 )
 target_link_libraries(hsd_commander
   hsd_commander_parameters

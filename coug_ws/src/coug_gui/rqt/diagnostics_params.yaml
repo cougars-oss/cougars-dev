@@ -20,3 +20,10 @@ diagnostic_aggregator:
         regex: ['.*navsat_preprocessor_node.*auv0.*']
         find_and_remove_prefix: ['navsat_preprocessor_node: [/auv0] ']
         timeout: 5.0
+
+      hsd_commander_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: 'hsd_commander_node'
+        regex: ['.*hsd_commander_node.*auv0.*']
+        find_and_remove_prefix: ['hsd_commander_node: [/auv0] ']
+        timeout: 5.0

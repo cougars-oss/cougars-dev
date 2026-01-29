@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <memory>
@@ -29,6 +30,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <diagnostic_updater/diagnostic_updater.hpp>
 
 #include <coug_navigation/hsd_commander_parameters.hpp>
 
@@ -100,6 +102,19 @@ private:
    */
   void processWaypointLogic(double current_x, double current_y);
 
+  // --- Diagnostics ---
+  /**
+   * @brief Diagnostic task to report mission progress and waypoint status.
+   * @param stat The diagnostic status wrapper to update.
+   */
+  void checkMissionStatus(diagnostic_updater::DiagnosticStatusWrapper & stat);
+
+  /**
+   * @brief Diagnostic task to report odometry health and freshness.
+   * @param stat The diagnostic status wrapper to update.
+   */
+  void checkOdometryStatus(diagnostic_updater::DiagnosticStatusWrapper & stat);
+
   // --- State ---
   enum class MissionState
   {
@@ -107,12 +122,14 @@ private:
     ACTIVE
   };
 
-  MissionState state_ = MissionState::IDLE;
+  std::atomic<MissionState> state_{MissionState::IDLE};
 
   std::vector<geometry_msgs::msg::Pose> waypoints_;
-  size_t current_waypoint_index_ = 0;
-  rclcpp::Time last_odom_time_;
+  std::atomic<size_t> total_waypoints_{0};
+  std::atomic<size_t> current_waypoint_index_{0};
+  std::atomic<double> last_odom_time_seconds_{0.0};
   double previous_distance_ = -1.0;
+  std::atomic<double> current_dist_to_target_{0.0};
 
   // --- ROS Interfaces ---
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr heading_pub_;
@@ -123,6 +140,7 @@ private:
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
 
   rclcpp::TimerBase::SharedPtr timeout_timer_;
+  diagnostic_updater::Updater diagnostic_updater_;
 
   // --- Parameters ---
   std::shared_ptr<hsd_commander_node::ParamListener> param_listener_;
