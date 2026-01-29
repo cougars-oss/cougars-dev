@@ -101,9 +101,7 @@ class DvlOdomConverterNode(Node):
             t_odom_dvl.transform.translation.y = msg.position.y
             t_odom_dvl.transform.translation.z = msg.position.z
             t_odom_dvl.transform.rotation = self.quaternion_from_euler(
-                math.radians(msg.roll),
-                math.radians(msg.pitch),
-                math.radians(msg.yaw)
+                math.radians(msg.roll), math.radians(msg.pitch), math.radians(msg.yaw)
             )
 
             p_base_in_odom = do_transform_pose(p_base_in_dvl.pose, t_odom_dvl)

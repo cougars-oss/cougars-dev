@@ -62,7 +62,9 @@ class DvlTwistConverterNode(Node):
             self.get_parameter("use_fom_covariance").get_parameter_value().bool_value
         )
         self.fom_covariance_scale = (
-            self.get_parameter("fom_covariance_scale").get_parameter_value().double_value
+            self.get_parameter("fom_covariance_scale")
+            .get_parameter_value()
+            .double_value
         )
 
         self.subscription = self.create_subscription(

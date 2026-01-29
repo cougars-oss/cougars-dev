@@ -8,7 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-ALGORITHMS = ["FGO", "TM", "EKF", "UKF", "IEKF"] # , "DVL"]
+ALGORITHMS = ["FGO", "TM", "EKF", "UKF", "IEKF"]  # , "DVL"]
 
 COLORS = {
     "FGO": "#4C72B0",

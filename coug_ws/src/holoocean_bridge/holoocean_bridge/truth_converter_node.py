@@ -83,7 +83,9 @@ class TruthConverterNode(Node):
 
         try:
             p_com_in_map = self.tf_buffer.transform(
-                p_com_in_holo, self.map_frame, timeout=rclpy.duration.Duration(seconds=0.1)
+                p_com_in_holo,
+                self.map_frame,
+                timeout=rclpy.duration.Duration(seconds=0.1),
             )
         except Exception:
             self.get_logger().error(
