@@ -130,6 +130,13 @@ def generate_launch_description():
                 parameters=[{"use_sim_time": use_sim_time}],
             ),
             Node(
+                condition=IfCondition(use_rviz),
+                package="coug_gui",
+                executable="odom_to_path_node.py",
+                name="odom_to_path_node",
+                parameters=[{"use_sim_time": use_sim_time}],
+            ),
+            Node(
                 condition=IfCondition(use_mapviz),
                 package="mapviz",
                 executable="mapviz",
