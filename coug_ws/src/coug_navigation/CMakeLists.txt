@@ -20,26 +20,26 @@ find_package(diagnostic_updater REQUIRED)
 find_package(generate_parameter_library REQUIRED)
 
 generate_parameter_library(
-  hsd_commander_parameters
-  "params/hsd_commander_params.yaml"
+  waypoint_follower_parameters
+  "params/waypoint_follower_params.yaml"
 )
 
-add_executable(hsd_commander src/hsd_commander_node.cpp)
-target_include_directories(hsd_commander PUBLIC
+add_executable(waypoint_follower src/waypoint_follower_node.cpp)
+target_include_directories(waypoint_follower PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(hsd_commander
+ament_target_dependencies(waypoint_follower
   rclcpp
   nav_msgs
   geometry_msgs
   std_msgs
   diagnostic_updater
 )
-target_link_libraries(hsd_commander
-  hsd_commander_parameters
+target_link_libraries(waypoint_follower
+  waypoint_follower_parameters
 )
 
-install(TARGETS hsd_commander
+install(TARGETS waypoint_follower
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch config

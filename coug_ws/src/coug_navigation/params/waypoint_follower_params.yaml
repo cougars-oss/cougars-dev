@@ -1,4 +1,4 @@
-hsd_commander_node:
+waypoint_follower_node:
   capture_radius:
     type: double
     default_value: 25.0

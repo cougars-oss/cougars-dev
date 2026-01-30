@@ -61,14 +61,14 @@ target_link_libraries(factor_graph
 )
 
 generate_parameter_library(
-  navsat_preprocessor_parameters
-  "params/navsat_preprocessor_params.yaml"
+  origin_manager_parameters
+  "params/origin_manager_params.yaml"
 )
 
-add_executable(navsat_preprocessor src/navsat_preprocessor_node.cpp)
-target_include_directories(navsat_preprocessor PUBLIC
+add_executable(origin_manager src/origin_manager_node.cpp)
+target_include_directories(origin_manager PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-ament_target_dependencies(navsat_preprocessor
+ament_target_dependencies(origin_manager
   rclcpp
   sensor_msgs
   nav_msgs
@@ -77,11 +77,11 @@ ament_target_dependencies(navsat_preprocessor
   geodesy
   diagnostic_updater
 )
-target_link_libraries(navsat_preprocessor
-  navsat_preprocessor_parameters
+target_link_libraries(origin_manager
+  origin_manager_parameters
 )
 
-install(TARGETS factor_graph navsat_preprocessor
+install(TARGETS factor_graph origin_manager
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch config

@@ -176,8 +176,8 @@ def generate_launch_description():
             ),
             Node(
                 package="coug_fgo",
-                executable="navsat_preprocessor",
-                name="navsat_preprocessor_node",
+                executable="origin_manager",
+                name="origin_manager_node",
                 parameters=[
                     params_file,
                     {

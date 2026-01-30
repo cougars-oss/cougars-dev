@@ -5,7 +5,7 @@ diagnostic_aggregator:
     auv0:
       type: diagnostic_aggregator/AnalyzerGroup
       path: auv0
-      analyzers: ['factor_graph_node', 'navsat_preprocessor_node']
+      analyzers: ['factor_graph_node', 'origin_manager_node', 'waypoint_follower_node']
 
       factor_graph_node:
         type: diagnostic_aggregator/GenericAnalyzer
@@ -14,16 +14,16 @@ diagnostic_aggregator:
         find_and_remove_prefix: ['factor_graph_node: [/auv0]', 'factor_graph_node_tm: [/auv0] ']
         timeout: 5.0
 
-      navsat_preprocessor_node:
+      origin_manager_node:
         type: diagnostic_aggregator/GenericAnalyzer
-        path: 'navsat_preprocessor_node'
-        regex: ['.*navsat_preprocessor_node.*auv0.*']
-        find_and_remove_prefix: ['navsat_preprocessor_node: [/auv0] ']
+        path: 'origin_manager_node'
+        regex: ['.*origin_manager_node.*auv0.*']
+        find_and_remove_prefix: ['origin_manager_node: [/auv0] ']
         timeout: 5.0
 
-      hsd_commander_node:
+      waypoint_follower_node:
         type: diagnostic_aggregator/GenericAnalyzer
-        path: 'hsd_commander_node'
-        regex: ['.*hsd_commander_node.*auv0.*']
-        find_and_remove_prefix: ['hsd_commander_node: [/auv0] ']
+        path: 'waypoint_follower_node'
+        regex: ['.*waypoint_follower_node.*auv0.*']
+        find_and_remove_prefix: ['waypoint_follower_node: [/auv0] ']
         timeout: 5.0

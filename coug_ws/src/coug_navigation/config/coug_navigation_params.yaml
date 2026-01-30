@@ -1,5 +1,5 @@
 /**:
-  hsd_commander_node:
+  waypoint_follower_node:
     ros__parameters:
       # --- ROS Topics and Frames ---
       waypoint_topic: "waypoints"

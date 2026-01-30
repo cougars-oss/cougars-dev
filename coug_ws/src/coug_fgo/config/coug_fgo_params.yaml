@@ -136,7 +136,7 @@
       enable_dvl_preintegration: false
       depth_rate_limit_hz: 4.0
 
-/**/navsat_preprocessor_node:
+/**/origin_manager_node:
   ros__parameters:
     # --- Node Settings ---
     origin_pub_rate: 1.0 # [Hz] Rate at which to publish the GPS origin.

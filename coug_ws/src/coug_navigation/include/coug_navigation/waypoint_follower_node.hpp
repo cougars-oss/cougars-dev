@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @file hsd_commander_node.hpp
- * @brief ROS 2 node for HSD (Heading, Speed, Depth) command generation and waypoint navigation.
+ * @file waypoint_follower_node.hpp
+ * @brief ROS 2 node for waypoint navigation and command generation.
  * @author Nelson Durrant
  * @date Jan 2026
  */
@@ -32,26 +32,26 @@
 #include <std_msgs/msg/float64.hpp>
 #include <diagnostic_updater/diagnostic_updater.hpp>
 
-#include <coug_navigation/hsd_commander_parameters.hpp>
+#include <coug_navigation/waypoint_follower_parameters.hpp>
 
 namespace coug_navigation
 {
 
 /**
- * @class HsdCommanderNode
+ * @class WaypointFollowerNode
  * @brief High-level mission commander for AUV waypoint navigation.
  *
  * This node manages AUV mission execution by following a list of waypoints.
  * It uses a capture radius to detect waypoint arrival and a slip radius to handle overshoots.
  * It publishes Heading, Speed, and Depth (HSD) commands to the control system.
  */
-class HsdCommanderNode : public rclcpp::Node
+class WaypointFollowerNode : public rclcpp::Node
 {
 public:
   /**
-   * @brief HsdCommanderNode constructor.
+   * @brief WaypointFollowerNode constructor.
    */
-  HsdCommanderNode();
+  WaypointFollowerNode();
 
 private:
   // --- Logic ---
@@ -143,8 +143,8 @@ private:
   diagnostic_updater::Updater diagnostic_updater_;
 
   // --- Parameters ---
-  std::shared_ptr<hsd_commander_node::ParamListener> param_listener_;
-  hsd_commander_node::Params params_;
+  std::shared_ptr<waypoint_follower_node::ParamListener> param_listener_;
+  waypoint_follower_node::Params params_;
 };
 
 }  // namespace coug_navigation

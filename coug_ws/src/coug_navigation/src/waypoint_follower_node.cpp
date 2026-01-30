@@ -13,26 +13,26 @@
 // limitations under the License.
 
 /**
- * @file hsd_commander_node.cpp
- * @brief Implementation of the HsdCommanderNode.
+ * @file waypoint_follower_node.cpp
+ * @brief Implementation of the WaypointFollowerNode.
  * @author Nelson Durrant
  * @date Jan 2026
  */
 
-#include "coug_navigation/hsd_commander_node.hpp"
+#include "coug_navigation/waypoint_follower_node.hpp"
 
 #include <cmath>
 
 namespace coug_navigation
 {
 
-HsdCommanderNode::HsdCommanderNode()
-: Node("hsd_commander_node"),
+WaypointFollowerNode::WaypointFollowerNode()
+: Node("waypoint_follower_node"),
   diagnostic_updater_(this)
 {
-  RCLCPP_INFO(get_logger(), "Starting HSD Commander Node...");
+  RCLCPP_INFO(get_logger(), "Starting Waypoint Follower Node...");
 
-  param_listener_ = std::make_shared<hsd_commander_node::ParamListener>(
+  param_listener_ = std::make_shared<waypoint_follower_node::ParamListener>(
     get_node_parameters_interface());
   params_ = param_listener_->get_params();
 
@@ -43,34 +43,34 @@ HsdCommanderNode::HsdCommanderNode()
 
   waypoint_sub_ = create_subscription<geometry_msgs::msg::PoseArray>(
     params_.waypoint_topic, 10,
-    std::bind(&HsdCommanderNode::waypointCallback, this, std::placeholders::_1));
+    std::bind(&WaypointFollowerNode::waypointCallback, this, std::placeholders::_1));
 
   odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
     params_.odom_topic, 10,
-    std::bind(&HsdCommanderNode::odomCallback, this, std::placeholders::_1));
+    std::bind(&WaypointFollowerNode::odomCallback, this, std::placeholders::_1));
 
   timeout_timer_ = create_wall_timer(
     std::chrono::milliseconds(1000),
-    std::bind(&HsdCommanderNode::checkOdomTimeout, this));
+    std::bind(&WaypointFollowerNode::checkOdomTimeout, this));
 
   // --- ROS Diagnostics ---
   std::string ns = this->get_namespace();
   std::string clean_ns = (ns == "/") ? "" : ns;
-  diagnostic_updater_.setHardwareID(clean_ns + "/hsd_commander_node");
+  diagnostic_updater_.setHardwareID(clean_ns + "/waypoint_follower_node");
 
   std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
 
   std::string mission_task = prefix + "Mission Status";
-  diagnostic_updater_.add(mission_task, this, &HsdCommanderNode::checkMissionStatus);
+  diagnostic_updater_.add(mission_task, this, &WaypointFollowerNode::checkMissionStatus);
 
   std::string odom_task = prefix + "Odometry Link";
-  diagnostic_updater_.add(odom_task, this, &HsdCommanderNode::checkOdometryStatus);
+  diagnostic_updater_.add(odom_task, this, &WaypointFollowerNode::checkOdometryStatus);
 
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for mission...");
 }
 
 
-void HsdCommanderNode::waypointCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg)
+void WaypointFollowerNode::waypointCallback(const geometry_msgs::msg::PoseArray::SharedPtr msg)
 {
   if (msg->poses.empty()) {
     RCLCPP_WARN(get_logger(), "Received empty mission. Stopping mission.");
@@ -97,7 +97,7 @@ void HsdCommanderNode::waypointCallback(const geometry_msgs::msg::PoseArray::Sha
   RCLCPP_INFO(get_logger(), "%s", ss.str().c_str());
 }
 
-void HsdCommanderNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
+void WaypointFollowerNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
 {
   last_odom_time_seconds_ = this->get_clock()->now().seconds();
 
@@ -114,7 +114,7 @@ void HsdCommanderNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg
   processWaypointLogic(msg->pose.pose.position.x, msg->pose.pose.position.y);
 }
 
-void HsdCommanderNode::processWaypointLogic(double current_x, double current_y)
+void WaypointFollowerNode::processWaypointLogic(double current_x, double current_y)
 {
   const auto & target = waypoints_[current_waypoint_index_];
   double distance = calculateDistance(current_x, current_y, target.position.x, target.position.y);
@@ -143,12 +143,12 @@ void HsdCommanderNode::processWaypointLogic(double current_x, double current_y)
   publishCommands(heading, params_.desired_speed_rpm, target.position.z);
 }
 
-double HsdCommanderNode::calculateDistance(double x1, double y1, double x2, double y2)
+double WaypointFollowerNode::calculateDistance(double x1, double y1, double x2, double y2)
 {
   return std::hypot(x2 - x1, y2 - y1);
 }
 
-void HsdCommanderNode::checkOdomTimeout()
+void WaypointFollowerNode::checkOdomTimeout()
 {
   if (state_ == MissionState::IDLE || last_odom_time_seconds_ == 0.0) {
     return;
@@ -161,7 +161,7 @@ void HsdCommanderNode::checkOdomTimeout()
   }
 }
 
-void HsdCommanderNode::publishCommands(double heading_deg, double speed_rpm, double depth_m)
+void WaypointFollowerNode::publishCommands(double heading_deg, double speed_rpm, double depth_m)
 {
   std_msgs::msg::Float64 msg;
 
@@ -175,7 +175,7 @@ void HsdCommanderNode::publishCommands(double heading_deg, double speed_rpm, dou
   depth_pub_->publish(msg);
 }
 
-void HsdCommanderNode::stopMission()
+void WaypointFollowerNode::stopMission()
 {
   state_ = MissionState::IDLE;
   waypoints_.clear();
@@ -184,7 +184,7 @@ void HsdCommanderNode::stopMission()
   publishCommands(0.0, 0.0, 0.0);
 }
 
-void HsdCommanderNode::checkMissionStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
+void WaypointFollowerNode::checkMissionStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
 {
   if (state_ == MissionState::IDLE) {
     stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "No mission recieved.");
@@ -198,7 +198,7 @@ void HsdCommanderNode::checkMissionStatus(diagnostic_updater::DiagnosticStatusWr
   }
 }
 
-void HsdCommanderNode::checkOdometryStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
+void WaypointFollowerNode::checkOdometryStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
 {
   if (last_odom_time_seconds_ == 0.0) {
     stat.summary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "No Odometry recieved.");
@@ -222,7 +222,7 @@ void HsdCommanderNode::checkOdometryStatus(diagnostic_updater::DiagnosticStatusW
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<coug_navigation::HsdCommanderNode>();
+  auto node = std::make_shared<coug_navigation::WaypointFollowerNode>();
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();

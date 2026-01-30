@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @file navsat_preprocessor_node.cpp
- * @brief Implementation of the NavsatPreprocessorNode.
+ * @file origin_manager_node.cpp
+ * @brief Implementation of the OriginManagerNode.
  * @author Nelson Durrant
  * @date Jan 2026
  */
 
-#include "coug_fgo/navsat_preprocessor_node.hpp"
+#include "coug_fgo/origin_manager_node.hpp"
 
 #include <geodesy/wgs84.h>
 #include <tf2/LinearMath/Quaternion.h>
@@ -30,13 +30,13 @@
 namespace coug_fgo
 {
 
-NavsatPreprocessorNode::NavsatPreprocessorNode()
-: Node("navsat_preprocessor_node"),
+OriginManagerNode::OriginManagerNode()
+: Node("origin_manager_node"),
   diagnostic_updater_(this)
 {
-  RCLCPP_INFO(get_logger(), "Starting NavSat Preprocessor Node...");
+  RCLCPP_INFO(get_logger(), "Starting Origin Manager Node...");
 
-  param_listener_ = std::make_shared<navsat_preprocessor_node::ParamListener>(
+  param_listener_ = std::make_shared<origin_manager_node::ParamListener>(
     get_node_parameters_interface());
   params_ = param_listener_->get_params();
 
@@ -91,20 +91,20 @@ NavsatPreprocessorNode::NavsatPreprocessorNode()
   // --- ROS Diagnostics ---
   std::string ns = this->get_namespace();
   std::string clean_ns = (ns == "/") ? "" : ns;
-  diagnostic_updater_.setHardwareID(clean_ns + "/navsat_preprocessor_node");
+  diagnostic_updater_.setHardwareID(clean_ns + "/origin_manager_node");
 
   std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
 
   std::string origin_task = prefix + "GPS Origin";
-  diagnostic_updater_.add(origin_task, this, &NavsatPreprocessorNode::checkOriginStatus);
+  diagnostic_updater_.add(origin_task, this, &OriginManagerNode::checkOriginStatus);
 
   std::string fix_task = prefix + "GPS Fix";
-  diagnostic_updater_.add(fix_task, this, &NavsatPreprocessorNode::checkNavSatFix);
+  diagnostic_updater_.add(fix_task, this, &OriginManagerNode::checkNavSatFix);
 
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for fix...");
 }
 
-void NavsatPreprocessorNode::originCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
+void OriginManagerNode::originCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
 {
   if (!origin_set_ && msg->status.status >= sensor_msgs::msg::NavSatStatus::STATUS_FIX) {
     try {
@@ -126,7 +126,7 @@ void NavsatPreprocessorNode::originCallback(const sensor_msgs::msg::NavSatFix::S
   }
 }
 
-void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
+void OriginManagerNode::navsatCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
 {
   last_navsat_time_ = this->get_clock()->now().seconds();
   last_fix_status_ = msg->status.status;
@@ -226,7 +226,7 @@ void NavsatPreprocessorNode::navsatCallback(const sensor_msgs::msg::NavSatFix::S
   }
 }
 
-bool NavsatPreprocessorNode::convertToEnu(
+bool OriginManagerNode::convertToEnu(
   const sensor_msgs::msg::NavSatFix::SharedPtr & msg,
   nav_msgs::msg::Odometry & odom_msg)
 {
@@ -284,7 +284,7 @@ bool NavsatPreprocessorNode::convertToEnu(
   }
 }
 
-void NavsatPreprocessorNode::checkOriginStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
+void OriginManagerNode::checkOriginStatus(diagnostic_updater::DiagnosticStatusWrapper & stat)
 {
   if (origin_set_) {
     stat.add("Origin Zone", std::to_string(origin_utm_.zone) + origin_utm_.band);
@@ -298,7 +298,7 @@ void NavsatPreprocessorNode::checkOriginStatus(diagnostic_updater::DiagnosticSta
   }
 }
 
-void NavsatPreprocessorNode::checkNavSatFix(diagnostic_updater::DiagnosticStatusWrapper & stat)
+void OriginManagerNode::checkNavSatFix(diagnostic_updater::DiagnosticStatusWrapper & stat)
 {
   stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "GPS fix acquired.");
 
@@ -321,7 +321,7 @@ void NavsatPreprocessorNode::checkNavSatFix(diagnostic_updater::DiagnosticStatus
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<coug_fgo::NavsatPreprocessorNode>();
+  auto node = std::make_shared<coug_fgo::OriginManagerNode>();
   rclcpp::executors::MultiThreadedExecutor executor;
   executor.add_node(node);
   executor.spin();

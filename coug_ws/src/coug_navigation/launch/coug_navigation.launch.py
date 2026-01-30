@@ -36,8 +36,8 @@ def generate_launch_description():
             ),
             Node(
                 package="coug_navigation",
-                executable="hsd_commander",
-                name="hsd_commander_node",
+                executable="waypoint_follower",
+                name="waypoint_follower_node",
                 parameters=[
                     params_file,
                     {"use_sim_time": use_sim_time},

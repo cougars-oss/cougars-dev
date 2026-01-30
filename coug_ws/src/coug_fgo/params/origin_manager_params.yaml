@@ -1,4 +1,4 @@
-navsat_preprocessor_node:
+origin_manager_node:
   origin_pub_rate:
     type: double
     default_value: 1.0

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @file navsat_preprocessor_node.hpp
+ * @file origin_manager_node.hpp
  * @brief ROS 2 node for preprocessing NavSatFix messages into ENU odometry.
  * @author Nelson Durrant
  * @date Jan 2026
@@ -34,26 +34,26 @@
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
 #include <diagnostic_updater/diagnostic_updater.hpp>
 
-#include <coug_fgo/navsat_preprocessor_parameters.hpp>
+#include <coug_fgo/origin_manager_parameters.hpp>
 
 namespace coug_fgo
 {
 
 /**
- * @class NavsatPreprocessorNode
+ * @class OriginManagerNode
  * @brief Preprocesses NavSatFix measurements into local ENU coordinates.
  *
  * This node converts global geographic coordinates (latitude, longitude, altitude)
  * into a local East-North-Up (ENU) frame relative to a set origin. It also handles
  * the publication and acquisition of the geographic origin.
  */
-class NavsatPreprocessorNode : public rclcpp::Node
+class OriginManagerNode : public rclcpp::Node
 {
 public:
   /**
-   * @brief NavsatPreprocessorNode constructor.
+   * @brief OriginManagerNode constructor.
    */
-  NavsatPreprocessorNode();
+  OriginManagerNode();
 
 private:
   // --- Logic ---
@@ -113,8 +113,8 @@ private:
   diagnostic_updater::Updater diagnostic_updater_;
 
   // --- Parameters ---
-  std::shared_ptr<navsat_preprocessor_node::ParamListener> param_listener_;
-  navsat_preprocessor_node::Params params_;
+  std::shared_ptr<origin_manager_node::ParamListener> param_listener_;
+  origin_manager_node::Params params_;
 };
 
 }  // namespace coug_fgo
