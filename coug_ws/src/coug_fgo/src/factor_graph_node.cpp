@@ -1323,6 +1323,7 @@ void FactorGraphNode::optimizeGraph()
   std::unique_lock<std::mutex> opt_lock(optimization_mutex_, std::try_to_lock);
   if (!opt_lock.owns_lock()) {return;}
 
+  double opt_start = this->get_clock()->now().seconds();
   rclcpp::Time target_stamp;
   bool should_abort = false;
 
@@ -1489,6 +1490,9 @@ void FactorGraphNode::optimizeGraph()
     prev_time_ = target_time;
     prev_step_ = current_step_;
     current_step_++;
+
+    double opt_end = this->get_clock()->now().seconds();
+    last_opt_duration_ = opt_end - opt_start;
   } catch (const std::exception & e) {
     RCLCPP_FATAL(get_logger(), "%s", e.what());
     rclcpp::shutdown();
@@ -1577,6 +1581,7 @@ void FactorGraphNode::checkProcessingOverflow(diagnostic_updater::DiagnosticStat
   } else {
     stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "No processing overflow detected.");
   }
+  stat.add("Optimization Duration (s)", last_opt_duration_.load());
 }
 
 }  // namespace coug_fgo
