@@ -117,7 +117,7 @@ Please cite our relevant publications if you find this repository useful for you
 ### HoloOcean (General Use)
 ```bibtex
 @inproceedings{potokar2022holooceanunderwaterroboticssim,
-  author={E. Potokar and S. Ashford and M. Kaess and J. Mangelson},
+  author={Easton Potokar and Spencer Ashford and Michael Kaess and Joshua G. Mangelson},
   title={Holo{O}cean: An Underwater Robotics Simulator},
   booktitle={Proc. IEEE Intl. Conf. on Robotics and Automation, ICRA},
   address={Philadelphia, PA, USA},
