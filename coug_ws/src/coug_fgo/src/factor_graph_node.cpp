@@ -1001,13 +1001,15 @@ void FactorGraphNode::addDvlFactor(
     // IMPORTANT! Add constant velocity constraints when DVL drops out.
     RCLCPP_WARN_THROTTLE(
       get_logger(), *get_clock(), 5000,
-      "DVL dropped out! Adding constant DVL factors.");
+      "DVL dropped out! Adding constant velocity factors.");
 
     double dt = target_time - prev_time_;
     double vel_random_walk = params_.dvl.velocity_random_walk;
     double scaled_sigma = vel_random_walk * std::sqrt(std::max(dt, 0.001));
 
     gtsam::SharedNoiseModel zero_accel_noise = gtsam::noiseModel::Isotropic::Sigma(3, scaled_sigma);
+
+    RCLCPP_DEBUG(get_logger(), "Adding constant velocity factor at step %zu", current_step_);
 
     graph.emplace_shared<coug_fgo::factors::CustomConstantVelocityFactor>(
       X(prev_step_), V(prev_step_),
