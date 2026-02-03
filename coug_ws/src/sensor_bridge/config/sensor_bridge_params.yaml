@@ -21,5 +21,6 @@
 
   gps_odom_converter_node:
     ros__parameters:
-      input_topic: "odometry/gps"
+      gps_odom_topic: "odometry/gps"
+      ahrs_topic: "imu/data"
       output_topic: "odometry/truth"

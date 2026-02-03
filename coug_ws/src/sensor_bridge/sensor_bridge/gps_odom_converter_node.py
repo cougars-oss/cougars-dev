@@ -15,6 +15,8 @@
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Pose
 
 from tf2_ros import Buffer, TransformListener
 from tf2_geometry_msgs import do_transform_pose
@@ -31,16 +33,18 @@ class GpsOdomConverterNode(Node):
     def __init__(self):
         super().__init__("gps_odom_converter_node")
 
-        self.declare_parameter("input_topic", "odometry/gps")
+        self.declare_parameter("gps_odom_topic", "odometry/gps")
         self.declare_parameter("output_topic", "odometry/truth")
+        self.declare_parameter("ahrs_topic", "imu/data")
         self.declare_parameter("base_frame", "base_link")
 
-        input_topic = (
-            self.get_parameter("input_topic").get_parameter_value().string_value
+        gps_odom_topic = (
+            self.get_parameter("gps_odom_topic").get_parameter_value().string_value
         )
         output_topic = (
             self.get_parameter("output_topic").get_parameter_value().string_value
         )
+        ahrs_topic = self.get_parameter("ahrs_topic").get_parameter_value().string_value
         self.base_frame = (
             self.get_parameter("base_frame").get_parameter_value().string_value
         )
@@ -48,15 +52,24 @@ class GpsOdomConverterNode(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
-        self.subscription = self.create_subscription(
-            Odometry, input_topic, self.listener_callback, 10
+        self.gps_subscription = self.create_subscription(
+            Odometry, gps_odom_topic, self.listener_callback, 10
+        )
+        self.ahrs_subscription = self.create_subscription(
+            Imu, ahrs_topic, self.ahrs_callback, 10
         )
         self.publisher = self.create_publisher(Odometry, output_topic, 10)
 
+        self.latest_ahrs_msg = None
+
         self.get_logger().info(
-            f"GPS Odom converter started. Listening on {input_topic} "
+            f"GPS Odom converter started. Listening on {gps_odom_topic} and {ahrs_topic} "
             f"and publishing on {output_topic}."
         )
+
+    def ahrs_callback(self, msg: Imu):
+        """Cache latest AHRS message."""
+        self.latest_ahrs_msg = msg
 
     def listener_callback(self, msg: Odometry):
         """
@@ -77,6 +90,25 @@ class GpsOdomConverterNode(Node):
             return
 
         p_base_in_map = do_transform_pose(msg.pose.pose, t_gps_base)
+
+        if self.latest_ahrs_msg:
+            try:
+                t_ahrs_base = self.tf_buffer.lookup_transform(
+                    self.latest_ahrs_msg.header.frame_id,
+                    self.base_frame,
+                    rclpy.time.Time(),
+                )
+
+                ahrs_pose = Pose()
+                ahrs_pose.orientation = self.latest_ahrs_msg.orientation
+                p_ahrs_base_in_map = do_transform_pose(ahrs_pose, t_ahrs_base)
+                p_base_in_map.orientation = p_ahrs_base_in_map.orientation
+
+            except Exception as e:
+                self.get_logger().warn(
+                    f"Could not transform AHRS orientation: {str(e)}",
+                    throttle_duration_sec=1.0,
+                )
 
         out_msg = Odometry()
         out_msg.header = msg.header
