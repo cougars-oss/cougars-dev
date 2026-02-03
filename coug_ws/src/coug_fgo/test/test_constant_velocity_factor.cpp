@@ -16,7 +16,7 @@
  * @file test_constant_velocity_factor.cpp
  * @brief Unit tests for constant_velocity_factor.hpp.
  * @author Nelson Durrant (w Gemini 3 Pro)
- * @date Feb 2026
+ * @date Jan 2026
  */
 
 #include <gtest/gtest.h>

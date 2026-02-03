@@ -30,6 +30,7 @@
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/transform.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/wrench.hpp>
 
 namespace coug_fgo::utils
 {
@@ -77,6 +78,19 @@ gtsam::Pose3 toGtsam(const geometry_msgs::msg::Transform & msg)
 {
   return gtsam::Pose3(toGtsam(msg.rotation), toGtsam(msg.translation));
 }
+
+/**
+ * @brief Converts a geometry_msgs Wrench to a GTSAM Vector6.
+ * @param msg The input Wrench message.
+ * @return The resulting gtsam::Vector6 [fx, fy, fz, tx, ty, tz].
+ */
+gtsam::Vector6 toGtsam(const geometry_msgs::msg::Wrench & msg)
+{
+  gtsam::Vector6 v;
+  v << msg.force.x, msg.force.y, msg.force.z, msg.torque.x, msg.torque.y, msg.torque.z;
+  return v;
+}
+
 /**
  * @brief Converts a GTSAM Point3 to a geometry_msgs Point.
  * @param gtsam_obj The input GTSAM Point3.

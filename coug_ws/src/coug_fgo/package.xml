@@ -3,7 +3,7 @@
 <package format="3">
   <name>coug_fgo</name>
   <version>0.0.0</version>
-  <description>Tightly-coupled, fixed-lag FGO odometry for the CougUV</description>
+  <description>FGO localization and odometry for the CougUV</description>
   <maintainer email="snelsondurrant@gmail.com">Nelson Durrant</maintainer>
   <license>Apache-2.0</license>
 

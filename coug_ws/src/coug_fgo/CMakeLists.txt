@@ -164,6 +164,13 @@ if(BUILD_TESTING)
     ${GTSAM_EIGEN_INCLUDE_DIR}
   )
   target_link_libraries(test_constant_velocity_factor gtsam)
+
+  ament_add_gtest(test_hydrodynamic_factor_arm test/test_hydrodynamic_factor_arm.cpp)
+  target_include_directories(test_hydrodynamic_factor_arm PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    ${GTSAM_EIGEN_INCLUDE_DIR}
+  )
+  target_link_libraries(test_hydrodynamic_factor_arm gtsam)
 endif()
 
 ament_package()

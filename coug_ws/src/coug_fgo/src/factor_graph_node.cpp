@@ -35,6 +35,7 @@
 #include "coug_fgo/factors/ahrs_factor.hpp"
 #include "coug_fgo/factors/mag_factor_arm.hpp"
 #include "coug_fgo/factors/constant_velocity_factor.hpp"
+#include "coug_fgo/factors/hydrodynamic_factor_arm.hpp"
 #include "coug_fgo/utils/conversion_utils.hpp"
 
 
@@ -45,6 +46,7 @@ using coug_fgo::factors::CustomGPSFactorArm;
 using coug_fgo::factors::CustomAHRSFactor;
 using coug_fgo::factors::CustomMagFactorArm;
 using coug_fgo::factors::CustomConstantVelocityFactor;
+using coug_fgo::factors::CustomHydrodynamicFactorArm;
 using coug_fgo::utils::toGtsam;
 using coug_fgo::utils::toQuatMsg;
 using coug_fgo::utils::toPointMsg;
@@ -166,6 +168,15 @@ void FactorGraphNode::setupRosInterfaces()
     },
     sensor_options);
 
+  wrench_sub_ = create_subscription<geometry_msgs::msg::WrenchStamped>(
+    params_.wrench_topic, 20,
+    [this](const geometry_msgs::msg::WrenchStamped::SharedPtr msg) {
+      std::scoped_lock lock(wrench_queue_mutex_);
+      wrench_queue_.push_back(msg);
+      last_wrench_time_ = this->get_clock()->now().seconds();
+    },
+    sensor_options);
+
   // --- ROS Diagnostics ---
   std::string ns = this->get_namespace();
   std::string clean_ns = (ns == "/") ? "" : ns;
@@ -262,6 +273,12 @@ bool FactorGraphNode::lookupInitialTransforms()
         params_.ahrs.parameter_frame : initial_ahrs_->header.frame_id;
       ahrs_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
       have_ahrs_to_dvl_tf_ = true;
+    }
+    if (params_.hydro.enable_hydro && !have_hydro_to_dvl_tf_) {
+      std::string child_frame = params_.hydro.use_parameter_frame ?
+        params_.hydro.parameter_frame : initial_wrench_->header.frame_id;
+      hydro_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
+      have_hydro_to_dvl_tf_ = true;
     }
   } catch (const tf2::TransformException & ex) {
     RCLCPP_ERROR_THROTTLE(
@@ -646,7 +663,8 @@ void FactorGraphNode::initializeGraph()
 
     if (!imu_queue_.empty() && (!params_.gps.enable_gps || !gps_queue_.empty()) &&
       !depth_queue_.empty() && (!params_.mag.enable_mag || !mag_queue_.empty()) &&
-      (!params_.ahrs.enable_ahrs || !ahrs_queue_.empty()) && !dvl_queue_.empty())
+      (!params_.ahrs.enable_ahrs || !ahrs_queue_.empty()) && !dvl_queue_.empty() &&
+      (!params_.hydro.enable_hydro || !wrench_queue_.empty()))
     {
       if (params_.prior.use_parameter_priors) {
         RCLCPP_INFO(
@@ -658,6 +676,7 @@ void FactorGraphNode::initializeGraph()
         if (params_.mag.enable_mag) {initial_mag_ = mag_queue_.back();}
         if (params_.ahrs.enable_ahrs) {initial_ahrs_ = ahrs_queue_.back();}
         initial_dvl_ = dvl_queue_.back();
+        if (params_.hydro.enable_hydro) {initial_wrench_ = wrench_queue_.back();}
         data_averaged_ = true;
       } else {
         RCLCPP_INFO(get_logger(), "Required sensor messages received! Averaging...");
@@ -666,12 +685,13 @@ void FactorGraphNode::initializeGraph()
       sensors_ready_ = true;
     } else {
       RCLCPP_WARN_THROTTLE(
-        get_logger(), *get_clock(), 5000, "Waiting for sensors: %s%s%s%s%s%s",
+        get_logger(), *get_clock(), 5000, "Waiting for sensors: %s%s%s%s%s%s%s",
         imu_queue_.empty() ? "[IMU] " : "",
         (params_.gps.enable_gps && gps_queue_.empty()) ? "[GPS] " : "",
         (params_.mag.enable_mag && mag_queue_.empty()) ? "[Magnetometer] " : "",
         (params_.ahrs.enable_ahrs && ahrs_queue_.empty()) ? "[AHRS] " : "",
-        depth_queue_.empty() ? "[Depth] " : "", dvl_queue_.empty() ? "[DVL]" : "");
+        depth_queue_.empty() ? "[Depth] " : "", dvl_queue_.empty() ? "[DVL] " : "",
+        (params_.hydro.enable_hydro && wrench_queue_.empty()) ? "[Wrench]" : "");
       return;
     }
   }
@@ -692,10 +712,11 @@ void FactorGraphNode::initializeGraph()
       std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_msgs;
       std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_msgs;
       std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_msgs;
+      std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_msgs;
 
       {
         std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
-          mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_);
+          mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_, wrench_queue_mutex_);
 
         imu_msgs = std::move(imu_queue_);
         gps_msgs = std::move(gps_queue_);
@@ -703,6 +724,7 @@ void FactorGraphNode::initializeGraph()
         mag_msgs = std::move(mag_queue_);
         ahrs_msgs = std::move(ahrs_queue_);
         dvl_msgs = std::move(dvl_queue_);
+        wrench_msgs = std::move(wrench_queue_);
       }
 
       AveragedMeasurements avgs =
@@ -716,6 +738,7 @@ void FactorGraphNode::initializeGraph()
       initial_mag_ = avgs.mag;
       initial_ahrs_ = avgs.ahrs;
       initial_dvl_ = avgs.dvl;
+      initial_wrench_ = wrench_msgs.back();
 
       RCLCPP_INFO(get_logger(), "Sensor data averaged successfully! Initializing graph...");
       data_averaged_ = true;
@@ -1016,6 +1039,40 @@ void FactorGraphNode::addConstantVelocityFactor(
     X(current_step_), V(current_step_),
     zero_accel_noise
   );
+}
+
+void FactorGraphNode::addHydrodynamicFactor(
+  gtsam::NonlinearFactorGraph & graph,
+  const std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> & wrench_msgs,
+  double target_time)
+{
+  if (!have_hydro_to_dvl_tf_ || wrench_msgs.empty()) {return;}
+
+  const auto & wrench_msg = wrench_msgs.back();
+
+  gtsam::Vector3 hydro_sigmas = gtsam::Vector3::Constant(params_.hydro.prediction_noise_sigma);
+  gtsam::SharedNoiseModel hydro_noise = gtsam::noiseModel::Diagonal::Sigmas(hydro_sigmas);
+
+  if (params_.hydro.robust_kernel == "Huber") {
+    hydro_noise = gtsam::noiseModel::Robust::Create(
+      gtsam::noiseModel::mEstimator::Huber::Create(params_.hydro.robust_k), hydro_noise);
+  } else if (params_.hydro.robust_kernel == "Tukey") {
+    hydro_noise = gtsam::noiseModel::Robust::Create(
+      gtsam::noiseModel::mEstimator::Tukey::Create(params_.hydro.robust_k), hydro_noise);
+  }
+
+  double dt = target_time - prev_time_;
+  RCLCPP_DEBUG(get_logger(), "Adding hydrodynamic factor at step %zu", current_step_);
+
+  graph.emplace_shared<CustomHydrodynamicFactorArm>(
+    X(prev_step_), V(prev_step_),
+    X(current_step_), V(current_step_),
+    dt, toGtsam(wrench_msg->wrench.force),
+    toGtsam(hydro_to_dvl_tf_.transform),
+    params_.hydro.mass,
+    params_.hydro.linear_drag,
+    params_.hydro.quad_drag,
+    hydro_noise);
 }
 
 void FactorGraphNode::addPreintegratedImuFactor(
@@ -1444,10 +1501,11 @@ void FactorGraphNode::optimizeGraph()
   std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_msgs;
   std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_msgs;
   std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_msgs;
+  std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_msgs;
 
   {
     std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
-      mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_);
+      mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_, wrench_queue_mutex_);
 
     imu_msgs = std::move(imu_queue_);
     gps_msgs = std::move(gps_queue_);
@@ -1455,6 +1513,7 @@ void FactorGraphNode::optimizeGraph()
     mag_msgs = std::move(mag_queue_);
     ahrs_msgs = std::move(ahrs_queue_);
     dvl_msgs = std::move(dvl_queue_);
+    wrench_msgs = std::move(wrench_queue_);
   }
 
   if (params_.experimental.enable_dvl_preintegration) {
@@ -1503,13 +1562,21 @@ void FactorGraphNode::optimizeGraph()
 
   if (params_.experimental.enable_dvl_preintegration) {
     if (dvl_msgs.empty() && !params_.experimental.enable_pseudo_dvl_w_imu) {
-      addConstantVelocityFactor(new_graph, target_time);
+      if (params_.hydro.enable_hydro) {
+        addHydrodynamicFactor(new_graph, wrench_msgs, target_time);
+      } else {
+        addConstantVelocityFactor(new_graph, target_time);
+      }
     } else {
       addPreintegratedDvlFactor(new_graph, dvl_msgs, imu_msgs, target_time);
     }
   } else {
     if (dvl_msgs.empty()) {
-      addConstantVelocityFactor(new_graph, target_time);
+      if (params_.hydro.enable_hydro) {
+        addHydrodynamicFactor(new_graph, wrench_msgs, target_time);
+      } else {
+        addConstantVelocityFactor(new_graph, target_time);
+      }
     } else {
       addDvlFactor(new_graph, dvl_msgs);
     }
@@ -1672,6 +1739,12 @@ void FactorGraphNode::checkSensorInputs(diagnostic_updater::DiagnosticStatusWrap
     check_queue(
       "DVL", dvl_queue_.size(), last_dvl_time_, true, true,
       params_.dvl.timeout_threshold);
+  }
+  {
+    std::scoped_lock lock(wrench_queue_mutex_);
+    check_queue(
+      "Wrench", wrench_queue_.size(), last_wrench_time_, params_.hydro.enable_hydro, false,
+      params_.hydro.timeout_threshold);
   }
 }
 

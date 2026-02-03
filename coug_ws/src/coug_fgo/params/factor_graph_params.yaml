@@ -58,6 +58,9 @@ factor_graph_node:
   dvl_topic:
     type: string
     default_value: "dvl/twist"
+  wrench_topic:
+    type: string
+    default_value: "cmd_wrench"
   global_odom_topic:
     type: string
     default_value: "odometry/global"
@@ -267,6 +270,38 @@ factor_graph_node:
     velocity_random_walk:
       type: double
       default_value: 0.1
+    timeout_threshold:
+      type: double
+      default_value: 1.0
+    robust_kernel:
+      type: string
+      default_value: "None"
+    robust_k:
+      type: double
+      default_value: 1.345
+
+  hydro:
+    enable_hydro:
+      type: bool
+      default_value: false
+    use_parameter_frame:
+      type: bool
+      default_value: false
+    parameter_frame:
+      type: string
+      default_value: "base_link"
+    prediction_noise_sigma:
+      type: double
+      default_value: 0.1
+    mass:
+      type: double
+      default_value: 10.0
+    linear_drag:
+      type: double
+      default_value: 10.0
+    quad_drag:
+      type: double
+      default_value: 10.0
     timeout_threshold:
       type: double
       default_value: 1.0

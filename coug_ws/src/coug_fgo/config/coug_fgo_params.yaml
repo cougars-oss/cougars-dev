@@ -30,6 +30,7 @@
     mag_topic: "imu/mag"
     ahrs_topic: "imu/ahrs"
     dvl_topic: "dvl/twist"
+    wrench_topic: "cmd_wrench"
     global_odom_topic: "odometry/global"
     smoothed_path_topic: "smoothed_path"
     velocity_topic: "~/velocity" # Published at the DVL frame.
@@ -119,6 +120,17 @@
         velocity_noise_sigma: 0.02 # [m/s] DVL body-velocity uncertainty sigma.
       velocity_random_walk: 0.1 # [m/s/sqrt(s)] Velocity uncertainty growth rate during dropouts.
       timeout_threshold: 0.25 # [s] Time before switching to depth-driven keyframes (DVL dropout).
+      robust_kernel: "None"
+      robust_k: 1.345
+
+    hydro:
+      enable_hydro: false
+      use_parameter_frame: false
+      prediction_noise_sigma: 0.1 # Sigma for prediction noise.
+      mass: 10.0 # [kg] Mass of the vehicle.
+      linear_drag: 10.0 # [kg/s] Linear drag coefficient.
+      quad_drag: 10.0 # [kg/m] Quadratic drag coefficient.
+      timeout_threshold: 1.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 

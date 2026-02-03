@@ -14,7 +14,7 @@
 
 /**
  * @file factor_graph_node.hpp
- * @brief ROS 2 node for factor graph optimization using GTSAM and fixed-lag smoothing.
+ * @brief ROS 2 node for AUV factor graph optimization using GTSAM.
  * @author Nelson Durrant
  * @date Jan 2026
  */
@@ -43,6 +43,7 @@
 #include <vector>
 
 #include <geometry_msgs/msg/twist_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/wrench_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <nav_msgs/msg/path.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -64,7 +65,7 @@ namespace coug_fgo
  * @brief Performs factor graph optimization for AUV navigation.
  *
  * This node integrates measurements from IMU, DVL, GPS, depth, magnetometer, and AHRS
- * sensors into a global factor graph. It uses fixed-lag smoothing (ISAM2) to estimate
+ * sensors into a global factor graph. It uses ISAM2 (fixed-lag or full) to estimate
  * the AUV's pose, velocity, and IMU biases in real-time.
  */
 class FactorGraphNode : public rclcpp::Node
@@ -221,6 +222,17 @@ private:
     double target_time);
 
   /**
+   * @brief Adds a hydrodynamic factor to the graph.
+   * @param graph The target factor graph.
+   * @param wrench_msgs Queue of wrench messages.
+   * @param target_time The timestamp for the new pose key.
+   */
+  void addHydrodynamicFactor(
+    gtsam::NonlinearFactorGraph & graph,
+    const std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> & wrench_msgs,
+    double target_time);
+
+  /**
    * @brief Integrates and adds a combined IMU factor to the graph.
    * @param graph The target factor graph.
    * @param imu_msgs Queue of IMU messages since the last pose.
@@ -331,6 +343,7 @@ private:
   std::atomic<double> last_depth_time_{0.0};
   std::atomic<double> last_mag_time_{0.0};
   std::atomic<double> last_ahrs_time_{0.0};
+  std::atomic<double> last_wrench_time_{0.0};
   std::atomic<double> last_real_dvl_time_{0.0};
   std::atomic<bool> processing_overflow_{false};
   std::atomic<double> last_depth_trigger_time_{0.0};
@@ -360,6 +373,7 @@ private:
   sensor_msgs::msg::Imu::SharedPtr initial_ahrs_;
   sensor_msgs::msg::MagneticField::SharedPtr initial_mag_;
   geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr initial_dvl_;
+  geometry_msgs::msg::WrenchStamped::SharedPtr initial_wrench_;
 
   // --- Message Queues ---
   std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_queue_;
@@ -368,6 +382,7 @@ private:
   std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_queue_;
   std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_queue_;
   std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_queue_;
+  std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_queue_;
 
   // --- Multithreading ---
   rclcpp::CallbackGroup::SharedPtr sensor_cb_group_;
@@ -380,6 +395,7 @@ private:
   std::mutex mag_queue_mutex_;
   std::mutex ahrs_queue_mutex_;
   std::mutex dvl_queue_mutex_;
+  std::mutex wrench_queue_mutex_;
 
   // --- Transformations ---
   std::string dvl_frame_;
@@ -391,6 +407,7 @@ private:
   bool have_depth_to_dvl_tf_ = false;
   bool have_mag_to_dvl_tf_ = false;
   bool have_ahrs_to_dvl_tf_ = false;
+  bool have_hydro_to_dvl_tf_ = false;
 
   geometry_msgs::msg::TransformStamped dvl_to_base_tf_;
   geometry_msgs::msg::TransformStamped imu_to_dvl_tf_;
@@ -398,6 +415,7 @@ private:
   geometry_msgs::msg::TransformStamped depth_to_dvl_tf_;
   geometry_msgs::msg::TransformStamped mag_to_dvl_tf_;
   geometry_msgs::msg::TransformStamped ahrs_to_dvl_tf_;
+  geometry_msgs::msg::TransformStamped hydro_to_dvl_tf_;
 
   // --- ROS Interfaces ---
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr global_odom_pub_;
@@ -411,6 +429,7 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::MagneticField>::SharedPtr mag_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr ahrs_sub_;
   rclcpp::Subscription<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr dvl_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::WrenchStamped>::SharedPtr wrench_sub_;
 
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_{nullptr};

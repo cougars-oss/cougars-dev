@@ -16,7 +16,7 @@
  * @file constant_velocity_factor.hpp
  * @brief GTSAM factor for enforcing constant body-frame velocity.
  * @author Nelson Durrant
- * @date Feb 2026
+ * @date Jan 2026
  */
 
 #pragma once
