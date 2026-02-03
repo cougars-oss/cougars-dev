@@ -763,7 +763,7 @@ void FactorGraphNode::initializeGraph()
     }
   }
 
-  // --- Initialize Incremental Fixed-Lag Smoother ---
+  // --- Initialize Smoother ---
   gtsam::IncrementalFixedLagSmoother::KeyTimestampMap initial_timestamps;
   initial_timestamps[X(0)] = prev_time_;
   initial_timestamps[V(0)] = prev_time_;
@@ -1515,7 +1515,7 @@ void FactorGraphNode::optimizeGraph()
     }
   }
 
-  // --- Incremental Fixed-Lag Smoother Update ---
+  // --- Smoother Update ---
   auto pred = imu_preintegrator_->predict(gtsam::NavState(prev_pose_, prev_vel_), prev_imu_bias_);
   new_values.insert(X(current_step_), pred.pose());
   new_values.insert(V(current_step_), pred.velocity());
