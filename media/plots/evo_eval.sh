@@ -4,21 +4,24 @@
 # Generates APE/RPE benchmark metrics for FGO evaluation
 #
 # Usage:
-#   ./evo_eval.sh <bag_name> [-n <N>] [-a] [-o] [-2]
+#   ./evo_eval.sh <bag_name> [evo_args...]
 #
 # Arguments:
 #   <bag_name>: Evaluate ../../bags/<bag_name> (required)
-#   -a: Align trajectories using Umeyama's method (best fit)
-#   -o: Align trajectories using the first pose (origin)
-#   -2: Project trajectories to the 2D plane (xy)
-#   -n: Number of poses to use for alignment (default: all)
+#   [evo_args...]: Additional arguments passed directly to evo_ape/evo_rpe
+#
+# Common Evo Arguments:
+#   --align: Align trajectories using Umeyama's method (best fit)
+#   --align_origin: Align trajectories using the first pose (origin)
+#   --project_to_plane xy: Project trajectories to the 2D plane (xy)
+#   --n_to_align <N>: Number of poses to use for alignment
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/../../scripts/common.sh"
 source "$SCRIPT_DIR/../../.venv/bin/activate"
 
 if [ -z "$1" ]; then
-    printError "Usage: $0 <bag_name> [-n <N>] [-a] [-o] [-2]"
+    printError "Usage: $0 <bag_name> [evo_args...]"
     exit 1
 fi
 
@@ -36,35 +39,6 @@ if [ ! -f "$METADATA_FILE" ]; then
     printError "Metadata file not found: $METADATA_FILE"
     exit 1
 fi
-
-ALIGN=""
-ALIGN_ORIGIN=""
-TWO_D=""
-N_TO_ALIGN=""
-
-while getopts ":n:ao2" opt; do
-    case $opt in
-        a)
-            ALIGN="--align"
-            ;;
-        o)
-            ALIGN_ORIGIN="--align_origin"
-            ;;
-        2)
-            TWO_D="--project_to_plane xy"
-            ;;
-        n)
-            N_TO_ALIGN="--n_to_align $OPTARG"
-            ALIGN="--align"
-            ;;
-        \?)
-            printError "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-    esac
-done
-
-EVO_ARGS="$ALIGN $ALIGN_ORIGIN $TWO_D $N_TO_ALIGN"
 
 # evo_config reset
 evo_config set save_traj_in_zip true
@@ -103,7 +77,7 @@ for agent in "${AGENTS[@]}"; do
 
             # 1. APE (Global Accuracy)
             if [ ! -f "$BAG_PATH/evo/${agent}/${LABEL}/ape_${metric}.zip" ]; then
-                evo_ape bag2 "$BAG_PATH" "$TRUTH" "$TOPIC" -r "$metric" $EVO_ARGS \
+                evo_ape bag2 "$BAG_PATH" "$TRUTH" "$TOPIC" -r "$metric" "$@" \
                     --save_results "$BAG_PATH/evo/${agent}/${LABEL}/ape_${metric}.zip"
             else
                 printWarning "Skipping APE ${metric} for ${agent}/${LABEL} (already exists)"
@@ -111,7 +85,7 @@ for agent in "${AGENTS[@]}"; do
 
             # 2. RPE (Drift - Normalized per 1 meter)
             if [ ! -f "$BAG_PATH/evo/${agent}/${LABEL}/rpe_${metric}.zip" ]; then
-                evo_rpe bag2 "$BAG_PATH" "$TRUTH" "$TOPIC" -r "$metric" $EVO_ARGS \
+                evo_rpe bag2 "$BAG_PATH" "$TRUTH" "$TOPIC" -r "$metric" "$@" \
                     --delta 1 --delta_unit m --all_pairs \
                     --save_results "$BAG_PATH/evo/${agent}/${LABEL}/rpe_${metric}.zip"
             else

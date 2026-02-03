@@ -13,7 +13,7 @@ cd "$SCRIPT_DIR"
 for d in ../../bags/*/; do
     bag=$(basename "$d")
     printInfo "Selecting ${bag}..."
-    ./evo_eval.sh "$bag"
+    ./evo_eval.sh "$bag" "$@"
 done
 
 printInfo "Generating plots..."
