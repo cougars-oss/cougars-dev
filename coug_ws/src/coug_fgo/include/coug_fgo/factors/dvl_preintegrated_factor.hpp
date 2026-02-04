@@ -45,16 +45,16 @@ class CustomDVLPreintegratedFactor : public gtsam::NoiseModelFactor2<gtsam::Pose
 public:
   /**
    * @brief Constructor for CustomDVLPreintegratedFactor.
-   * @param key_i GTSAM key for the starting AUV pose.
-   * @param key_j GTSAM key for the ending AUV pose.
+   * @param pose_key_i GTSAM key for the starting AUV pose.
+   * @param pose_key_j GTSAM key for the ending AUV pose.
    * @param measured_translation The preintegrated translation measurement.
-   * @param model The noise model for the measurement.
+   * @param noise_model The noise model for the measurement.
    */
   CustomDVLPreintegratedFactor(
-    gtsam::Key key_i, gtsam::Key key_j,
+    gtsam::Key pose_key_i, gtsam::Key pose_key_j,
     const gtsam::Vector3 & measured_translation,
-    gtsam::SharedNoiseModel model)
-  : gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Pose3>(model, key_i, key_j),
+    gtsam::SharedNoiseModel noise_model)
+  : gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Pose3>(noise_model, pose_key_i, pose_key_j),
     measured_translation_(measured_translation) {}
 
   /**
@@ -71,27 +71,27 @@ public:
     boost::optional<gtsam::Matrix &> H_pose_i = boost::none,
     boost::optional<gtsam::Matrix &> H_pose_j = boost::none) const override
   {
-    gtsam::Matrix66 D_between_i, D_between_j;
+    // Predict the translation measurement
+    gtsam::Matrix36 H_tj_posej;
+    gtsam::Point3 t_j = pose_j.translation(H_pose_j ? &H_tj_posej : 0);
 
-    gtsam::Pose3 relative_pose =
-      pose_i.between(
-      pose_j, (H_pose_i || H_pose_j) ? &D_between_i : 0,
-      (H_pose_i || H_pose_j) ? &D_between_j : 0);
-
-    gtsam::Matrix36 D_trans_pose;
-    gtsam::Vector3 p_ij = relative_pose.translation((H_pose_i || H_pose_j) ? &D_trans_pose : 0);
+    gtsam::Matrix36 H_pij_posei;
+    gtsam::Matrix33 H_pij_tj;
+    gtsam::Point3 p_ij = pose_i.transformTo(
+      t_j, H_pose_i ? &H_pij_posei : 0,
+      H_pose_j ? &H_pij_tj : 0);
 
     // 3D translation residual
     gtsam::Vector3 error = p_ij - measured_translation_;
 
     if (H_pose_i) {
-      // Jacobian with respect to starting pose
-      *H_pose_i = D_trans_pose * D_between_i;
+      // Jacobian with respect to starting pose (3x6)
+      *H_pose_i = H_pij_posei;
     }
 
     if (H_pose_j) {
-      // Jacobian with respect to ending pose
-      *H_pose_j = D_trans_pose * D_between_j;
+      // Jacobian with respect to ending pose (3x6)
+      *H_pose_j = H_pij_tj * H_tj_posej;
     }
 
     return error;

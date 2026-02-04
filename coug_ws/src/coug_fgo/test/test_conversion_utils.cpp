@@ -117,8 +117,15 @@ TEST(ConversionUtilsTest, GtsamExtraction) {
   EXPECT_DOUBLE_EQ(m3_diag(2, 2), cov6x6[14]);
   EXPECT_DOUBLE_EQ(m3_diag(0, 1), 0.0);
 
-  gtsam::Matrix11 m11 = coug_fgo::utils::toGtsam1x1(123.456);
-  EXPECT_DOUBLE_EQ(m11(0, 0), 123.456);
+  std::array<double, 9> cov3x3_val;
+  cov3x3_val.fill(0.0); cov3x3_val[8] = 42.0;
+  gtsam::Matrix11 m11_yaw = coug_fgo::utils::toGtsamYawCovariance(cov3x3_val);
+  EXPECT_DOUBLE_EQ(m11_yaw(0, 0), 42.0);
+
+  std::array<double, 36> cov6x6_val;
+  cov6x6_val.fill(0.0); cov6x6_val[14] = 84.0;
+  gtsam::Matrix11 m11_depth = coug_fgo::utils::toGtsamDepthCovariance(cov6x6_val);
+  EXPECT_DOUBLE_EQ(m11_depth(0, 0), 84.0);
 }
 
 /**

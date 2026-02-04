@@ -63,12 +63,10 @@
     gps:
       enable_gps: false
       enable_gps_init_only: false
-      enable_altitude: false
       use_parameter_frame: false
       use_parameter_covariance: true
       parameter_covariance:
         position_noise_sigma: 0.015 # [m] GPS position uncertainty sigma.
-        altitude_noise_sigma: 0.025 # [m] GPS altitude uncertainty sigma.
       timeout_threshold: 2.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
@@ -85,7 +83,6 @@
     mag:
       enable_mag: false
       enable_mag_init_only: false
-      constrain_yaw_only: true
       use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
@@ -101,12 +98,10 @@
     ahrs:
       enable_ahrs: true
       enable_ahrs_init_only: false
-      enable_roll_pitch: false
       use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
         yaw_noise_sigma: 0.01745 # [rad] AHRS sensor yaw uncertainty sigma.
-        roll_pitch_noise_sigma: 0.00349 # [rad] AHRS sensor roll and pitch uncertainty sigma.
       # https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml#declination
       mag_declination_radians: 0.0
       timeout_threshold: 1.0 # [s]

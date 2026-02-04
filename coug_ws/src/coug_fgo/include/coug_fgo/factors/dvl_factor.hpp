@@ -51,16 +51,16 @@ class CustomDVLFactor : public gtsam::NoiseModelFactor2<gtsam::Pose3, gtsam::Vec
 public:
   /**
    * @brief Constructor for CustomDVLFactor.
-   * @param poseKey GTSAM key for the AUV pose.
-   * @param velKey GTSAM key for the AUV world-frame velocity.
+   * @param pose_key GTSAM key for the AUV pose.
+   * @param vel_key GTSAM key for the AUV world-frame velocity.
    * @param measured_velocity_base The velocity measurement in the base frame.
-   * @param model The noise model for the measurement.
+   * @param noise_model The noise model for the measurement.
    */
   CustomDVLFactor(
-    gtsam::Key poseKey, gtsam::Key velKey,
+    gtsam::Key pose_key, gtsam::Key vel_key,
     const gtsam::Vector3 & measured_velocity_base,
-    const gtsam::SharedNoiseModel & model)
-  : NoiseModelFactor2<gtsam::Pose3, gtsam::Vector3>(model, poseKey, velKey),
+    const gtsam::SharedNoiseModel & noise_model)
+  : NoiseModelFactor2<gtsam::Pose3, gtsam::Vector3>(noise_model, pose_key, vel_key),
     measured_velocity_base_(measured_velocity_base) {}
 
   /**
@@ -77,22 +77,23 @@ public:
     boost::optional<gtsam::Matrix &> H_pose = boost::none,
     boost::optional<gtsam::Matrix &> H_vel = boost::none) const override
   {
-    gtsam::Rot3 R_bw = pose.rotation().inverse();
-    gtsam::Vector3 predicted_vel_base = R_bw.rotate(vel_world);
+    // Predict the velocity measurement
+    gtsam::Matrix33 H_unrotate_R, H_unrotate_v;
+    gtsam::Vector3 predicted_vel_base = pose.rotation().unrotate(
+      vel_world, H_pose ? &H_unrotate_R : 0, H_vel ? &H_unrotate_v : 0);
 
     // 3D velocity residual
     gtsam::Vector3 error = predicted_vel_base - measured_velocity_base_;
 
     if (H_pose) {
-      // Jacobian with respect to pose
-      gtsam::Matrix3 H_rot = gtsam::skewSymmetric(predicted_vel_base);  // d(error)/d(theta)
-      gtsam::Matrix3 H_trans = gtsam::Matrix3::Zero();  // d(error)/d(pos)
-      *H_pose = (gtsam::Matrix(3, 6) << H_rot, H_trans).finished();
+      // Jacobian with respect to pose (3x6)
+      H_pose->setZero(3, 6);
+      H_pose->block<3, 3>(0, 0) = H_unrotate_R;
     }
 
     if (H_vel) {
-      // Jacobian with respect to velocity
-      *H_vel = R_bw.matrix();
+      // Jacobian with respect to velocity (3x3)
+      *H_vel = H_unrotate_v;
     }
 
     return error;

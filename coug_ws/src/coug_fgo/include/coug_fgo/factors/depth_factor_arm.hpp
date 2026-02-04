@@ -42,22 +42,24 @@ namespace coug_fgo::factors
 class CustomDepthFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
   double measured_depth_;
-  gtsam::Pose3 T_base_sensor_;
+  gtsam::Point3 base_p_sensor_;
 
 public:
   /**
    * @brief Constructor for CustomDepthFactorArm.
-   * @param poseKey GTSAM key for the AUV pose.
+   * @param pose_key GTSAM key for the AUV pose.
    * @param measured_depth The depth measurement (Z-axis).
-   * @param T_base_sensor The static transform from base to sensor.
-   * @param model The noise model for the measurement.
+   * @param base_T_sensor The static transform from base to sensor.
+   * @param noise_model The noise model for the measurement.
    */
   CustomDepthFactorArm(
-    gtsam::Key poseKey, double measured_depth,
-    const gtsam::Pose3 & T_base_sensor, const gtsam::SharedNoiseModel & model)
-  : NoiseModelFactor1<gtsam::Pose3>(model, poseKey),
-    measured_depth_(measured_depth),
-    T_base_sensor_(T_base_sensor) {}
+    gtsam::Key pose_key, double measured_depth,
+    const gtsam::Pose3 & base_T_sensor, const gtsam::SharedNoiseModel & noise_model)
+  : NoiseModelFactor1<gtsam::Pose3>(noise_model, pose_key),
+    measured_depth_(measured_depth)
+  {
+    base_p_sensor_ = base_T_sensor.translation();
+  }
 
   /**
    * @brief Evaluates the error and Jacobians for the factor.
@@ -69,24 +71,16 @@ public:
     const gtsam::Pose3 & pose,
     boost::optional<gtsam::Matrix &> H = boost::none) const override
   {
-    gtsam::Pose3 T_ws = pose.compose(T_base_sensor_);
+    // Predict the depth measurement
+    gtsam::Matrix36 H_full;
+    gtsam::Point3 p_sensor_est = pose.transformFrom(base_p_sensor_, H ? &H_full : 0);
 
-    // 1D Z-axis residual
-    double error = T_ws.z() - measured_depth_;
+    // 1D depth residual
+    double error = p_sensor_est.z() - measured_depth_;
 
     if (H) {
-      // Jacobian with respect to pose
-      gtsam::Matrix H_matrix = gtsam::Matrix::Zero(1, 6);
-
-      gtsam::Matrix R_wb = pose.rotation().matrix();
-      gtsam::Vector3 p_bs = T_base_sensor_.translation();
-      gtsam::Matrix p_bs_skew = gtsam::skewSymmetric(p_bs);
-      gtsam::Matrix R_row2 = R_wb.row(2);
-
-      H_matrix.block<1, 3>(0, 0) = -R_row2 * p_bs_skew;  // d(error)/d(theta)
-      H_matrix.block<1, 3>(0, 3) = R_row2;  // d(error)/d(pos)
-
-      *H = H_matrix;
+      // Jacobian with respect to pose (1x6)
+      *H = H_full.row(2);
     }
 
     return gtsam::Vector1(error);

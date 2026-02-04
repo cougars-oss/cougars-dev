@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @file mag_factor_arm.hpp
- * @brief GTSAM factor for magnetometer yaw-only measurements with a lever arm.
+ * @file ahrs_factor_arm.hpp
+ * @brief GTSAM factor for AHRS/orientation yaw-only measurements with a lever arm.
  * @author Nelson Durrant
  * @date Jan 2026
  */
@@ -23,7 +23,6 @@
 
 #include <gtsam/base/Matrix.h>
 #include <gtsam/base/Vector.h>
-#include <gtsam/geometry/Point3.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/geometry/Rot3.h>
 #include <gtsam/inference/Symbol.h>
@@ -35,36 +34,38 @@ namespace coug_fgo::factors
 {
 
 /**
- * @class CustomMagYawFactorArm
- * @brief GTSAM factor for magnetometer yaw-only measurements with a lever arm.
+ * @class CustomAHRSYawFactorArm
+ * @brief GTSAM factor for AHRS/orientation yaw-only measurements with a lever arm.
  *
- * This factor constrains the yaw orientation of the AUV based on magnetometer measurements,
+ * This factor constrains the yaw orientation of the AUV based on AHRS/IMU measurements,
  * accounting for the rotation between the AUV base and the sensor.
  */
-class CustomMagYawFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
+class CustomAHRSYawFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
-  gtsam::Point3 reference_field_;
+  gtsam::Rot3 measured_rot_sensor_;
   gtsam::Rot3 base_R_sensor_;
-  double measured_yaw_;
+  double measured_yaw_base_;
 
 public:
   /**
-   * @brief Constructor for CustomMagYawFactorArm.
+   * @brief Constructor for CustomAHRSYawFactorArm.
    * @param pose_key GTSAM key for the AUV pose.
-   * @param measured_field The measured magnetic field vector (sensor frame).
-   * @param reference_field The reference magnetic field vector (world frame).
+   * @param measured_rot_sensor The measured orientation of the sensor in the world frame.
    * @param base_R_sensor The static rotation from base to sensor.
+   * @param mag_declination Magnetic declination to add to the measurement [rad].
    * @param noise_model The noise model for the measurement (1D).
    */
-  CustomMagYawFactorArm(
-    gtsam::Key pose_key, const gtsam::Point3 & measured_field,
-    const gtsam::Point3 & reference_field,
-    const gtsam::Rot3 & base_R_sensor, const gtsam::SharedNoiseModel & noise_model)
+  CustomAHRSYawFactorArm(
+    gtsam::Key pose_key, const gtsam::Rot3 & measured_rot_sensor,
+    const gtsam::Rot3 & base_R_sensor, double mag_declination,
+    const gtsam::SharedNoiseModel & noise_model)
   : NoiseModelFactor1<gtsam::Pose3>(noise_model, pose_key),
-    reference_field_(reference_field),
+    measured_rot_sensor_(measured_rot_sensor),
     base_R_sensor_(base_R_sensor)
   {
-    measured_yaw_ = std::atan2(measured_field.y(), measured_field.x());
+    gtsam::Rot3 R_decl = gtsam::Rot3::Yaw(mag_declination);
+    gtsam::Rot3 measured_rot_base = (R_decl * measured_rot_sensor) * base_R_sensor.inverse();
+    measured_yaw_base_ = measured_rot_base.yaw();
   }
 
   /**
@@ -77,14 +78,12 @@ public:
     const gtsam::Pose3 & pose,
     boost::optional<gtsam::Matrix &> H = boost::none) const override
   {
-    // Predict the magnetic field measurement
-    gtsam::Point3 b_body = pose.rotation().unrotate(reference_field_);
-    gtsam::Point3 b_sensor = base_R_sensor_.unrotate(b_body);
-
-    double yaw_pred = std::atan2(b_sensor.y(), b_sensor.x());
+    // Predict the yaw measurement
+    const gtsam::Rot3 & R_est_base = pose.rotation();
+    double yaw_est = R_est_base.yaw();
 
     // 1D yaw residual
-    double error = yaw_pred - measured_yaw_;
+    double error = yaw_est - measured_yaw_base_;
     while (error > M_PI) {
       error -= 2.0 * M_PI;
     }
@@ -96,17 +95,17 @@ public:
       // Jacobian with respect to pose (1x6)
       H->setZero(1, 6);
 
-      double r2 = b_sensor.x() * b_sensor.x() + b_sensor.y() * b_sensor.y();
-      double inv_r2 = (r2 > 1e-9) ? (1.0 / r2) : 0.0;
-      double d_yaw_dx = -b_sensor.y() * inv_r2;
-      double d_yaw_dy = b_sensor.x() * inv_r2;
+      const gtsam::Matrix33 & R = R_est_base.matrix();
+      double R00 = R(0, 0);
+      double R10 = R(1, 0);
 
-      gtsam::Vector3 J_inter = base_R_sensor_.rotate(gtsam::Vector3(d_yaw_dx, d_yaw_dy, 0.0));
-      gtsam::Vector3 J_rot = J_inter.cross(b_body);
-
-      (*H)(0, 0) = J_rot.x();
-      (*H)(0, 1) = J_rot.y();
-      (*H)(0, 2) = J_rot.z();
+      double D = R00 * R00 + R10 * R10;
+      if (D > 1e-9) {
+        (*H)(0, 1) = (R10 * R(0, 2) - R00 * R(1, 2)) / D;
+        (*H)(0, 2) = (R00 * R(1, 1) - R10 * R(0, 1)) / D;
+      } else {
+        (*H)(0, 2) = 1.0;
+      }
     }
 
     return gtsam::Vector1(error);

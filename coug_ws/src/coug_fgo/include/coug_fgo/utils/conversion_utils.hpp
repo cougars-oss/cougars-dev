@@ -163,14 +163,26 @@ gtsam::Matrix33 toGtsam3x3Diagonal(const std::array<double, 36> & cov)
 }
 
 /**
- * @brief Converts a single double to a GTSAM Matrix11.
- * @param val The input value.
+ * @brief Extracts the yaw variance (index 8) from a 3x3 orientation covariance array.
+ * @param cov The input 3x3 covariance array.
  * @return The resulting gtsam::Matrix11.
  */
-gtsam::Matrix11 toGtsam1x1(double val)
+gtsam::Matrix11 toGtsamYawCovariance(const std::array<double, 9> & cov)
 {
   gtsam::Matrix11 m;
-  m(0, 0) = val;
+  m(0, 0) = cov[8];
+  return m;
+}
+
+/**
+ * @brief Extracts the Z variance (index 14) from a 6x6 pose covariance array.
+ * @param cov The input 6x6 covariance array.
+ * @return The resulting gtsam::Matrix11.
+ */
+gtsam::Matrix11 toGtsamDepthCovariance(const std::array<double, 36> & cov)
+{
+  gtsam::Matrix11 m;
+  m(0, 0) = cov[14];
   return m;
 }
 

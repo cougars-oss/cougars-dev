@@ -25,10 +25,10 @@
 
 #include <boost/bind/bind.hpp>
 
-#include "coug_fgo/factors/ahrs_factor.hpp"
+#include "coug_fgo/factors/ahrs_factor_arm.hpp"
 
 /**
- * @brief Test the error evaluation logic of the CustomAHRSFactor.
+ * @brief Test the error evaluation logic of the CustomAHRSYawFactorArm.
  *
  * Verifies that the factor correctly accounts for the mounting rotation (offset)
  * between the vehicle's body frame and the AHRS sensor frame.
@@ -40,68 +40,70 @@
  * 4.  **Combined**: Vehicle rotated + Sensor offset.
  * 5.  **Error Check**: Verifies non-zero error magnitude.
  */
-TEST(CustomAHRSFactorTest, ErrorEvaluation) {
+TEST(CustomAHRSYawFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
-  gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(3, 0.1);
+  gtsam::SharedNoiseModel model = gtsam::noiseModel::Isotropic::Sigma(1, 0.1);
 
   // Case 1: Identity
-  coug_fgo::factors::CustomAHRSFactor factor1(poseKey, gtsam::Rot3::Identity(),
+  coug_fgo::factors::CustomAHRSYawFactorArm factor1(poseKey, gtsam::Rot3::Identity(),
     gtsam::Rot3::Identity(), 0.0, model);
   EXPECT_TRUE(
     gtsam::assert_equal(
-      gtsam::Vector3::Zero(),
+      gtsam::Vector1::Zero(),
       factor1.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
   // Case 2: Rotation
   gtsam::Pose3 pose_rot = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3());
-  coug_fgo::factors::CustomAHRSFactor factor_rot(poseKey, gtsam::Rot3::Yaw(M_PI_2),
+  coug_fgo::factors::CustomAHRSYawFactorArm factor_rot(poseKey, gtsam::Rot3::Yaw(M_PI_2),
     gtsam::Rot3::Identity(), 0.0, model);
   EXPECT_TRUE(
     gtsam::assert_equal(
-      gtsam::Vector3::Zero(),
+      gtsam::Vector1::Zero(),
       factor_rot.evaluateError(pose_rot), 1e-9));
 
   // Case 3: Mounting/Lever Arm
-  coug_fgo::factors::CustomAHRSFactor factor2(poseKey, gtsam::Rot3::Yaw(M_PI_2),
+  coug_fgo::factors::CustomAHRSYawFactorArm factor2(poseKey, gtsam::Rot3::Yaw(M_PI_2),
     gtsam::Rot3::Yaw(M_PI_2), 0.0, model);
   EXPECT_TRUE(
     gtsam::assert_equal(
-      gtsam::Vector3::Zero(),
+      gtsam::Vector1::Zero(),
       factor2.evaluateError(gtsam::Pose3::Identity()), 1e-9));
 
   // Case 4: Combined
-  coug_fgo::factors::CustomAHRSFactor factor_comb(poseKey, gtsam::Rot3::Yaw(M_PI),
+  coug_fgo::factors::CustomAHRSYawFactorArm factor_comb(poseKey, gtsam::Rot3::Yaw(M_PI),
     gtsam::Rot3::Yaw(M_PI_2), 0.0, model);
   EXPECT_TRUE(
     gtsam::assert_equal(
-      gtsam::Vector3::Zero(),
+      gtsam::Vector1::Zero(),
       factor_comb.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3())), 1e-9));
 
   // Case 5: Error Check
   double angle = 0.174533;
   gtsam::Vector error =
     factor2.evaluateError(gtsam::Pose3(gtsam::Rot3::Yaw(angle), gtsam::Point3()));
-  EXPECT_NEAR(error[2], angle, 1e-5);
+  EXPECT_NEAR(error[0], angle, 1e-5);
 }
 
 /**
- * @brief Verify Jacobians of the CustomAHRSFactor using numerical differentiation.
+ * @brief Verify Jacobians of the CustomAHRSYawFactorArm using numerical differentiation.
  *
  * Validates the analytical Jacobians with respect to:
  * 1.  **Pose**: Orientation affects the error (rotational difference).
  */
-TEST(CustomAHRSFactorTest, Jacobians) {
-  coug_fgo::factors::CustomAHRSFactor factor(gtsam::symbol_shorthand::X(1),
+TEST(CustomAHRSYawFactorArmTest, Jacobians) {
+  coug_fgo::factors::CustomAHRSYawFactorArm factor(gtsam::symbol_shorthand::X(1),
     gtsam::Rot3::Ypr(0.5, 0.1, -0.1),
-    gtsam::Rot3::Ypr(0.1, 0, 0), 0.0, gtsam::noiseModel::Isotropic::Sigma(3, 0.1));
+    gtsam::Rot3::Ypr(0.1, 0, 0), 0.0, gtsam::noiseModel::Isotropic::Sigma(1, 0.1));
   gtsam::Pose3 pose = gtsam::Pose3(gtsam::Rot3::Ypr(0.4, 0.05, -0.05), gtsam::Point3(1, 1, 1));
 
   gtsam::Matrix expectedH = gtsam::numericalDerivative11<gtsam::Vector, gtsam::Pose3>(
     boost::bind(
-      &coug_fgo::factors::CustomAHRSFactor::evaluateError, &factor,
+      &coug_fgo::factors::CustomAHRSYawFactorArm::evaluateError, &factor,
       boost::placeholders::_1, boost::none), pose, 1e-5);
 
   gtsam::Matrix actualH;
   factor.evaluateError(pose, actualH);
   EXPECT_TRUE(gtsam::assert_equal(expectedH, actualH, 1e-5));
+  EXPECT_EQ(actualH.rows(), 1);
+  EXPECT_EQ(actualH.cols(), 6);
 }

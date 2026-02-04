@@ -23,7 +23,6 @@
 
 #include <gtsam/base/Matrix.h>
 #include <gtsam/base/Vector.h>
-#include <gtsam/base/numericalDerivative.h>
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/geometry/Rot3.h>
 #include <gtsam/inference/Symbol.h>
@@ -49,8 +48,7 @@ class CustomHydrodynamicFactorArm : public gtsam::NoiseModelFactor4<gtsam::Pose3
 {
 private:
   double dt_;
-  gtsam::Vector3 control_force_;
-  gtsam::Pose3 body_P_sensor_;
+  gtsam::Vector3 force_body_;
   double mass_;
   double linear_drag_;
   double quad_drag_;
@@ -58,63 +56,39 @@ private:
 public:
   /**
    * @brief Constructor for CustomHydrodynamicFactorArm.
-   * @param poseKey1 GTSAM key for the first pose (state i).
-   * @param velKey1 GTSAM key for the first velocity (state i).
-   * @param poseKey2 GTSAM key for the second pose (state j).
-   * @param velKey2 GTSAM key for the second velocity (state j).
+   * @param pose_key1 GTSAM key for the first pose (state i).
+   * @param vel_key1 GTSAM key for the first velocity (state i).
+   * @param pose_key2 GTSAM key for the second pose (state j).
+   * @param vel_key2 GTSAM key for the second velocity (state j).
    * @param dt The time interval between the two states.
    * @param control_force The sensor-frame force vector from thrusters.
-   * @param body_P_sensor The transform from sensor frame to body frame.
+   * @param body_T_sensor The transform from sensor frame to body frame.
    * @param mass Combined mass (Rigid body + Added mass).
    * @param linear_drag Linear damping coefficient.
    * @param quad_drag Quadratic damping coefficient.
-   * @param model The noise model for the constraint.
+   * @param noise_model The noise model for the constraint.
    */
   CustomHydrodynamicFactorArm(
-    gtsam::Key poseKey1, gtsam::Key velKey1,
-    gtsam::Key poseKey2, gtsam::Key velKey2,
+    gtsam::Key pose_key1, gtsam::Key vel_key1,
+    gtsam::Key pose_key2, gtsam::Key vel_key2,
     double dt,
     const gtsam::Vector3 & control_force,
-    const gtsam::Pose3 & body_P_sensor,
+    const gtsam::Pose3 & body_T_sensor,
     double mass,
     double linear_drag,
     double quad_drag,
-    const gtsam::SharedNoiseModel & model)
+    const gtsam::SharedNoiseModel & noise_model)
   : NoiseModelFactor4<gtsam::Pose3, gtsam::Vector3, gtsam::Pose3, gtsam::Vector3>(
-      model, poseKey1, velKey1, poseKey2, velKey2),
+      noise_model, pose_key1, vel_key1, pose_key2, vel_key2),
     dt_(dt),
-    control_force_(control_force),
-    body_P_sensor_(body_P_sensor),
     mass_(mass),
     linear_drag_(linear_drag),
     quad_drag_(quad_drag)
-  {}
+  {
+    force_body_ = body_T_sensor.rotation() * control_force;
+  }
 
   ~CustomHydrodynamicFactorArm() override {}
-
-  /**
-   * @brief Helper function to predict the next body velocity based on physics.
-   * @param pose1 The current pose estimate.
-   * @param vel1 The current world velocity estimate.
-   * @return The predicted body-frame velocity at the next time step.
-   */
-  gtsam::Vector3 predictBodyVelocity(
-    const gtsam::Pose3 & pose1,
-    const gtsam::Vector3 & vel1) const
-  {
-    gtsam::Vector3 v_body = pose1.rotation().unrotate(vel1);
-    gtsam::Vector3 force_body = body_P_sensor_.rotation() * control_force_;
-
-    gtsam::Vector3 accel_body;
-    for (int i = 0; i < 3; i++) {
-      double u = v_body(i);
-      double drag = -(linear_drag_ * u + quad_drag_ * std::abs(u) * u);
-      double net_force = force_body(i) + drag;
-      accel_body(i) = net_force / mass_;
-    }
-
-    return v_body + accel_body * dt_;
-  }
 
   /**
    * @brief Evaluates the error and Jacobians for the factor.
@@ -122,11 +96,11 @@ public:
    * @param vel1 The first velocity estimate.
    * @param pose2 The second pose estimate.
    * @param vel2 The second velocity estimate.
-   * @param H1 Optional Jacobian matrix.
-   * @param H2 Optional Jacobian matrix.
-   * @param H3 Optional Jacobian matrix.
-   * @param H4 Optional Jacobian matrix.
-   * @return The 3D error vector (difference between measured and predicted body velocity).
+   * @param H1 Optional Jacobian matrix (Pose1).
+   * @param H2 Optional Jacobian matrix (Vel1).
+   * @param H3 Optional Jacobian matrix (Pose2).
+   * @param H4 Optional Jacobian matrix (Vel2).
+   * @return The 3D error vector.
    */
   gtsam::Vector evaluateError(
     const gtsam::Pose3 & pose1, const gtsam::Vector3 & vel1,
@@ -136,34 +110,62 @@ public:
     boost::optional<gtsam::Matrix &> H3 = boost::none,
     boost::optional<gtsam::Matrix &> H4 = boost::none) const override
   {
-    auto errorFunc =
-      [this](
-      const gtsam::Pose3 & p1, const gtsam::Vector3 & v1,
-      const gtsam::Pose3 & p2, const gtsam::Vector3 & v2) -> gtsam::Vector {
-        // 3D velocity difference residual
-        gtsam::Vector3 v_body_pred = this->predictBodyVelocity(p1, v1);
-        gtsam::Vector3 v_body_meas = p2.rotation().unrotate(v2);
-        return v_body_meas - v_body_pred;
-      };
+    // Predict the velocity measurements
+    gtsam::Matrix33 J_vb1_R1, J_vb1_v1, J_vb2_R2, J_vb2_v2;
+    gtsam::Vector3 v_body1 =
+      pose1.rotation().unrotate(vel1, H1 ? &J_vb1_R1 : 0, H2 ? &J_vb1_v1 : 0);
+    gtsam::Vector3 v_body2 =
+      pose2.rotation().unrotate(vel2, H3 ? &J_vb2_R2 : 0, H4 ? &J_vb2_v2 : 0);
+
+    gtsam::Vector3 drag_force;
+    gtsam::Matrix33 J_drag_v = gtsam::Matrix33::Zero();
+
+    for (int i = 0; i < 3; i++) {
+      double u = v_body1(i);
+      double abs_u = std::abs(u);
+
+      drag_force(i) = -(linear_drag_ * u + quad_drag_ * abs_u * u);
+
+      if (H1 || H2) {
+        J_drag_v(i, i) = -(linear_drag_ + 2.0 * quad_drag_ * abs_u);
+      }
+    }
+
+    gtsam::Vector3 accel_body = (force_body_ + drag_force) / mass_;
+    gtsam::Vector3 v_body_pred = v_body1 + accel_body * dt_;
+
+    // 3D velocity residual
+    gtsam::Vector3 error = v_body2 - v_body_pred;
 
     if (H1) {
-      *H1 = gtsam::numericalDerivative41<gtsam::Vector, gtsam::Pose3, gtsam::Vector3,
-          gtsam::Pose3, gtsam::Vector3>(errorFunc, pose1, vel1, pose2, vel2);
-    }
-    if (H2) {
-      *H2 = gtsam::numericalDerivative42<gtsam::Vector, gtsam::Pose3, gtsam::Vector3,
-          gtsam::Pose3, gtsam::Vector3>(errorFunc, pose1, vel1, pose2, vel2);
-    }
-    if (H3) {
-      *H3 = gtsam::numericalDerivative43<gtsam::Vector, gtsam::Pose3, gtsam::Vector3,
-          gtsam::Pose3, gtsam::Vector3>(errorFunc, pose1, vel1, pose2, vel2);
-    }
-    if (H4) {
-      *H4 = gtsam::numericalDerivative44<gtsam::Vector, gtsam::Pose3, gtsam::Vector3,
-          gtsam::Pose3, gtsam::Vector3>(errorFunc, pose1, vel1, pose2, vel2);
+      // Jacobian with respect to pose1 (3x6)
+      gtsam::Matrix33 J_scale = gtsam::Matrix33::Identity();
+      J_scale.diagonal() += (dt_ / mass_) * J_drag_v.diagonal();
+
+      H1->setZero(3, 6);
+      H1->block<3, 3>(0, 0) = -J_scale * J_vb1_R1;
     }
 
-    return errorFunc(pose1, vel1, pose2, vel2);
+    if (H2) {
+      // Jacobian with respect to velocity1 (3x3)
+      gtsam::Matrix33 J_scale = gtsam::Matrix33::Identity();
+      J_scale.diagonal() += (dt_ / mass_) * J_drag_v.diagonal();
+
+      *H2 = -J_scale * J_vb1_v1;
+    }
+
+    if (H3) {
+      // Jacobian with respect to pose2 (3x6)
+      H3->setZero(3, 6);
+      H3->block<3, 3>(0, 0) = J_vb2_R2;
+    }
+
+    if (H4) {
+      // Jacobian with respect to velocity2 (3x3)
+      *H4 = J_vb2_v2;
+    }
+
+    return error;
   }
 };
 

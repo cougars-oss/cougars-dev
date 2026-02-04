@@ -32,7 +32,7 @@
 #include "coug_fgo/factors/dvl_factor.hpp"
 #include "coug_fgo/factors/dvl_preintegrated_factor.hpp"
 #include "coug_fgo/factors/gps_factor_arm.hpp"
-#include "coug_fgo/factors/ahrs_factor.hpp"
+#include "coug_fgo/factors/ahrs_factor_arm.hpp"
 #include "coug_fgo/factors/mag_factor_arm.hpp"
 #include "coug_fgo/factors/constant_velocity_factor.hpp"
 #include "coug_fgo/factors/hydrodynamic_factor_arm.hpp"
@@ -42,15 +42,16 @@
 using coug_fgo::factors::CustomDepthFactorArm;
 using coug_fgo::factors::CustomDVLFactor;
 using coug_fgo::factors::CustomDVLPreintegratedFactor;
-using coug_fgo::factors::CustomGPSFactorArm;
-using coug_fgo::factors::CustomAHRSFactor;
-using coug_fgo::factors::CustomMagFactorArm;
+using coug_fgo::factors::CustomGPS2DFactorArm;
+using coug_fgo::factors::CustomAHRSYawFactorArm;
+using coug_fgo::factors::CustomMagYawFactorArm;
 using coug_fgo::factors::CustomConstantVelocityFactor;
 using coug_fgo::factors::CustomHydrodynamicFactorArm;
 using coug_fgo::utils::toGtsam;
 using coug_fgo::utils::toGtsam3x3;
 using coug_fgo::utils::toGtsam3x3Diagonal;
-using coug_fgo::utils::toGtsam1x1;
+using coug_fgo::utils::toGtsamYawCovariance;
+using coug_fgo::utils::toGtsamDepthCovariance;
 using coug_fgo::utils::toQuatMsg;
 using coug_fgo::utils::toPointMsg;
 using coug_fgo::utils::toVectorMsg;
@@ -211,14 +212,6 @@ FactorGraphNode::FactorGraphNode()
   param_listener_ = std::make_shared<factor_graph_node::ParamListener>(
     get_node_parameters_interface());
   params_ = param_listener_->get_params();
-
-  // --- Parameter Overrides ---
-  if (!params_.gps.enable_altitude) {
-    params_.gps.parameter_covariance.altitude_noise_sigma = 1e9;
-  }
-  if (!params_.ahrs.enable_roll_pitch) {
-    params_.ahrs.parameter_covariance.roll_pitch_noise_sigma = 1e9;
-  }
 
   setupRosInterfaces();
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for sensor messages...");
@@ -824,21 +817,12 @@ void FactorGraphNode::addGpsFactor(
 
   gtsam::SharedNoiseModel gps_noise;
   if (params_.gps.use_parameter_covariance) {
-    gtsam::Vector3 gps_sigmas;
+    gtsam::Vector2 gps_sigmas;
     gps_sigmas << params_.gps.parameter_covariance.position_noise_sigma,
-      params_.gps.parameter_covariance.position_noise_sigma,
-      params_.gps.parameter_covariance.altitude_noise_sigma;
+      params_.gps.parameter_covariance.position_noise_sigma;
     gps_noise = gtsam::noiseModel::Diagonal::Sigmas(gps_sigmas);
   } else {
-    gtsam::Matrix33 gps_cov = toGtsam3x3(gps_msg->pose.covariance);
-
-    // Enable ignoring altitude from GPS
-    if (!params_.gps.enable_altitude) {
-      gps_cov(2, 2) = 1e9;
-      gps_cov.block<2, 1>(0, 2).setZero();
-      gps_cov.block<1, 2>(2, 0).setZero();
-    }
-
+    gtsam::Matrix22 gps_cov = toGtsam3x3(gps_msg->pose.covariance).block<2, 2>(0, 0);
     gps_noise = gtsam::noiseModel::Gaussian::Covariance(gps_cov);
   }
 
@@ -852,7 +836,7 @@ void FactorGraphNode::addGpsFactor(
 
   RCLCPP_DEBUG(get_logger(), "Adding GPS factor at step %zu", current_step_);
 
-  graph.emplace_shared<CustomGPSFactorArm>(
+  graph.emplace_shared<CustomGPS2DFactorArm>(
     X(current_step_), toGtsam(gps_msg->pose.pose.position),
     toGtsam(gps_to_dvl_tf_.transform), gps_noise);
 }
@@ -870,8 +854,8 @@ void FactorGraphNode::addDepthFactor(
     double depth_sigma = params_.depth.parameter_covariance.position_z_noise_sigma;
     depth_noise = gtsam::noiseModel::Isotropic::Sigma(1, depth_sigma);
   } else {
-    depth_noise =
-      gtsam::noiseModel::Gaussian::Covariance(toGtsam1x1(depth_msg->pose.covariance[14]));
+    depth_noise = gtsam::noiseModel::Gaussian::Covariance(
+      toGtsamDepthCovariance(depth_msg->pose.covariance));
   }
 
   if (params_.depth.robust_kernel == "Huber") {
@@ -899,24 +883,12 @@ void FactorGraphNode::addAhrsFactor(
 
   gtsam::SharedNoiseModel ahrs_noise;
   if (params_.ahrs.use_parameter_covariance) {
-    gtsam::Vector3 ahrs_sigmas;
-    ahrs_sigmas << params_.ahrs.parameter_covariance.roll_pitch_noise_sigma,
-      params_.ahrs.parameter_covariance.roll_pitch_noise_sigma,
-      params_.ahrs.parameter_covariance.yaw_noise_sigma;
+    gtsam::Vector1 ahrs_sigmas;
+    ahrs_sigmas << params_.ahrs.parameter_covariance.yaw_noise_sigma;
     ahrs_noise = gtsam::noiseModel::Diagonal::Sigmas(ahrs_sigmas);
   } else {
-    gtsam::Matrix33 ahrs_cov = toGtsam(ahrs_msg->orientation_covariance);
-
-    // Enable ignoring roll and pitch from AHRS
-    if (!params_.ahrs.enable_roll_pitch) {
-      ahrs_cov(0, 0) = 1e9;
-      ahrs_cov(1, 1) = 1e9;
-      ahrs_cov.block<2, 1>(0, 2).setZero();
-      ahrs_cov.block<1, 2>(2, 0).setZero();
-      ahrs_cov(0, 1) = 0.0; ahrs_cov(1, 0) = 0.0;
-    }
-
-    ahrs_noise = gtsam::noiseModel::Gaussian::Covariance(ahrs_cov);
+    ahrs_noise = gtsam::noiseModel::Gaussian::Covariance(
+      toGtsamYawCovariance(ahrs_msg->orientation_covariance));
   }
 
   if (params_.ahrs.robust_kernel == "Huber") {
@@ -929,7 +901,7 @@ void FactorGraphNode::addAhrsFactor(
 
   RCLCPP_DEBUG(get_logger(), "Adding AHRS factor at step %zu", current_step_);
 
-  graph.emplace_shared<CustomAHRSFactor>(
+  graph.emplace_shared<CustomAHRSYawFactorArm>(
     X(current_step_), toGtsam(ahrs_msg->orientation),
     toGtsam(ahrs_to_dvl_tf_.transform.rotation),
     params_.ahrs.mag_declination_radians,
@@ -948,65 +920,33 @@ void FactorGraphNode::addMagFactor(
     params_.mag.reference_field[1],
     params_.mag.reference_field[2]);
 
-  if (params_.mag.constrain_yaw_only) {
-    // 1D Factor
-    gtsam::Vector1 mag_sigma;
-    if (params_.mag.use_parameter_covariance) {
-      mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigma;
-    } else {
-      double B_mag = ref_vec.norm();
-      if (B_mag > 1e-6) {
-        // Convert to angular uncertainty (rad) from magnetic field uncertainty
-        double sigma_B = sqrt(mag_msg->magnetic_field_covariance[0]);
-        mag_sigma << sigma_B / B_mag;
-      } else {
-        mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigma;
-      }
-    }
-    gtsam::SharedNoiseModel mag_noise = gtsam::noiseModel::Isotropic::Sigma(1, mag_sigma(0));
-
-    if (params_.mag.robust_kernel == "Huber") {
-      mag_noise = gtsam::noiseModel::Robust::Create(
-        gtsam::noiseModel::mEstimator::Huber::Create(params_.mag.robust_k), mag_noise);
-    } else if (params_.mag.robust_kernel == "Tukey") {
-      mag_noise = gtsam::noiseModel::Robust::Create(
-        gtsam::noiseModel::mEstimator::Tukey::Create(params_.mag.robust_k), mag_noise);
-    }
-
-    RCLCPP_DEBUG(get_logger(), "Adding 1D mag factor at step %zu", current_step_);
-
-    graph.emplace_shared<CustomMagFactorArm>(
-      X(current_step_), toGtsam(mag_msg->magnetic_field), ref_vec,
-      toGtsam(mag_to_dvl_tf_.transform.rotation), mag_noise, true);
-
+  gtsam::Vector1 mag_sigma;
+  if (params_.mag.use_parameter_covariance) {
+    mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigma;
   } else {
-    // Standard 3D Factor
-    gtsam::SharedNoiseModel mag_noise;
-    if (params_.mag.use_parameter_covariance) {
-      gtsam::Vector3 mag_sigmas;
-      mag_sigmas << params_.mag.parameter_covariance.magnetic_field_noise_sigma,
-        params_.mag.parameter_covariance.magnetic_field_noise_sigma,
-        params_.mag.parameter_covariance.magnetic_field_noise_sigma;
-      mag_noise = gtsam::noiseModel::Diagonal::Sigmas(mag_sigmas);
+    double B_mag = ref_vec.norm();
+    if (B_mag > 1e-6) {
+      double sigma_B = sqrt(mag_msg->magnetic_field_covariance[0]);
+      mag_sigma << sigma_B / B_mag;
     } else {
-      gtsam::Matrix33 mag_cov = toGtsam(mag_msg->magnetic_field_covariance);
-      mag_noise = gtsam::noiseModel::Gaussian::Covariance(mag_cov);
+      mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigma;
     }
-
-    if (params_.mag.robust_kernel == "Huber") {
-      mag_noise = gtsam::noiseModel::Robust::Create(
-        gtsam::noiseModel::mEstimator::Huber::Create(params_.mag.robust_k), mag_noise);
-    } else if (params_.mag.robust_kernel == "Tukey") {
-      mag_noise = gtsam::noiseModel::Robust::Create(
-        gtsam::noiseModel::mEstimator::Tukey::Create(params_.mag.robust_k), mag_noise);
-    }
-
-    RCLCPP_DEBUG(get_logger(), "Adding 3D mag factor at step %zu", current_step_);
-
-    graph.emplace_shared<CustomMagFactorArm>(
-      X(current_step_), toGtsam(mag_msg->magnetic_field), ref_vec,
-      toGtsam(mag_to_dvl_tf_.transform.rotation), mag_noise, false);
   }
+  gtsam::SharedNoiseModel mag_noise = gtsam::noiseModel::Isotropic::Sigma(1, mag_sigma(0));
+
+  if (params_.mag.robust_kernel == "Huber") {
+    mag_noise = gtsam::noiseModel::Robust::Create(
+      gtsam::noiseModel::mEstimator::Huber::Create(params_.mag.robust_k), mag_noise);
+  } else if (params_.mag.robust_kernel == "Tukey") {
+    mag_noise = gtsam::noiseModel::Robust::Create(
+      gtsam::noiseModel::mEstimator::Tukey::Create(params_.mag.robust_k), mag_noise);
+  }
+
+  RCLCPP_DEBUG(get_logger(), "Adding mag factor at step %zu", current_step_);
+
+  graph.emplace_shared<CustomMagYawFactorArm>(
+    X(current_step_), toGtsam(mag_msg->magnetic_field), ref_vec,
+    toGtsam(mag_to_dvl_tf_.transform.rotation), mag_noise);
 }
 
 void FactorGraphNode::addDvlFactor(

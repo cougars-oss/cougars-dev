@@ -125,9 +125,6 @@ factor_graph_node:
     enable_gps_init_only:
       type: bool
       default_value: false
-    enable_altitude:
-      type: bool
-      default_value: false
     use_parameter_frame:
       type: bool
       default_value: false
@@ -141,9 +138,6 @@ factor_graph_node:
       position_noise_sigma:
         type: double
         default_value: 0.015
-      altitude_noise_sigma:
-        type: double
-        default_value: 0.025
     timeout_threshold:
       type: double
       default_value: 2.0
@@ -185,9 +179,6 @@ factor_graph_node:
     enable_mag_init_only:
       type: bool
       default_value: false
-    constrain_yaw_only:
-      type: bool
-      default_value: true
     use_parameter_frame:
       type: bool
       default_value: false
@@ -221,9 +212,6 @@ factor_graph_node:
     enable_ahrs_init_only:
       type: bool
       default_value: false
-    enable_roll_pitch:
-      type: bool
-      default_value: false
     use_parameter_frame:
       type: bool
       default_value: false
@@ -237,9 +225,6 @@ factor_graph_node:
       yaw_noise_sigma:
         type: double
         default_value: 0.01745
-      roll_pitch_noise_sigma:
-        type: double
-        default_value: 0.00349
     mag_declination_radians:
       type: double
       default_value: 0.0

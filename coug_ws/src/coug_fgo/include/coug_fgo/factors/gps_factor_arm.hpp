@@ -34,59 +34,54 @@ namespace coug_fgo::factors
 {
 
 /**
- * @class CustomGPSFactorArm
- * @brief GTSAM factor for GPS position measurements with a lever arm.
+ * @class CustomGPS2DFactorArm
+ * @brief GTSAM factor for 2D GPS position measurements with a lever arm.
  *
- * This factor constrains the 3D position of the AUV based on GPS measurements,
+ * This factor constrains the 2D (horizontal) position of the AUV based on GPS,
  * accounting for the lever arm between the AUV base and the sensor.
  */
-class CustomGPSFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
+class CustomGPS2DFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
   gtsam::Point3 measured_position_;
-  gtsam::Pose3 T_base_sensor_;
+  gtsam::Point3 base_p_sensor_;
 
 public:
   /**
-   * @brief Constructor for CustomGPSFactorArm.
-   * @param poseKey GTSAM key for the AUV pose.
-   * @param measured_position The measured 3D position in the world frame.
-   * @param T_base_sensor The static transform from base to sensor.
-   * @param model The noise model for the measurement.
+   * @brief Constructor for CustomGPS2DFactorArm.
+   * @param pose_key GTSAM key for the AUV pose.
+   * @param measured_position The measured 3D position (Z is ignored).
+   * @param base_T_sensor The static transform from base to sensor.
+   * @param noise_model The noise model for the measurement (model dimension must be 2).
    */
-  CustomGPSFactorArm(
-    gtsam::Key poseKey, const gtsam::Point3 & measured_position,
-    const gtsam::Pose3 & T_base_sensor, const gtsam::SharedNoiseModel & model)
-  : NoiseModelFactor1<gtsam::Pose3>(model, poseKey),
-    measured_position_(measured_position),
-    T_base_sensor_(T_base_sensor) {}
+  CustomGPS2DFactorArm(
+    gtsam::Key pose_key, const gtsam::Point3 & measured_position,
+    const gtsam::Pose3 & base_T_sensor, const gtsam::SharedNoiseModel & noise_model)
+  : NoiseModelFactor1<gtsam::Pose3>(noise_model, pose_key),
+    measured_position_(measured_position)
+  {
+    base_p_sensor_ = base_T_sensor.translation();
+  }
 
   /**
    * @brief Evaluates the error and Jacobians for the factor.
    * @param pose The AUV pose estimate.
    * @param H Optional Jacobian matrix.
-   * @return The 3D error vector (measured - predicted).
+   * @return The 2D error vector (measured - predicted) in [x, y].
    */
   gtsam::Vector evaluateError(
     const gtsam::Pose3 & pose,
     boost::optional<gtsam::Matrix &> H = boost::none) const override
   {
-    gtsam::Pose3 T_ws = pose.compose(T_base_sensor_);
+    // Predict the position measurement
+    gtsam::Matrix36 H_full;
+    gtsam::Point3 p_sensor_est = pose.transformFrom(base_p_sensor_, H ? &H_full : 0);
 
-    // 3D position residual
-    gtsam::Vector3 error = T_ws.translation() - measured_position_;
+    // 2D position residual (ignore Z)
+    gtsam::Vector2 error = (p_sensor_est - measured_position_).head<2>();
 
     if (H) {
-      // Jacobian with respect to pose
-      gtsam::Matrix H_matrix = gtsam::Matrix::Zero(3, 6);
-
-      gtsam::Matrix R_wb = pose.rotation().matrix();
-      gtsam::Vector3 p_bs = T_base_sensor_.translation();
-      gtsam::Matrix p_bs_skew = gtsam::skewSymmetric(p_bs);
-
-      H_matrix.block<3, 3>(0, 0) = -R_wb * p_bs_skew;  // d(error)/d(theta)
-      H_matrix.block<3, 3>(0, 3) = R_wb;  // d(error)/d(pos)
-
-      *H = H_matrix;
+      // Jacobian with respect to pose (2x6)
+      *H = H_full.topRows<2>();
     }
 
     return error;
