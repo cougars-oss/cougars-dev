@@ -37,6 +37,7 @@ class GpsOdomConverterNode(Node):
         self.declare_parameter("output_topic", "odometry/truth")
         self.declare_parameter("ahrs_topic", "imu/data")
         self.declare_parameter("base_frame", "base_link")
+        self.declare_parameter("max_position_covariance", 0.01)
 
         gps_odom_topic = (
             self.get_parameter("gps_odom_topic").get_parameter_value().string_value
@@ -47,6 +48,11 @@ class GpsOdomConverterNode(Node):
         ahrs_topic = self.get_parameter("ahrs_topic").get_parameter_value().string_value
         self.base_frame = (
             self.get_parameter("base_frame").get_parameter_value().string_value
+        )
+        self.max_position_covariance = (
+            self.get_parameter("max_position_covariance")
+            .get_parameter_value()
+            .double_value
         )
 
         self.tf_buffer = Buffer()
@@ -85,6 +91,17 @@ class GpsOdomConverterNode(Node):
             self.get_logger().error(
                 f"Could not find transform from {msg.child_frame_id} "
                 f"to {self.base_frame}",
+                throttle_duration_sec=1.0,
+            )
+            return
+
+        if (
+            msg.pose.covariance[0] > self.max_position_covariance
+            or msg.pose.covariance[7] > self.max_position_covariance
+        ):
+            self.get_logger().warn(
+                f"Dropping GPS message with high covariance: "
+                f"{msg.pose.covariance[0]}, {msg.pose.covariance[7]}",
                 throttle_duration_sec=1.0,
             )
             return
