@@ -201,6 +201,9 @@
   ros__parameters:
     ahrs_topic: "imu/data"
 
+    imu:
+      gravity: [0.0, 0.0, -9.81]
+
     gps:
       enable_gps: false
 
