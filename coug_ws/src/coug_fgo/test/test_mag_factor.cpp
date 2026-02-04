@@ -83,7 +83,7 @@ TEST(CustomMagYawFactorArmTest, ErrorEvaluation) {
   // Case 5: Error Check
   gtsam::Pose3 pose_small = gtsam::Pose3(gtsam::Rot3::Yaw(0.1), gtsam::Point3());
   gtsam::Vector error_small = factor1.evaluateError(pose_small);
-  EXPECT_NEAR(error_small[0], -0.1, 1e-5);
+  EXPECT_NEAR(error_small[0], 0.1, 1e-5);
 
   // Case 6: Ignore Dip/Mag
   gtsam::Vector3 meas_mag_dip(2.0, 0.0, 1.0);

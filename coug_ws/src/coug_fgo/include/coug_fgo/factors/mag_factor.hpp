@@ -45,7 +45,8 @@ class CustomMagYawFactorArm : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
   gtsam::Point3 reference_field_;
   gtsam::Rot3 base_R_sensor_;
-  double measured_yaw_;
+  gtsam::Point3 measured_field_;
+  double ref_yaw_;
 
 public:
   /**
@@ -62,9 +63,10 @@ public:
     const gtsam::Rot3 & base_R_sensor, const gtsam::SharedNoiseModel & noise_model)
   : NoiseModelFactor1<gtsam::Pose3>(noise_model, pose_key),
     reference_field_(reference_field),
-    base_R_sensor_(base_R_sensor)
+    base_R_sensor_(base_R_sensor),
+    measured_field_(measured_field)
   {
-    measured_yaw_ = std::atan2(measured_field.y(), measured_field.x());
+    ref_yaw_ = std::atan2(reference_field_.y(), reference_field_.x());
   }
 
   /**
@@ -78,13 +80,15 @@ public:
     boost::optional<gtsam::Matrix &> H = boost::none) const override
   {
     // Predict the magnetic field measurement
-    gtsam::Point3 b_body = pose.rotation().unrotate(reference_field_);
-    gtsam::Point3 b_sensor = base_R_sensor_.unrotate(b_body);
+    gtsam::Point3 b_base = base_R_sensor_.rotate(measured_field_);
 
-    double yaw_pred = std::atan2(b_sensor.y(), b_sensor.x());
+    gtsam::Matrix33 H_rot;
+    gtsam::Point3 b_world = pose.rotation().rotate(b_base, H ? &H_rot : 0);
+
+    double measured_yaw = std::atan2(b_world.y(), b_world.x());
 
     // 1D yaw residual
-    double error = yaw_pred - measured_yaw_;
+    double error = measured_yaw - ref_yaw_;
     while (error > M_PI) {
       error -= 2.0 * M_PI;
     }
@@ -96,17 +100,19 @@ public:
       // Jacobian with respect to pose (1x6)
       H->setZero(1, 6);
 
-      double r2 = b_sensor.x() * b_sensor.x() + b_sensor.y() * b_sensor.y();
+      double r2 = b_world.x() * b_world.x() + b_world.y() * b_world.y();
       double inv_r2 = (r2 > 1e-9) ? (1.0 / r2) : 0.0;
-      double d_yaw_dx = -b_sensor.y() * inv_r2;
-      double d_yaw_dy = b_sensor.x() * inv_r2;
+      double d_yaw_dx = -b_world.y() * inv_r2;
+      double d_yaw_dy = b_world.x() * inv_r2;
 
-      gtsam::Vector3 J_inter = base_R_sensor_.rotate(gtsam::Vector3(d_yaw_dx, d_yaw_dy, 0.0));
-      gtsam::Vector3 J_rot = J_inter.cross(b_body);
+      gtsam::Matrix13 J_atan;
+      J_atan << d_yaw_dx, d_yaw_dy, 0.0;
 
-      (*H)(0, 0) = J_rot.x();
-      (*H)(0, 1) = J_rot.y();
-      (*H)(0, 2) = J_rot.z();
+      gtsam::Matrix13 J_rot = J_atan * H_rot;
+
+      (*H)(0, 0) = J_rot(0, 0);
+      (*H)(0, 1) = J_rot(0, 1);
+      (*H)(0, 2) = J_rot(0, 2);
     }
 
     return gtsam::Vector1(error);
