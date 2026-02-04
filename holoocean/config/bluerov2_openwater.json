@@ -50,9 +50,9 @@
                     "configuration": {
                         "Sigma": 0.003,
                         "MagneticVector": [
-                            0.41,
                             0.08,
-                            0.91
+                            0.41,
+                            -0.91
                         ]
                     },
                     "ros_publish": true

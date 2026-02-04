@@ -916,6 +916,8 @@ void FactorGraphNode::addMagFactor(
 
   const auto & mag_msg = mag_msgs.back();
 
+  // IMPORTANT! The reference field must be in the world frame (ENU), not NED.
+  // If getting values from NOAA (NED), convert as: [Y, X, -Z].
   gtsam::Point3 ref_vec(params_.mag.reference_field[0],
     params_.mag.reference_field[1],
     params_.mag.reference_field[2]);
