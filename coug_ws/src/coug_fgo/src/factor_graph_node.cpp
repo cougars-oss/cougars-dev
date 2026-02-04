@@ -61,7 +61,6 @@ using gtsam::symbol_shorthand::X;  // Pose3 (x,y,z,r,p,y)
 namespace coug_fgo
 {
 
-
 void FactorGraphNode::setupRosInterfaces()
 {
   // --- ROS TF Interfaces ---
