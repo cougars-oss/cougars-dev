@@ -38,5 +38,14 @@ if ! grep -q "source /completions.sh" /home/$USERNAME/.bashrc; then
 fi
 touch /home/$USERNAME/.hushlogin
 
+# Install vcs-defined external packages
+CURRENT_DIR=$(pwd)
+cd /home/$USERNAME/coug_ws/src
+if [ -f "cougars.repos" ]; then
+    gosu $USERNAME vcs import . < cougars.repos
+    gosu $USERNAME vcs custom --git --args submodule update --init --recursive
+fi
+cd $CURRENT_DIR
+
 touch /tmp/ready
 exec "$@"
