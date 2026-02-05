@@ -222,12 +222,12 @@ private:
     double target_time);
 
   /**
-   * @brief Adds a hydrodynamic factor to the graph.
+   * @brief Adds a dynamics factor to the graph.
    * @param graph The target factor graph.
    * @param wrench_msgs Queue of wrench messages.
    * @param target_time The timestamp for the new pose key.
    */
-  void addHydrodynamicFactor(
+  void addAuvDynamicsFactor(
     gtsam::NonlinearFactorGraph & graph,
     const std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> & wrench_msgs,
     double target_time);
@@ -407,7 +407,7 @@ private:
   bool have_depth_to_dvl_tf_ = false;
   bool have_mag_to_dvl_tf_ = false;
   bool have_ahrs_to_dvl_tf_ = false;
-  bool have_hydro_to_dvl_tf_ = false;
+  bool have_com_to_dvl_tf_ = false;
 
   geometry_msgs::msg::TransformStamped dvl_to_base_tf_;
   geometry_msgs::msg::TransformStamped imu_to_dvl_tf_;
@@ -415,7 +415,7 @@ private:
   geometry_msgs::msg::TransformStamped depth_to_dvl_tf_;
   geometry_msgs::msg::TransformStamped mag_to_dvl_tf_;
   geometry_msgs::msg::TransformStamped ahrs_to_dvl_tf_;
-  geometry_msgs::msg::TransformStamped hydro_to_dvl_tf_;
+  geometry_msgs::msg::TransformStamped com_to_dvl_tf_;
 
   // --- ROS Interfaces ---
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr global_odom_pub_;

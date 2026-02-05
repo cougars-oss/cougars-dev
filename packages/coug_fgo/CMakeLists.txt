@@ -165,12 +165,12 @@ if(BUILD_TESTING)
   )
   target_link_libraries(test_constant_velocity_factor gtsam)
 
-  ament_add_gtest(test_hydrodynamic_drag_factor test/test_hydrodynamic_drag_factor.cpp)
-  target_include_directories(test_hydrodynamic_drag_factor PUBLIC
+  ament_add_gtest(test_auv_dynamics_factor test/test_auv_dynamics_factor.cpp)
+  target_include_directories(test_auv_dynamics_factor PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     ${GTSAM_EIGEN_INCLUDE_DIR}
   )
-  target_link_libraries(test_hydrodynamic_drag_factor gtsam)
+  target_link_libraries(test_auv_dynamics_factor gtsam)
 endif()
 
 ament_package()

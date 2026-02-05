@@ -84,15 +84,15 @@ def generate_launch_description():
         ]
     )
 
-    # com_link_frame = PythonExpression(
-    #     [
-    #         "'",
-    #         auv_ns,
-    #         "/com_link' if '",
-    #         auv_ns,
-    #         "' != '' else 'com_link'",
-    #     ]
-    # )
+    com_link_frame = PythonExpression(
+        [
+            "'",
+            auv_ns,
+            "/com_link' if '",
+            auv_ns,
+            "' != '' else 'com_link'",
+        ]
+    )
 
     # modem_link_frame = PythonExpression(
     #     [
@@ -145,7 +145,7 @@ def generate_launch_description():
                         "gps.parameter_frame": gps_link_frame,
                         "mag.parameter_frame": imu_link_frame,
                         "ahrs.parameter_frame": imu_link_frame,
-                        "hydro.parameter_frame": base_link_frame,
+                        "dynamics.parameter_frame": com_link_frame,
                     },
                 ],
             ),
@@ -168,7 +168,7 @@ def generate_launch_description():
                         "gps.parameter_frame": gps_link_frame,
                         "mag.parameter_frame": imu_link_frame,
                         "ahrs.parameter_frame": imu_link_frame,
-                        "hydro.parameter_frame": base_link_frame,
+                        "dynamics.parameter_frame": com_link_frame,
                         "max_keyframe_rate": 4.0,
                         "global_odom_topic": "odometry/global_tm",
                         "smoothed_path_topic": "smoothed_path_tm",

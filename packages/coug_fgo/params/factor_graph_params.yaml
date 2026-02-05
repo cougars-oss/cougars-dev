@@ -265,8 +265,8 @@ factor_graph_node:
       type: double
       default_value: 1.345
 
-  hydro:
-    enable_hydro:
+  dynamics:
+    enable_dynamics:
       type: bool
       default_value: false
     use_parameter_frame:

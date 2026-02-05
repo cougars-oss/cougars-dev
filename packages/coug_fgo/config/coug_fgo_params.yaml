@@ -119,8 +119,8 @@
       robust_kernel: "None"
       robust_k: 1.345
 
-    hydro:
-      enable_hydro: false
+    dynamics:
+      enable_dynamics: false
       use_parameter_frame: false
       prediction_noise_sigma: 0.1 # Sigma for prediction noise.
       mass: [10.0, 10.0, 10.0] # [kg] Mass of the vehicle (diagonal).

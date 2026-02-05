@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @file hydrodynamic_drag_factor.hpp
+ * @file auv_dynamics_factor.hpp
  * @brief GTSAM factor for enforcing a simplified version of Fossen's equations with lever arm.
  * @author Nelson Durrant
  * @date Jan 2026
@@ -35,15 +35,15 @@ namespace coug_fgo::factors
 {
 
 /**
- * @class CustomHydrodynamicDragFactorArm
- * @brief GTSAM factor for enforcing simplified hydrodynamic dynamics between two poses.
+ * @class CustomAUVDynamicsFactorArm
+ * @brief GTSAM factor for enforcing simplified AUV dynamics between two poses.
  *
  * This factor constrains the velocity evolution of the AUV based on a simplified
  * Fossen model, accounting for thruster inputs and drag.
  *
  * Model: V_next = V_curr + (dt/m) * (F_thrust - (linear_drag * V + quad_drag * |V| * V))
  */
-class CustomHydrodynamicDragFactorArm : public gtsam::NoiseModelFactor4<gtsam::Pose3,
+class CustomAUVDynamicsFactorArm : public gtsam::NoiseModelFactor4<gtsam::Pose3,
     gtsam::Vector3, gtsam::Pose3, gtsam::Vector3>
 {
 private:
@@ -56,7 +56,7 @@ private:
 
 public:
   /**
-   * @brief Constructor for CustomHydrodynamicDragFactorArm.
+   * @brief Constructor for CustomAUVDynamicsFactorArm.
    * @param pose_key1 GTSAM key for the first pose (state i).
    * @param vel_key1 GTSAM key for the first velocity (state i).
    * @param pose_key2 GTSAM key for the second pose (state j).
@@ -69,7 +69,7 @@ public:
    * @param quad_drag Quadratic damping coefficient.
    * @param noise_model The noise model for the constraint.
    */
-  CustomHydrodynamicDragFactorArm(
+  CustomAUVDynamicsFactorArm(
     gtsam::Key pose_key1, gtsam::Key vel_key1,
     gtsam::Key pose_key2, gtsam::Key vel_key2,
     double dt,
@@ -90,7 +90,7 @@ public:
     mass_inv_ = mass_.inverse();
   }
 
-  ~CustomHydrodynamicDragFactorArm() override {}
+  ~CustomAUVDynamicsFactorArm() override {}
 
   /**
    * @brief Evaluates the error and Jacobians for the factor.
