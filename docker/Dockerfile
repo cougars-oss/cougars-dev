@@ -47,7 +47,7 @@ RUN apt update && apt install -y --no-install-recommends \
 
 RUN mkdir -p /home/frostlab-docker/coug_ws/src && chown -R frostlab-docker:frostlab-docker /home/frostlab-docker/coug_ws
 WORKDIR /home/frostlab-docker/coug_ws/src
-COPY --chown=frostlab-docker:frostlab-docker coug_ws/src .
+COPY --chown=frostlab-docker:frostlab-docker packages .
 
 # Install Python dependencies
 USER frostlab-docker

@@ -1,0 +1,15 @@
+{
+    "name": "CoUGARs Development",
+    "dockerComposeFile": [
+        "../docker/docker-compose.yaml",
+        "docker-compose.dev.yaml"
+    ],
+    "service": "cougars",
+    "workspaceFolder": "/workspace",
+    "remoteUser": "frostlab-docker",
+    "runServices": [
+        "cougars",
+        "mapproxy"
+    ],
+    "postCreateCommand": "bash .devcontainer/post_create.sh"
+}

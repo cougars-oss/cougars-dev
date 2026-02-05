@@ -7,11 +7,11 @@
 
 bags/*
 !bags/.gitkeep
-coug_ws/src/*
-!coug_ws/src/coug_*
-!coug_ws/src/holoocean_bridge
-!coug_ws/src/sensor_bridge
-!coug_ws/src/cougars.repos
+packages/*
+!packages/coug_*
+!packages/holoocean_bridge
+!packages/sensor_bridge
+!packages/cougars.repos
 
 __pycache__
 .vscode

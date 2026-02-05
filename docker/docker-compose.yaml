@@ -47,11 +47,12 @@ services:
       - QT_X11_NO_MITSHM=1
     volumes:
       - ../bags:/home/frostlab-docker/bags
-      - ../coug_ws:/home/frostlab-docker/coug_ws
+      - ../packages:/home/frostlab-docker/coug_ws/src
       - ../scripts:/home/frostlab-docker/scripts
       - ./completions.sh:/completions.sh
       - ./introduction.txt:/introduction.txt
       - ./.tmux.conf:/home/frostlab-docker/.tmux.conf
+      - ..:/workspace:cached # VSCode devcontainer
       - /dev:/dev:rw
       - /etc/udev:/etc/udev:rw
       - /dev/shm:/dev/shm
