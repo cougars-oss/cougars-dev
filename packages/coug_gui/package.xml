@@ -15,13 +15,13 @@
   <depend>libqt5-opengl-dev</depend>
   <depend>libqt5-opengl</depend>
   
+  <depend>rclcpp</depend>
   <depend>geometry_msgs</depend>
   <depend condition="$ROS_BUILD_ARCH == 'amd64'">mapviz</depend>
   <depend condition="$ROS_BUILD_ARCH == 'amd64'">mapviz_plugins</depend>
   <depend condition="$ROS_BUILD_ARCH == 'amd64'">tile_map</depend>
-  <depend>pluginlib</depend>
-  <depend>rclcpp</depend>
   <depend condition="$ROS_BUILD_ARCH == 'amd64'">swri_transform_util</depend>
+  <depend>pluginlib</depend>
   <depend>tf2</depend>
 
   <exec_depend>rviz2</exec_depend>
