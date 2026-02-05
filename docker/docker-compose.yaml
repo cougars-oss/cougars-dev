@@ -52,7 +52,6 @@ services:
       - ./completions.sh:/completions.sh
       - ./introduction.txt:/introduction.txt
       - ./.tmux.conf:/home/frostlab-docker/.tmux.conf
-      - ..:/workspace:cached # VSCode devcontainer
       - /dev:/dev:rw
       - /etc/udev:/etc/udev:rw
       - /dev/shm:/dev/shm
