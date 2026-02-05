@@ -5,7 +5,7 @@
 
 [**Get Started**](#get-started) | [**Contributing**](#contributing) | [**Citations**](#citations)
 
-CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autonomy research by the [Field Robotic Systems Lab (FRoSt Lab)](https://frostlab.byu.edu) at [Brigham Young University](https://byu.edu).
+CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autonomy research by the [Field Robotic Systems Lab (FROST Lab)](https://frostlab.byu.edu) at [Brigham Young University](https://byu.edu).
 
 --
 

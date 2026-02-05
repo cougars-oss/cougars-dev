@@ -17,13 +17,13 @@ repositories:
   #   version: master
   # time_sync_utils:
   #   type: git
-  #   url: https://github.com/BYU-FRoSt-Lab/time_sync_utils.git
+  #   url: https://github.com/BYU-FROST-Lab/time_sync_utils.git
   #   version: main
   # pressure_sensor_ros2:
   #   type: git
-  #   url: https://github.com/BYU-FRoSt-Lab/pressure_sensor_ros2.git
+  #   url: https://github.com/BYU-FROST-Lab/pressure_sensor_ros2.git
   #   version: main
   # seatrac-ros2
   #   type: git
-  #   url: https://github.com/BYU-FRoSt-Lab/seatrac-ros2.git
+  #   url: https://github.com/BYU-FROST-Lab/seatrac-ros2.git
   #   version: main
