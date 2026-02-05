@@ -43,8 +43,6 @@ RUN apt update && apt install -y --no-install-recommends \
     ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy ros-${ROS_DISTRO}-teleop-twist-keyboard \
     # Better rosbag2 storage format - Nelson Durrant, Jan 2026
     ros-${ROS_DISTRO}-rosbag2-storage-mcap \
-    # Package documentation - Nelson Durrant, Feb 2026
-    ros-${ROS_DISTRO}-rosdoc2 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /home/frostlab-docker/coug_ws/src && chown -R frostlab-docker:frostlab-docker /home/frostlab-docker/coug_ws
@@ -55,7 +53,9 @@ COPY --chown=frostlab-docker:frostlab-docker packages .
 USER frostlab-docker
 RUN pip3 install --no-cache-dir \
     # Tool for managing external repos - Nelson Durrant, Jan 2026
-    vcstool
+    vcstool \
+    # Package documentation - Nelson Durrant, Feb 2026
+    rosdoc2
 
 # Install custom ROS package dependencies (rosdep)
 RUN vcs import . < cougars.repos \
