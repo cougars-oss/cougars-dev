@@ -52,10 +52,10 @@
       use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
-        accel_noise_sigma: 0.0078 # [m/s^2] Accelerometer measurement noise sigma.
-        gyro_noise_sigma: 0.0012 # [rad/s] Gyroscope measurement noise sigma.
-      accel_bias_rw_sigma: 1.05e-04 # [m/s^3] Sigma for accelerometer bias random walk.
-      gyro_bias_rw_sigma: 3.91e-05 # [rad/s^2] Sigma for gyroscope bias random walk.
+        accel_noise_sigmas: [0.0078, 0.0078, 0.0078] # [m/s^2] Accelerometer measurement noise sigmas.
+        gyro_noise_sigmas: [0.0012, 0.0012, 0.0012] # [rad/s] Gyroscope measurement noise sigmas.
+      accel_bias_rw_sigmas: [1.05e-04, 1.05e-04, 1.05e-04] # [m/s^3] Sigmas for accelerometer bias random walk.
+      gyro_bias_rw_sigmas: [3.91e-05, 3.91e-05, 3.91e-05] # [rad/s^2] Sigmas for gyroscope bias random walk.
       integration_covariance: 1e-5 # A small covariance for the integration process itself.
       gravity: [0.0, 0.0, -9.8] # [m/s^2]
       timeout_threshold: 1.0 # [s]
@@ -66,7 +66,7 @@
       use_parameter_frame: false
       use_parameter_covariance: true
       parameter_covariance:
-        position_noise_sigma: 0.015 # [m] GPS position uncertainty sigma.
+        position_noise_sigmas: [0.015, 0.015] # [m] GPS position uncertainty sigmas.
       timeout_threshold: 2.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
@@ -86,7 +86,7 @@
       use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
-        magnetic_field_noise_sigma: 0.003 # [normalized] Magnetic field uncertainty sigma.
+        magnetic_field_noise_sigmas: [0.003, 0.003, 0.003] # [normalized] Magnetic field uncertainty sigmas.
       # https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml#igrfwmm
       # WMMHR-2025 (40.2406 N, 111.741 W, 2026-01-23)
       # North: 20,842.3 nT, East: 3,963.4 nT, Vertical: 45,767.8 nT
@@ -113,7 +113,7 @@
       use_parameter_frame: false
       use_parameter_covariance: false
       parameter_covariance:
-        velocity_noise_sigma: 0.02 # [m/s] DVL body-velocity uncertainty sigma.
+        velocity_noise_sigmas: [0.02, 0.02, 0.02] # [m/s] DVL body-velocity uncertainty sigmas.
       velocity_random_walk: 0.1 # [m/s/sqrt(s)] Velocity uncertainty growth rate during dropouts.
       timeout_threshold: 0.25 # [s] Time before switching to depth-driven keyframes (DVL dropout).
       robust_kernel: "None"
@@ -122,7 +122,7 @@
     dynamics:
       enable_dynamics: false
       use_parameter_frame: false
-      prediction_noise_sigma: 0.1 # Sigma for prediction noise.
+      prediction_noise_sigmas: [0.1, 0.1, 0.1] # Model prediction uncertainty sigmas.
       mass: [10.0, 10.0, 10.0] # [kg] Mass of the vehicle (diagonal).
       linear_drag: [10.0, 10.0, 10.0] # [kg/s] Linear drag coefficient (diagonal).
       quad_drag: [10.0, 10.0, 10.0] # [kg/m] Quadratic drag coefficient (diagonal).
@@ -143,11 +143,11 @@
         initial_velocity: [0.0, 0.0, 0.0] # [m/s] (at DVL frame)
         initial_accel_bias: [0.0, 0.0, 0.0] # [m/s^2]
         initial_gyro_bias: [0.0, 0.0, 0.0] # [rad/s]
-        initial_position_sigma: 1e-3 # [m] Initial position uncertainty.
-        initial_orientation_sigma: 1e-3 # [rad] Initial yaw uncertainty.
-        initial_velocity_sigma: 1e-3 # [m/s] Initial velocity uncertainty.
-      initial_accel_bias_sigma: 1e-2 # [m/s^2] Initial accelerometer bias uncertainty.
-      initial_gyro_bias_sigma: 1e-3 # [rad/s] Initial gyroscope bias uncertainty.
+        initial_position_sigmas: [1e-3, 1e-3, 1e-3] # [m] Initial position uncertainty.
+        initial_orientation_sigmas: [1e-3, 1e-3, 1e-3] # [rad] Initial yaw uncertainty.
+        initial_velocity_sigmas: [1e-3, 1e-3, 1e-3] # [m/s] Initial velocity uncertainty.
+      initial_accel_bias_sigmas: [1e-2, 1e-2, 1e-2] # [m/s^2] Initial accelerometer bias uncertainty.
+      initial_gyro_bias_sigmas: [1e-3, 1e-3, 1e-3] # [rad/s] Initial gyroscope bias uncertainty.
 
     # --- Experimental Features ---
     experimental:

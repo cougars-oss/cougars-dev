@@ -96,18 +96,18 @@ factor_graph_node:
       type: bool
       default_value: false
     parameter_covariance:
-      accel_noise_sigma:
-        type: double
-        default_value: 0.0078
-      gyro_noise_sigma:
-        type: double
-        default_value: 0.0012
-    accel_bias_rw_sigma:
-      type: double
-      default_value: 1.05e-4
-    gyro_bias_rw_sigma:
-      type: double
-      default_value: 3.91e-5
+      accel_noise_sigmas:
+        type: double_array
+        default_value: [0.0078, 0.0078, 0.0078]
+      gyro_noise_sigmas:
+        type: double_array
+        default_value: [0.0012, 0.0012, 0.0012]
+    accel_bias_rw_sigmas:
+      type: double_array
+      default_value: [1.05e-4, 1.05e-4, 1.05e-4]
+    gyro_bias_rw_sigmas:
+      type: double_array
+      default_value: [3.91e-5, 3.91e-5, 3.91e-5]
     integration_covariance:
       type: double
       default_value: 1.0e-5
@@ -135,9 +135,9 @@ factor_graph_node:
       type: bool
       default_value: false
     parameter_covariance:
-      position_noise_sigma:
-        type: double
-        default_value: 0.015
+      position_noise_sigmas:
+        type: double_array
+        default_value: [0.015, 0.015]
     timeout_threshold:
       type: double
       default_value: 2.0
@@ -189,9 +189,9 @@ factor_graph_node:
       type: bool
       default_value: false
     parameter_covariance:
-      magnetic_field_noise_sigma:
-        type: double
-        default_value: 0.003
+      magnetic_field_noise_sigmas:
+        type: double_array
+        default_value: [0.003, 0.003, 0.003]
     reference_field:
       type: double_array
       default_value: [0.07857, 0.41316, -0.90726]
@@ -249,9 +249,9 @@ factor_graph_node:
       type: bool
       default_value: false
     parameter_covariance:
-      velocity_noise_sigma:
-        type: double
-        default_value: 0.02
+      velocity_noise_sigmas:
+        type: double_array
+        default_value: [0.02, 0.02, 0.02]
     velocity_random_walk:
       type: double
       default_value: 0.1
@@ -275,9 +275,9 @@ factor_graph_node:
     parameter_frame:
       type: string
       default_value: "base_link"
-    prediction_noise_sigma:
-      type: double
-      default_value: 0.1
+    prediction_noise_sigmas:
+      type: double_array
+      default_value: [0.1, 0.1, 0.1]
     mass:
       type: double_array
       default_value: [10.0, 10.0, 10.0]
@@ -321,21 +321,21 @@ factor_graph_node:
       initial_gyro_bias:
         type: double_array
         default_value: [0.0, 0.0, 0.0]
-      initial_position_sigma:
-        type: double
-        default_value: 1.0e-3
-      initial_orientation_sigma:
-        type: double
-        default_value: 1.0e-3
-      initial_velocity_sigma:
-        type: double
-        default_value: 1.0e-3
-    initial_accel_bias_sigma:
-      type: double
-      default_value: 1.0e-2
-    initial_gyro_bias_sigma:
-      type: double
-      default_value: 1.0e-3
+      initial_position_sigmas:
+        type: double_array
+        default_value: [1.0e-3, 1.0e-3, 1.0e-3]
+      initial_orientation_sigmas:
+        type: double_array
+        default_value: [1.0e-3, 1.0e-3, 1.0e-3]
+      initial_velocity_sigmas:
+        type: double_array
+        default_value: [1.0e-3, 1.0e-3, 1.0e-3]
+    initial_accel_bias_sigmas:
+      type: double_array
+      default_value: [1.0e-2, 1.0e-2, 1.0e-2]
+    initial_gyro_bias_sigmas:
+      type: double_array
+      default_value: [1.0e-3, 1.0e-3, 1.0e-3]
 
   # --- Experimental Features ---
   experimental:

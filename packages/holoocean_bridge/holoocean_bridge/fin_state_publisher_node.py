@@ -42,7 +42,7 @@ class FinStatePublisherNode(Node):
         self.joint_names = ["top_fin_joint", "left_fin_joint", "right_fin_joint"]
 
         self.subscription = self.create_subscription(
-            ControlCommand, input_topic, self.control_command_callback, 10
+            ControlCommand, input_topic, self.listener_callback, 10
         )
         self.publisher = self.create_publisher(JointState, output_topic, 10)
 
@@ -51,7 +51,7 @@ class FinStatePublisherNode(Node):
             f"and publishing on {output_topic}."
         )
 
-    def control_command_callback(self, msg: ControlCommand):
+    def listener_callback(self, msg: ControlCommand):
         """
         Process HoloOcean control commands (ControlCommand).
 

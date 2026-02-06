@@ -49,16 +49,12 @@ using coug_fgo::factors::CustomAUVDynamicsFactorArm;
 using coug_fgo::factors::CustomConstantVelocityFactor;
 using coug_fgo::utils::toGtsam;
 using coug_fgo::utils::toGtsam3x3;
-using coug_fgo::utils::toGtsam3x3Diagonal;
-using coug_fgo::utils::toGtsamYawCovariance;
-using coug_fgo::utils::toGtsamDepthCovariance;
+using coug_fgo::utils::toGtsamDiagonal;
+using coug_fgo::utils::toGtsamSquaredDiagonal;
 using coug_fgo::utils::toQuatMsg;
 using coug_fgo::utils::toPointMsg;
 using coug_fgo::utils::toVectorMsg;
 using coug_fgo::utils::toPoseMsg;
-using coug_fgo::utils::toTransformMsg;
-using coug_fgo::utils::toWrenchMsg;
-using coug_fgo::utils::toCovariance9Msg;
 using coug_fgo::utils::toCovariance36Msg;
 using coug_fgo::utils::toPoseCovarianceMsg;
 using coug_fgo::utils::DVLPreintegrator;
@@ -297,27 +293,21 @@ FactorGraphNode::configureImuPreintegration()
     gtsam::Vector3(params_.imu.gravity[0], params_.imu.gravity[1], params_.imu.gravity[2]);
   imu_params->body_P_sensor = toGtsam(imu_to_dvl_tf_.transform);
 
-  auto set_cov = [&](bool use_param, double sigma, const std::array<double, 9> & msg_cov) {
-      if (use_param) {
-        return (gtsam::Matrix33)(gtsam::Matrix33::Identity() * (sigma * sigma));
-      } else {
-        return toGtsam(msg_cov);
-      }
-    };
+  if (params_.imu.use_parameter_covariance) {
+    imu_params->accelerometerCovariance = toGtsamSquaredDiagonal(
+      params_.imu.parameter_covariance.accel_noise_sigmas).block<3, 3>(0, 0);
+  } else {
+    imu_params->accelerometerCovariance = toGtsam(initial_imu_->linear_acceleration_covariance);
+  }
 
-  imu_params->accelerometerCovariance =
-    set_cov(
-    params_.imu.use_parameter_covariance, params_.imu.parameter_covariance.accel_noise_sigma,
-    initial_imu_->linear_acceleration_covariance);
-  imu_params->gyroscopeCovariance =
-    set_cov(
-    params_.imu.use_parameter_covariance, params_.imu.parameter_covariance.gyro_noise_sigma,
-    initial_imu_->angular_velocity_covariance);
-  imu_params->biasAccCovariance = gtsam::Matrix33::Identity() * (params_.imu.accel_bias_rw_sigma *
-    params_.imu.accel_bias_rw_sigma);
-  imu_params->biasOmegaCovariance =
-    gtsam::Matrix33::Identity() *
-    (params_.imu.gyro_bias_rw_sigma * params_.imu.gyro_bias_rw_sigma);
+  if (params_.imu.use_parameter_covariance) {
+    imu_params->gyroscopeCovariance = toGtsamSquaredDiagonal(
+      params_.imu.parameter_covariance.gyro_noise_sigmas).block<3, 3>(0, 0);
+  } else {
+    imu_params->gyroscopeCovariance = toGtsam(initial_imu_->angular_velocity_covariance);
+  }
+  imu_params->biasAccCovariance = toGtsamSquaredDiagonal(params_.imu.accel_bias_rw_sigmas);
+  imu_params->biasOmegaCovariance = toGtsamSquaredDiagonal(params_.imu.gyro_bias_rw_sigmas);
   imu_params->integrationCovariance =
     gtsam::Matrix33::Identity() * params_.imu.integration_covariance;
 
@@ -448,11 +438,8 @@ gtsam::Rot3 FactorGraphNode::computeInitialOrientation()
     return R_world_base * R_base_dvl;
   }
 
-  gtsam::Vector3 accel_imu(initial_imu_->linear_acceleration.x,
-    initial_imu_->linear_acceleration.y,
-    initial_imu_->linear_acceleration.z);
-
   // Account for IMU rotation
+  gtsam::Vector3 accel_imu = toGtsam(initial_imu_->linear_acceleration);
   gtsam::Pose3 T_dvl_imu = toGtsam(imu_to_dvl_tf_.transform);
   gtsam::Pose3 T_base_dvl = toGtsam(dvl_to_base_tf_.transform);
   gtsam::Vector3 accel_base = T_base_dvl.rotation() * (T_dvl_imu.rotation() * accel_imu);
@@ -475,9 +462,7 @@ gtsam::Rot3 FactorGraphNode::computeInitialOrientation()
     gtsam::Rot3 R_dvl_sensor = toGtsam(mag_to_dvl_tf_.transform.rotation);
 
     gtsam::Rot3 R_base_sensor = R_base_dvl * R_dvl_sensor;
-    gtsam::Vector3 mag_sensor(initial_mag_->magnetic_field.x,
-      initial_mag_->magnetic_field.y,
-      initial_mag_->magnetic_field.z);
+    gtsam::Vector3 mag_sensor = toGtsam(initial_mag_->magnetic_field);
     gtsam::Vector3 mag_base = R_base_sensor * mag_sensor;
 
     // Use the tilt-compensated magnetic vector to calculate yaw
@@ -499,7 +484,8 @@ gtsam::Rot3 FactorGraphNode::computeInitialOrientation()
 
 gtsam::Point3 FactorGraphNode::computeInitialPosition(const gtsam::Rot3 & initial_orientation_dvl)
 {
-  gtsam::Point3 P_world_base(params_.prior.parameter_priors.initial_position[0],
+  gtsam::Point3 P_world_base(
+    params_.prior.parameter_priors.initial_position[0],
     params_.prior.parameter_priors.initial_position[1],
     params_.prior.parameter_priors.initial_position[2]);
   gtsam::Pose3 T_base_dvl = toGtsam(dvl_to_base_tf_.transform);
@@ -534,7 +520,7 @@ gtsam::Vector3 FactorGraphNode::computeInitialVelocity(const gtsam::Rot3 & initi
   if (params_.prior.use_parameter_priors) {
     // Account for DVL rotation (in world frame)
     return initial_orientation_dvl.rotate(
-      gtsam::Vector3(params_.prior.parameter_priors.initial_velocity.data()));
+      toGtsam(params_.prior.parameter_priors.initial_velocity));
   }
 
   RCLCPP_DEBUG(
@@ -549,20 +535,11 @@ gtsam::imuBias::ConstantBias FactorGraphNode::computeInitialBias()
 {
   gtsam::Vector3 init_gyro_bias;
   if (params_.prior.use_parameter_priors) {
-    init_gyro_bias =
-      gtsam::Vector3(
-      params_.prior.parameter_priors.initial_gyro_bias[0],
-      params_.prior.parameter_priors.initial_gyro_bias[1],
-      params_.prior.parameter_priors.initial_gyro_bias[2]);
+    init_gyro_bias = toGtsam(params_.prior.parameter_priors.initial_gyro_bias);
   } else {
-    init_gyro_bias =
-      gtsam::Vector3(
-      initial_imu_->angular_velocity.x, initial_imu_->angular_velocity.y,
-      initial_imu_->angular_velocity.z);
+    init_gyro_bias = toGtsam(initial_imu_->angular_velocity);
   }
-  gtsam::Vector3 init_accel_bias(params_.prior.parameter_priors.initial_accel_bias[0],
-    params_.prior.parameter_priors.initial_accel_bias[1],
-    params_.prior.parameter_priors.initial_accel_bias[2]);
+  gtsam::Vector3 init_accel_bias = toGtsam(params_.prior.parameter_priors.initial_accel_bias);
 
   RCLCPP_DEBUG(
     get_logger(), "Initial accel bias: %f %f %f", init_accel_bias.x(), init_accel_bias.y(),
@@ -575,20 +552,20 @@ void FactorGraphNode::addPriorFactors(gtsam::NonlinearFactorGraph & graph, gtsam
 {
   // Add initial pose prior
   gtsam::Vector6 prior_pose_sigmas;
-  prior_pose_sigmas << params_.prior.parameter_priors.initial_orientation_sigma,
-    params_.prior.parameter_priors.initial_orientation_sigma,
-    params_.prior.parameter_priors.initial_orientation_sigma,
-    params_.prior.parameter_priors.initial_position_sigma,
-    params_.prior.parameter_priors.initial_position_sigma,
-    params_.prior.parameter_priors.initial_position_sigma;
+  prior_pose_sigmas << params_.prior.parameter_priors.initial_orientation_sigmas[0],
+    params_.prior.parameter_priors.initial_orientation_sigmas[1],
+    params_.prior.parameter_priors.initial_orientation_sigmas[2],
+    params_.prior.parameter_priors.initial_position_sigmas[0],
+    params_.prior.parameter_priors.initial_position_sigmas[1],
+    params_.prior.parameter_priors.initial_position_sigmas[2];
 
   if (!params_.prior.use_parameter_priors) {
     if (params_.gps.enable_gps) {
       prior_pose_sigmas(3) = params_.gps.use_parameter_covariance ?
-        params_.gps.parameter_covariance.position_noise_sigma :
+        params_.gps.parameter_covariance.position_noise_sigmas[0] :
         std::sqrt(toGtsam(initial_gps_->pose.covariance)(0, 0));
       prior_pose_sigmas(4) = params_.gps.use_parameter_covariance ?
-        params_.gps.parameter_covariance.position_noise_sigma :
+        params_.gps.parameter_covariance.position_noise_sigmas[1] :
         std::sqrt(toGtsam(initial_gps_->pose.covariance)(1, 1));
     }
     prior_pose_sigmas(5) = params_.depth.use_parameter_covariance ?
@@ -601,14 +578,14 @@ void FactorGraphNode::addPriorFactors(gtsam::NonlinearFactorGraph & graph, gtsam
         std::sqrt(toGtsam(initial_ahrs_->orientation_covariance)(2, 2));
     } else if (params_.mag.enable_mag) {
       prior_pose_sigmas(2) = params_.mag.use_parameter_covariance ?
-        params_.mag.parameter_covariance.magnetic_field_noise_sigma :
+        params_.mag.parameter_covariance.magnetic_field_noise_sigmas[0] :
         std::sqrt(toGtsam(initial_mag_->magnetic_field_covariance)(2, 2));
     }
     prior_pose_sigmas(0) = params_.imu.use_parameter_covariance ?
-      params_.imu.parameter_covariance.gyro_noise_sigma :
+      params_.imu.parameter_covariance.gyro_noise_sigmas[0] :
       std::sqrt(toGtsam(initial_imu_->angular_velocity_covariance)(0, 0));
     prior_pose_sigmas(1) = params_.imu.use_parameter_covariance ?
-      params_.imu.parameter_covariance.gyro_noise_sigma :
+      params_.imu.parameter_covariance.gyro_noise_sigmas[1] :
       std::sqrt(toGtsam(initial_imu_->angular_velocity_covariance)(1, 1));
   }
 
@@ -619,16 +596,14 @@ void FactorGraphNode::addPriorFactors(gtsam::NonlinearFactorGraph & graph, gtsam
   // Add initial velocity prior
   gtsam::SharedNoiseModel prior_vel_noise;
   if (params_.prior.use_parameter_priors) {
-    prior_vel_noise =
-      gtsam::noiseModel::Isotropic::Sigma(3, params_.prior.parameter_priors.initial_velocity_sigma);
+    auto & sigmas = params_.prior.parameter_priors.initial_velocity_sigmas;
+    prior_vel_noise = gtsam::noiseModel::Diagonal::Sigmas(toGtsam(sigmas));
   } else {
     if (params_.dvl.use_parameter_covariance) {
-      prior_vel_noise =
-        gtsam::noiseModel::Isotropic::Sigma(
-        3,
-        params_.dvl.parameter_covariance.velocity_noise_sigma);
+      auto & sigmas = params_.dvl.parameter_covariance.velocity_noise_sigmas;
+      prior_vel_noise = gtsam::noiseModel::Diagonal::Sigmas(toGtsam(sigmas));
     } else {
-      gtsam::Matrix33 dvl_cov = toGtsam(initial_dvl_->twist.covariance).block<3, 3>(0, 0);
+      gtsam::Matrix33 dvl_cov = toGtsam3x3(initial_dvl_->twist.covariance);
       prior_vel_noise = gtsam::noiseModel::Diagonal::Covariance(dvl_cov);
     }
   }
@@ -638,8 +613,10 @@ void FactorGraphNode::addPriorFactors(gtsam::NonlinearFactorGraph & graph, gtsam
 
   // Add initial IMU bias prior
   gtsam::Vector6 prior_imu_bias_sigmas;
-  prior_imu_bias_sigmas << gtsam::Vector3::Constant(params_.prior.initial_accel_bias_sigma),
-    gtsam::Vector3::Constant(params_.prior.initial_gyro_bias_sigma);
+  gtsam::Vector3 accel_sigmas = toGtsam(params_.prior.initial_accel_bias_sigmas);
+  gtsam::Vector3 gyro_sigmas = toGtsam(params_.prior.initial_gyro_bias_sigmas);
+  prior_imu_bias_sigmas << accel_sigmas, gyro_sigmas;
+
   gtsam::SharedNoiseModel prior_imu_bias_noise =
     gtsam::noiseModel::Diagonal::Sigmas(prior_imu_bias_sigmas);
 
@@ -785,9 +762,8 @@ void FactorGraphNode::initializeGraph()
 
     last_dvl_velocity_ = toGtsam(initial_dvl_->twist.twist.linear);
     if (params_.dvl.use_parameter_covariance) {
-      last_dvl_covariance_ = gtsam::Matrix3::Identity() *
-        (params_.dvl.parameter_covariance.velocity_noise_sigma *
-        params_.dvl.parameter_covariance.velocity_noise_sigma);
+      last_dvl_covariance_ = toGtsamSquaredDiagonal(
+        params_.dvl.parameter_covariance.velocity_noise_sigmas).block<3, 3>(0, 0);
     } else {
       last_dvl_covariance_ = toGtsam(initial_dvl_->twist.covariance).block<3, 3>(0, 0);
     }
@@ -826,10 +802,8 @@ void FactorGraphNode::addGpsFactor(
 
   gtsam::SharedNoiseModel gps_noise;
   if (params_.gps.use_parameter_covariance) {
-    gtsam::Vector2 gps_sigmas;
-    gps_sigmas << params_.gps.parameter_covariance.position_noise_sigma,
-      params_.gps.parameter_covariance.position_noise_sigma;
-    gps_noise = gtsam::noiseModel::Diagonal::Sigmas(gps_sigmas);
+    gps_noise = gtsam::noiseModel::Diagonal::Sigmas(
+      toGtsam(params_.gps.parameter_covariance.position_noise_sigmas));
   } else {
     gtsam::Matrix22 gps_cov = toGtsam3x3(gps_msg->pose.covariance).block<2, 2>(0, 0);
     gps_noise = gtsam::noiseModel::Gaussian::Covariance(gps_cov);
@@ -863,8 +837,9 @@ void FactorGraphNode::addDepthFactor(
     double depth_sigma = params_.depth.parameter_covariance.position_z_noise_sigma;
     depth_noise = gtsam::noiseModel::Isotropic::Sigma(1, depth_sigma);
   } else {
-    depth_noise = gtsam::noiseModel::Gaussian::Covariance(
-      toGtsamDepthCovariance(depth_msg->pose.covariance));
+    gtsam::Matrix11 depth_cov;
+    depth_cov << depth_msg->pose.covariance[14];
+    depth_noise = gtsam::noiseModel::Gaussian::Covariance(depth_cov);
   }
 
   if (params_.depth.robust_kernel == "Huber") {
@@ -896,8 +871,9 @@ void FactorGraphNode::addAhrsFactor(
     ahrs_sigmas << params_.ahrs.parameter_covariance.yaw_noise_sigma;
     ahrs_noise = gtsam::noiseModel::Diagonal::Sigmas(ahrs_sigmas);
   } else {
-    ahrs_noise = gtsam::noiseModel::Gaussian::Covariance(
-      toGtsamYawCovariance(ahrs_msg->orientation_covariance));
+    gtsam::Matrix11 ahrs_cov;
+    ahrs_cov << ahrs_msg->orientation_covariance[8];
+    ahrs_noise = gtsam::noiseModel::Gaussian::Covariance(ahrs_cov);
   }
 
   if (params_.ahrs.robust_kernel == "Huber") {
@@ -933,14 +909,14 @@ void FactorGraphNode::addMagFactor(
 
   gtsam::Vector1 mag_sigma;
   if (params_.mag.use_parameter_covariance) {
-    mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigma;
+    mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigmas[0];
   } else {
     double B_mag = ref_vec.norm();
     if (B_mag > 1e-6) {
       double sigma_B = sqrt(mag_msg->magnetic_field_covariance[0]);
       mag_sigma << sigma_B / B_mag;
     } else {
-      mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigma;
+      mag_sigma << params_.mag.parameter_covariance.magnetic_field_noise_sigmas[0];
     }
   }
   gtsam::SharedNoiseModel mag_noise = gtsam::noiseModel::Isotropic::Sigma(1, mag_sigma(0));
@@ -970,11 +946,8 @@ void FactorGraphNode::addDvlFactor(
 
   gtsam::SharedNoiseModel dvl_noise;
   if (params_.dvl.use_parameter_covariance) {
-    gtsam::Vector3 dvl_sigmas;
-    dvl_sigmas << params_.dvl.parameter_covariance.velocity_noise_sigma,
-      params_.dvl.parameter_covariance.velocity_noise_sigma,
-      params_.dvl.parameter_covariance.velocity_noise_sigma;
-    dvl_noise = gtsam::noiseModel::Diagonal::Sigmas(dvl_sigmas);
+    dvl_noise = gtsam::noiseModel::Diagonal::Sigmas(
+      toGtsam(params_.dvl.parameter_covariance.velocity_noise_sigmas));
   } else {
     gtsam::Matrix33 dvl_cov = toGtsam3x3(dvl_msg->twist.covariance);
     dvl_noise = gtsam::noiseModel::Gaussian::Covariance(dvl_cov);
@@ -1023,8 +996,7 @@ void FactorGraphNode::addAuvDynamicsFactor(
 
   const auto & wrench_msg = wrench_msgs.back();
 
-  gtsam::Vector3 dynamics_sigmas =
-    gtsam::Vector3::Constant(params_.dynamics.prediction_noise_sigma);
+  gtsam::Vector3 dynamics_sigmas = toGtsam(params_.dynamics.prediction_noise_sigmas);
   gtsam::SharedNoiseModel dynamics_noise = gtsam::noiseModel::Diagonal::Sigmas(dynamics_sigmas);
 
   if (params_.dynamics.robust_kernel == "Huber") {
@@ -1036,15 +1008,15 @@ void FactorGraphNode::addAuvDynamicsFactor(
   }
 
   double dt = target_time - prev_time_;
-  RCLCPP_DEBUG(get_logger(), "Adding dynamics factor at step %zu", current_step_); // Add the factor to the graph
+  RCLCPP_DEBUG(get_logger(), "Adding dynamics factor at step %zu", current_step_);
   graph.emplace_shared<coug_fgo::factors::CustomAUVDynamicsFactorArm>(
     X(prev_step_), V(prev_step_),
     X(current_step_), V(current_step_),
     dt, toGtsam(wrench_msg->wrench.force),
     toGtsam(com_to_dvl_tf_.transform),
-    toGtsam3x3Diagonal(params_.dynamics.mass),
-    toGtsam3x3Diagonal(params_.dynamics.linear_drag),
-    toGtsam3x3Diagonal(params_.dynamics.quad_drag),
+    toGtsamDiagonal(params_.dynamics.mass).block<3, 3>(0, 0),
+    toGtsamDiagonal(params_.dynamics.linear_drag).block<3, 3>(0, 0),
+    toGtsamDiagonal(params_.dynamics.quad_drag).block<3, 3>(0, 0),
     dynamics_noise);
 }
 
@@ -1181,11 +1153,10 @@ void FactorGraphNode::addPreintegratedDvlFactor(
       last_real_dvl_time_ = current_dvl_time;
 
       if (params_.dvl.use_parameter_covariance) {
-        last_dvl_covariance_ = gtsam::Matrix3::Identity() *
-          (params_.dvl.parameter_covariance.velocity_noise_sigma *
-          params_.dvl.parameter_covariance.velocity_noise_sigma);
+        last_dvl_covariance_ = toGtsamSquaredDiagonal(
+          params_.dvl.parameter_covariance.velocity_noise_sigmas).block<3, 3>(0, 0);
       } else {
-        last_dvl_covariance_ = toGtsam3x3Diagonal(dvl_msg->twist.covariance);
+        last_dvl_covariance_ = toGtsam3x3(dvl_msg->twist.covariance);
       }
 
       // Integrate DVL measurement alongside interpolated IMU attitude

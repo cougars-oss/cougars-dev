@@ -134,6 +134,20 @@ gtsam::Matrix66 toGtsam(const std::array<double, 36> & cov)
 }
 
 /**
+ * @brief Converts a std::vector to a GTSAM Vector (dynamic size).
+ * @param v The input vector.
+ * @return The resulting gtsam::Vector.
+ */
+gtsam::Vector toGtsam(const std::vector<double> & v)
+{
+  gtsam::Vector gtsam_v(v.size());
+  for (size_t i = 0; i < v.size(); ++i) {
+    gtsam_v(i) = v[i];
+  }
+  return gtsam_v;
+}
+
+/**
  * @brief Extracts the upper-left 3x3 block from a 36-element covariance array.
  * @param cov The input 6x6 covariance array.
  * @return The resulting gtsam::Matrix33.
@@ -150,54 +164,31 @@ gtsam::Matrix33 toGtsam3x3(const std::array<double, 36> & cov)
 }
 
 /**
- * @brief Extracts the diagonal of the upper-left 3x3 from a 36-element covariance array.
- * @param cov The input 6x6 covariance array.
- * @return The resulting gtsam::Matrix33.
+ * @brief Converts a vector of sigmas to a squared diagonal covariance matrix (dynamic size).
+ * @param sigmas The input vector of standard deviations.
+ * @return The resulting gtsam::Matrix (diagonal with sigmas squared).
  */
-gtsam::Matrix33 toGtsam3x3Diagonal(const std::array<double, 36> & cov)
+gtsam::Matrix toGtsamSquaredDiagonal(const std::vector<double> & sigmas)
 {
-  gtsam::Matrix33 m = gtsam::Matrix33::Zero();
-  m(0, 0) = cov[0];
-  m(1, 1) = cov[7];
-  m(2, 2) = cov[14];
-  return m;
-}
-
-/**
- * @brief Converts a 3-element vector to a diagonal GTSAM Matrix33.
- * @param vec The input vector (diagonal elements).
- * @return The resulting gtsam::Matrix33.
- */
-gtsam::Matrix33 toGtsam3x3Diagonal(const std::vector<double> & vec)
-{
-  if (vec.size() != 3) {
-    throw std::runtime_error("Vector size must be 3 for diagonal Matrix33 conversion");
+  gtsam::Vector squared(sigmas.size());
+  for (size_t i = 0; i < sigmas.size(); ++i) {
+    squared(i) = sigmas[i] * sigmas[i];
   }
-  return gtsam::Vector3(vec[0], vec[1], vec[2]).asDiagonal();
+  return squared.asDiagonal();
 }
 
 /**
- * @brief Extracts the yaw variance (index 8) from a 3x3 orientation covariance array.
- * @param cov The input 3x3 covariance array.
- * @return The resulting gtsam::Matrix11.
+ * @brief Converts a vector of values to a diagonal matrix (dynamic size).
+ * @param diag_elements The input vector of diagonal elements.
+ * @return The resulting gtsam::Matrix.
  */
-gtsam::Matrix11 toGtsamYawCovariance(const std::array<double, 9> & cov)
+gtsam::Matrix toGtsamDiagonal(const std::vector<double> & diag_elements)
 {
-  gtsam::Matrix11 m;
-  m(0, 0) = cov[8];
-  return m;
-}
-
-/**
- * @brief Extracts the Z variance (index 14) from a 6x6 pose covariance array.
- * @param cov The input 6x6 covariance array.
- * @return The resulting gtsam::Matrix11.
- */
-gtsam::Matrix11 toGtsamDepthCovariance(const std::array<double, 36> & cov)
-{
-  gtsam::Matrix11 m;
-  m(0, 0) = cov[14];
-  return m;
+  gtsam::Vector v(diag_elements.size());
+  for (size_t i = 0; i < diag_elements.size(); ++i) {
+    v(i) = diag_elements[i];
+  }
+  return v.asDiagonal();
 }
 
 /**
@@ -257,47 +248,6 @@ geometry_msgs::msg::Pose toPoseMsg(const gtsam::Pose3 & gtsam_obj)
   return msg;
 }
 
-/**
- * @brief Converts a GTSAM Pose3 to a geometry_msgs Transform.
- * @param gtsam_obj The input GTSAM Pose3.
- * @return The resulting geometry_msgs::msg::Transform.
- */
-geometry_msgs::msg::Transform toTransformMsg(const gtsam::Pose3 & gtsam_obj)
-{
-  geometry_msgs::msg::Transform msg;
-  msg.translation = toVectorMsg(gtsam_obj.translation());
-  msg.rotation = toQuatMsg(gtsam_obj.rotation());
-  return msg;
-}
-
-/**
- * @brief Converts a GTSAM Vector6 to a geometry_msgs Wrench.
- * @param v The input GTSAM Vector6.
- * @return The resulting geometry_msgs::msg::Wrench.
- */
-geometry_msgs::msg::Wrench toWrenchMsg(const gtsam::Vector6 & v)
-{
-  geometry_msgs::msg::Wrench msg;
-  msg.force.x = v(0); msg.force.y = v(1); msg.force.z = v(2);
-  msg.torque.x = v(3); msg.torque.y = v(4); msg.torque.z = v(5);
-  return msg;
-}
-
-/**
- * @brief Converts a GTSAM Matrix33 to a 9-element covariance array.
- * @param cov The input GTSAM Matrix33.
- * @return The resulting std::array<double, 9>.
- */
-std::array<double, 9> toCovariance9Msg(const gtsam::Matrix33 & cov)
-{
-  std::array<double, 9> msg;
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      msg[i * 3 + j] = cov(i, j);
-    }
-  }
-  return msg;
-}
 
 /**
  * @brief Converts a GTSAM Matrix33 to a 36-element covariance array (upper-left block).

@@ -22,8 +22,6 @@ class CmdVelConverterNode(Node):
     """
     Converts ROS 2 cmd_vel commands to HoloOcean agent command messages.
 
-    TODO: Adjust scalars so the velocities actually kind of match.
-
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
     """
@@ -35,6 +33,12 @@ class CmdVelConverterNode(Node):
         self.declare_parameter("output_topic", "/command/agent")
         self.declare_parameter("agent_name", "auv0")
 
+        # Calculated from BlueROV2.h
+        self.declare_parameter("thruster_limit", 28.75)
+        self.declare_parameter("horizontal_scale", 4.066)
+        self.declare_parameter("vertical_scale", 2.875)
+        self.declare_parameter("angular_scale", 2.0)
+
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
         )
@@ -44,19 +48,30 @@ class CmdVelConverterNode(Node):
         self.agent_name = (
             self.get_parameter("agent_name").get_parameter_value().string_value
         )
-
-        self.last_command_msg = None
+        self.thruster_limit = (
+            self.get_parameter("thruster_limit").get_parameter_value().double_value
+        )
+        self.h_scale = (
+            self.get_parameter("horizontal_scale").get_parameter_value().double_value
+        )
+        self.v_scale = (
+            self.get_parameter("vertical_scale").get_parameter_value().double_value
+        )
+        self.a_scale = (
+            self.get_parameter("angular_scale").get_parameter_value().double_value
+        )
 
         self.subscription = self.create_subscription(
-            Twist, input_topic, self.cmd_vel_callback, 10
+            Twist, input_topic, self.listener_callback, 10
         )
         self.publisher = self.create_publisher(AgentCommand, output_topic, 10)
+
         self.get_logger().info(
             f"Cmd Vel converter started. Listening on {input_topic} and "
             f"publishing on {output_topic}."
         )
 
-    def cmd_vel_callback(self, msg: Twist):
+    def listener_callback(self, msg: Twist):
         """
         Process cmd_vel (Twist) messages.
 
@@ -66,25 +81,35 @@ class CmdVelConverterNode(Node):
         agent_cmd.header.stamp = self.get_clock().now().to_msg()
         agent_cmd.header.frame_id = self.agent_name
 
-        # Map Twist 6-DOF to BlueROV variables
-        forward = msg.linear.x * 10
-        vertical = msg.linear.z * 10
-        yaw = msg.angular.z * 0.1
-        left = msg.linear.y * 10
-        pitch = msg.angular.y * 0.1
-        roll = msg.angular.x * 0.1
+        # Map Twist to BlueROV thruster commands
+        fwd = msg.linear.x * self.h_scale
+        lat = msg.linear.y * self.h_scale
+        vert = msg.linear.z * self.v_scale
 
-        agent_cmd.command = [
-            (vertical + pitch + roll),
-            (vertical + pitch - roll),
-            (vertical - pitch - roll),
-            (vertical - pitch + roll),
-            (forward + yaw + left),
-            (forward - yaw - left),
-            (forward - yaw + left),
-            (forward + yaw - left),
-        ]
+        roll = msg.angular.x * self.a_scale
+        pitch = msg.angular.y * self.a_scale
+        yaw = msg.angular.z * self.a_scale
 
+        cmd_0 = vert - pitch - roll
+        cmd_1 = vert - pitch + roll
+        cmd_2 = vert + pitch + roll
+        cmd_3 = vert + pitch - roll
+
+        cmd_4 = fwd + lat + yaw
+        cmd_5 = fwd - lat - yaw
+        cmd_6 = fwd + lat - yaw
+        cmd_7 = fwd - lat + yaw
+
+        raw_cmds = [cmd_0, cmd_1, cmd_2, cmd_3, cmd_4, cmd_5, cmd_6, cmd_7]
+
+        max_req = max([abs(x) for x in raw_cmds])
+        if max_req > self.thruster_limit:
+            scale_factor = self.thruster_limit / max_req
+            final_cmds = [x * scale_factor for x in raw_cmds]
+        else:
+            final_cmds = raw_cmds
+
+        agent_cmd.command = final_cmds
         self.publisher.publish(agent_cmd)
 
 
