@@ -22,12 +22,12 @@ setup(
             glob("urdf/bluerov2_holoocean/meshes/*.*"),
         ),
         (
-            os.path.join("share", package_name, "urdf/bluerov2_heavy"),
-            glob("urdf/bluerov2_heavy/*.*"),
+            os.path.join("share", package_name, "urdf/bluerov2"),
+            glob("urdf/bluerov2/*.*"),
         ),
         (
-            os.path.join("share", package_name, "urdf/bluerov2_heavy/meshes"),
-            glob("urdf/bluerov2_heavy/meshes/*.*"),
+            os.path.join("share", package_name, "urdf/bluerov2/meshes"),
+            glob("urdf/bluerov2/meshes/*.*"),
         ),
     ],
     install_requires=["setuptools"],

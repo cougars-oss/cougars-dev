@@ -176,7 +176,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "urdf_file",
-                default_value="urdf/bluerov2_heavy/bluerov2_heavy.urdf.xacro",
+                default_value="urdf/bluerov2/bluerov2.urdf.xacro",
                 description="URDF or Xacro file to load",
             ),
             DeclareLaunchArgument(

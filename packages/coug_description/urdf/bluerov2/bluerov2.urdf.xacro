@@ -2,8 +2,8 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="bluerov2">
 
   <!--
-  @file bluerov2_heavy.urdf.xacro
-  @brief URDF description for the BlueROV2 Heavy configuration.
+  @file bluerov2.urdf.xacro
+  @brief URDF description for the BlueROV2.
   @author Nelson Durrant
   @date Jan 2026
   -->
@@ -16,7 +16,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <mesh filename="package://coug_description/urdf/bluerov2_heavy/meshes/bluerov2_heavy.dae" scale="0.025 0.025 0.025"/>
+        <mesh filename="package://coug_description/urdf/bluerov2/meshes/bluerov2.dae" scale="0.025 0.025 0.025"/>
       </geometry>
     </visual>
   </link>
