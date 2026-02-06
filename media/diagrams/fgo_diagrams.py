@@ -206,7 +206,7 @@ for i in range(4):
 
         pgm_dynamics.add_node(
             f"dynamics{i}",
-            f"$f^{{v}}_{{{i}{i+1}}}$",
+            f"$f^\\mathcal{{M}}_{{{i}{i+1}}}$",
             mid_x,
             2.5,
             fixed=True,
@@ -219,7 +219,7 @@ for i in range(4):
         pgm_dynamics.add_edge(f"v{i+1}", f"dynamics{i}")
 
 pgm_dynamics.render()
-# pgm_dynamics.figure.savefig(OUTPUT_DIR / "fgo_dynamics.pdf", bbox_inches="tight")
+pgm_dynamics.figure.savefig(OUTPUT_DIR / "fgo_dynamics.pdf", bbox_inches="tight")
 pgm_dynamics.figure.savefig(
     OUTPUT_DIR / "fgo_dynamics.png", bbox_inches="tight", dpi=300
 )
