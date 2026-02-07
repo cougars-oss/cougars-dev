@@ -37,6 +37,7 @@ COPY --chown=frostlab-docker:frostlab-docker packages .
 
 # Install Python dependencies
 USER frostlab-docker
+ENV PATH="$PATH:/home/frostlab-docker/.local/bin"
 RUN pip3 install --upgrade --no-cache-dir \
     vcstool rosdoc2 tmuxp asciimatics Pillow
 
