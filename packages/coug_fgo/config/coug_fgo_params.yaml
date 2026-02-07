@@ -124,7 +124,7 @@
       velocity_sigma: [0.1, 0.1, 0.1] # [m/s/sqrt(s)] Velocity uncertainty growth rate during dropouts.
 
     dynamics:
-      enable_dynamics: true
+      enable_dynamics: false
       enable_dynamics_dropout_only: false
       use_parameter_frame: false
       prediction_noise_sigmas: [0.1, 0.1, 0.1] # Model prediction uncertainty sigmas.
