@@ -8,11 +8,12 @@
   <license>Apache-2.0</license>
 
   <depend>coug_description</depend>
-  <depend>coug_localization</depend>
-  <depend condition="$ROS_BUILD_ARCH == 'amd64'">coug_gui</depend>
   <depend>coug_fgo</depend>
+  <depend condition="$ROS_BUILD_ARCH == 'amd64'">coug_gui</depend>
+  <depend>coug_localization</depend>
   <depend>coug_navigation</depend>
   <depend>holoocean_bridge</depend>
+  <depend>sensor_bridge</depend>
   <depend>rosbag2_storage_mcap</depend>
 
   <test_depend>ament_lint_auto</test_depend>
