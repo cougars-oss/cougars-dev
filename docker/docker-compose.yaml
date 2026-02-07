@@ -47,9 +47,9 @@ services:
       - ../bags:/home/frostlab-docker/bags
       - ../packages:/home/frostlab-docker/coug_ws/src
       - ../scripts:/home/frostlab-docker/scripts
+      - ./startup:/startup
       - ./entrypoint.sh:/entrypoint.sh
       - ./completions.sh:/completions.sh
-      - ./introduction.txt:/introduction.txt
       - ./.tmux.conf:/home/frostlab-docker/.tmux.conf
       - /dev:/dev:rw
       - /etc/udev:/etc/udev:rw

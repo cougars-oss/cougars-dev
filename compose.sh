@@ -52,7 +52,7 @@ case $1 in
             docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct \
                 tmux new-session -d -s coug_dev -n main -c "~"
             docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct \
-                tmux send-keys -t coug_dev:main.0 "clear && cat /introduction.txt" C-m
+                tmux send-keys -t coug_dev:main.0 "python3 /startup/display.py && clear && cat /startup/introduction.txt" C-m
         fi
         
         # Attach to the 'coug_dev' tmux session

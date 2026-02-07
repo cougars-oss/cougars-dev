@@ -51,11 +51,13 @@ COPY --chown=frostlab-docker:frostlab-docker packages .
 
 # Install Python dependencies
 USER frostlab-docker
-RUN pip3 install --no-cache-dir \
+RUN pip3 install --upgrade --no-cache-dir \
     # Tool for managing external repos - Nelson Durrant, Jan 2026
     vcstool \
     # Package documentation - Nelson Durrant, Feb 2026
-    rosdoc2
+    rosdoc2 \
+    # ASCII art boot screen - Nelson Durrant, Feb 2026
+    asciimatics Pillow
 
 # Install custom ROS package dependencies (rosdep)
 RUN vcs import . < cougars.repos \
