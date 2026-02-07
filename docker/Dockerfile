@@ -19,26 +19,12 @@ ARG TARGETARCH
 
 ENV RCUTILS_COLORIZED_OUTPUT=1
 
-# ROS_BUILD_ARCH is used to skip building architecture-incompatible packages
+# Used to skip building architecture-incompatible packages
 ENV ROS_BUILD_ARCH=$TARGETARCH
-
-#################################
-# IMPORTANT DOCUMENTATION NOTE! #
-#################################
-
-# When adding dependencies or Dockerfile commands below, please document your changes
-# following this format:
-#
-#     # Why do we need this dependency or command? - Full Name, Month Year
-#     < Add system dependencies here >
-#
-# https://docs.docker.com/reference/dockerfile/
 
 # Install ROS packages
 USER root
 RUN apt update && apt install -y --no-install-recommends \
-    # Helpful ROS GUI tools - Nelson Durrant, Jan 2026
-    ros-${ROS_DISTRO}-rqt* \
     # Drive the AUV with a joystick or keyboard - Nelson Durrant, Jan 2026
     ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy ros-${ROS_DISTRO}-teleop-twist-keyboard \
     # Better rosbag2 storage format - Nelson Durrant, Jan 2026
@@ -52,12 +38,7 @@ COPY --chown=frostlab-docker:frostlab-docker packages .
 # Install Python dependencies
 USER frostlab-docker
 RUN pip3 install --upgrade --no-cache-dir \
-    # Tool for managing external repos - Nelson Durrant, Jan 2026
-    vcstool \
-    # Package documentation - Nelson Durrant, Feb 2026
-    rosdoc2 \
-    # ASCII art boot screen - Nelson Durrant, Feb 2026
-    asciimatics Pillow
+    vcstool rosdoc2 tmuxp asciimatics Pillow
 
 # Install tmux plugins
 RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -73,7 +54,7 @@ RUN vcs import . < cougars.repos \
     && sudo rm -rf /var/lib/apt/lists/* \
     && sudo rm -rf ./*
 
-# Configure bash environment - Nelson Durrant, Jan 2026
+# Configure bash environment
 RUN echo "" >> /home/frostlab-docker/.bashrc \
     && echo "# Source ROS 2 environment" >> /home/frostlab-docker/.bashrc \
     && echo "source /opt/ros/humble/setup.bash" >> /home/frostlab-docker/.bashrc \

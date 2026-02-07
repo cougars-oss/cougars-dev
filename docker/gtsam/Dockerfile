@@ -30,7 +30,7 @@ RUN apt update && apt install -y --no-install-recommends \
     x11-apps x11-utils x11-xserver-utils xauth \
     && rm -rf /var/lib/apt/lists/*
 
-# Install GTSAM (build from source for ARM) - Nelson Durrant, Jan 2026
+# Install GTSAM (build from source for ARM)
 RUN apt update && apt install -y --no-install-recommends \
     build-essential cmake libboost-dev libtbb-dev \
     libboost-serialization-dev \

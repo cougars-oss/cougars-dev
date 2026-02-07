@@ -8,7 +8,7 @@
 #
 # Arguments:
 #   down: Stop the holoocean-ct container
-#   up: Start the holoocean-ct container (default)
+#   up: Start the holoocean-ct container and launch the CougUV scenario (default)
 #   -b: Launch the BlueROV2 scenario
 #   -m: Launch the multi-CougUV scenario
 #   command: Any other arguments will be passed to the container (e.g. bash)
@@ -35,7 +35,8 @@ case $1 in
         docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" up -d
 
         # Wait for './entrypoint.sh' to finish
-        while [ "$(docker exec holoocean-ct test -f /tmp/ready && echo 'yes' || echo 'no')" != "yes" ]; do sleep 1; done
+        while [ "$(docker exec holoocean-ct test -f /tmp/ready \
+            && echo 'yes' || echo 'no')" != "yes" ]; do sleep 1; done
 
         PARAMS_FILE="/home/ue4/config/coug_holoocean_params.yaml"
         
@@ -55,14 +56,13 @@ case $1 in
         done
 
         printInfo "Launching the configured scenario in HoloOcean..."
-        docker exec -it --user ue4 -e HOME=/home/ue4 -e RMW_FASTRTPS_USE_QOS_FROM_XML=1 \
+        docker exec -it --user ue4 -e RMW_FASTRTPS_USE_QOS_FROM_XML=1 \
             -e FASTRTPS_DEFAULT_PROFILES_FILE=/home/ue4/config/fastdds.xml holoocean-ct /bin/bash -c \
             "source ~/ros2_ws/install/setup.bash && ros2 run holoocean_main holoocean_node --ros-args \
             --params-file $PARAMS_FILE"
         ;;
     *)
         # Pass the command to the container
-        docker exec -it --user ue4 -e HOME=/home/ue4 -e RMW_FASTRTPS_USE_QOS_FROM_XML=1 \
-            -e FASTRTPS_DEFAULT_PROFILES_FILE=/home/ue4/config/fastdds.xml holoocean-ct "$@"
+        docker exec -it --user ue4 holoocean-ct "$@"
         ;;
 esac

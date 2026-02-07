@@ -41,26 +41,26 @@ case $1 in
         docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" $PROFILES up -d
 
         # Wait for './entrypoint.sh' to finish
-        while [ "$(docker exec cougars-ct test -f /tmp/ready && echo 'yes' || echo 'no')" != "yes" ]; do sleep 1; done
+        while [ "$(docker exec cougars-ct test -f /tmp/ready \
+            && echo 'yes' || echo 'no')" != "yes" ]; do sleep 1; done
 
         # Check if a 'coug_dev' tmux session already exists
-        if [ "$(docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct \
+        if [ "$(docker exec -it --user frostlab-docker cougars-ct \
             tmux list-sessions | grep coug_dev)" == "" ]; then
 
             # If not, create a new 'coug_dev' tmux session
             printWarning "Creating a new 'coug_dev' tmux session..."
-            docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct \
-                tmux new-session -d -s coug_dev -n main -c "~"
-            docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct \
-                tmux send-keys -t coug_dev:main.0 "python3 /startup/display.py && clear && cat /startup/introduction.txt" C-m
+            docker exec -it --user frostlab-docker cougars-ct \
+                tmuxp load -d /home/frostlab-docker/.tmuxp/coug_dev.yaml
         fi
-        
+
         # Attach to the 'coug_dev' tmux session
         printInfo "Attaching to the 'coug_dev' tmux session..."
-        docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct tmux attach -t coug_dev
+        docker exec -it --user frostlab-docker cougars-ct \
+            tmux attach -t coug_dev
         ;;
     *)
         # Pass the command to the container
-        docker exec -it --user frostlab-docker -e HOME=/home/frostlab-docker cougars-ct "$@"
+        docker exec -it --user frostlab-docker cougars-ct "$@"
         ;;
 esac
