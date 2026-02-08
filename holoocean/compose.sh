@@ -29,7 +29,7 @@ case $1 in
         fi
 
         # Allow container to forward graphical displays to host
-        xhost +
+        xhost +local:root
 
         printInfo "Loading the holoocean-ct container..."
         docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" up -d

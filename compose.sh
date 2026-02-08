@@ -32,7 +32,7 @@ case $1 in
         ;;
     "up" | "")
         # Allow container to forward graphical displays to host
-        xhost +
+        xhost +local:root
 
         if [[ "$arch" == "x86_64" ]]; then
             printInfo "Loading the mapproxy-ct container..."
@@ -45,8 +45,8 @@ case $1 in
             && echo 'yes' || echo 'no')" != "yes" ]; do sleep 1; done
 
         # Check if a 'coug_dev' tmux session already exists
-        if [ "$(docker exec -it --user frostlab-docker cougars-ct \
-            tmux list-sessions | grep coug_dev)" == "" ]; then
+        if ! docker exec --user frostlab-docker cougars-ct \
+            tmux has-session -t coug_dev 2>/dev/null; then
 
             # If not, create a new 'coug_dev' tmux session
             printWarning "Creating a new 'coug_dev' tmux session..."
