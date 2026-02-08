@@ -15,19 +15,19 @@
 #   --project_to_plane xy: Project trajectories to the 2D plane (xy)
 #   --n_to_align <N>: Number of poses to use for alignment
 
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-source "$SCRIPT_DIR/../../scripts/common.sh"
+script_dir="$(dirname "$(readlink -f "$0")")"
+source "$script_dir/../../scripts/common.sh"
 
-printInfo "Evaluating all bags..."
+print_info "Evaluating all bags..."
 
-cd "$SCRIPT_DIR"
+cd "$script_dir"
 for d in ../../bags/*/; do
     bag=$(basename "$d")
-    printInfo "Selecting ${bag}..."
+    print_info "Selecting ${bag}..."
     ./evo_eval.sh "$bag" "$@"
 done
 
-printInfo "Generating plots..."
+print_info "Generating plots..."
 
 python3 traj_plot.py
 python3 metrics_plot.py

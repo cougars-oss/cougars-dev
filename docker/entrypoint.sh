@@ -9,24 +9,24 @@ set -e
 
 # Fix permission errors
 USERNAME=frostlab-docker
-TARGET_UID=$(stat -c '%u' /home/$USERNAME/coug_ws/src)
-TARGET_GID=$(stat -c '%g' /home/$USERNAME/coug_ws/src)
+target_uid=$(stat -c '%u' /home/$USERNAME/coug_ws/src)
+target_gid=$(stat -c '%g' /home/$USERNAME/coug_ws/src)
 
-if [ ! -z "$TARGET_GID" ]; then
-    if [ "$TARGET_GID" != "$(id -g $USERNAME)" ]; then
-        echo "Changing GID of $USERNAME to $TARGET_GID..."
-        groupmod -o -g "$TARGET_GID" $USERNAME
+if [ ! -z "$target_gid" ]; then
+    if [ "$target_gid" != "$(id -g $USERNAME)" ]; then
+        echo "Changing GID of $USERNAME to $target_gid..."
+        groupmod -o -g "$target_gid" $USERNAME
     fi
 fi
-if [ ! -z "$TARGET_UID" ]; then
-    if [ "$TARGET_UID" != "$(id -u $USERNAME)" ]; then
-        echo "Changing UID of $USERNAME to $TARGET_UID..."
-        usermod -o -u "$TARGET_UID" $USERNAME
+if [ ! -z "$target_uid" ]; then
+    if [ "$target_uid" != "$(id -u $USERNAME)" ]; then
+        echo "Changing UID of $USERNAME to $target_uid..."
+        usermod -o -u "$target_uid" $USERNAME
     fi
 fi
 
 # Install vcs-defined external packages
-CURRENT_DIR=$(pwd)
+current_dir=$(pwd)
 cd /home/$USERNAME/coug_ws/src
 if wget -q --spider http://github.com; then
     if [ -f "cougars.repos" ]; then
@@ -37,7 +37,7 @@ if wget -q --spider http://github.com; then
 else
     echo "No network connection. Skipping vcs repository updates."
 fi
-cd $CURRENT_DIR
+cd $current_dir
 
 # Source ROS environment
 source /opt/ros/humble/setup.bash

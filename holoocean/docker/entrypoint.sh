@@ -9,19 +9,19 @@ set -e
 
 # Fix permission errors
 USERNAME=ue4
-TARGET_UID=$(stat -c '%u' /home/$USERNAME/config)
-TARGET_GID=$(stat -c '%g' /home/$USERNAME/config)
+target_uid=$(stat -c '%u' /home/$USERNAME/config)
+target_gid=$(stat -c '%g' /home/$USERNAME/config)
 
-if [ ! -z "$TARGET_GID" ]; then
-    if [ "$TARGET_GID" != "$(id -g $USERNAME)" ]; then
-        echo "Changing GID of $USERNAME to $TARGET_GID..."
-        groupmod -o -g "$TARGET_GID" $USERNAME
+if [ ! -z "$target_gid" ]; then
+    if [ "$target_gid" != "$(id -g $USERNAME)" ]; then
+        echo "Changing GID of $USERNAME to $target_gid..."
+        groupmod -o -g "$target_gid" $USERNAME
     fi
 fi
-if [ ! -z "$TARGET_UID" ]; then
-    if [ "$TARGET_UID" != "$(id -u $USERNAME)" ]; then
-        echo "Changing UID of $USERNAME to $TARGET_UID..."
-        usermod -o -u "$TARGET_UID" $USERNAME
+if [ ! -z "$target_uid" ]; then
+    if [ "$target_uid" != "$(id -u $USERNAME)" ]; then
+        echo "Changing UID of $USERNAME to $target_uid..."
+        usermod -o -u "$target_uid" $USERNAME
     fi
 fi
 

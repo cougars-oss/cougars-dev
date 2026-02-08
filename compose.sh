@@ -13,32 +13,32 @@
 
 set -e
 
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-source "$SCRIPT_DIR/scripts/common.sh"
+script_dir="$(dirname "$(readlink -f "$0")")"
+source "$script_dir/scripts/common.sh"
 
-PROFILES=""
+profiles=""
 arch=$(uname -m)
 if [[ "$arch" == "x86_64" ]]; then
-    PROFILES="--profile mapproxy"
+    profiles="--profile mapproxy"
 fi
 
 case $1 in
     "down")
         if [[ "$arch" == "x86_64" ]]; then
-            printWarning "Stopping the mapproxy-ct container..."
+            print_warning "Stopping the mapproxy-ct container..."
         fi
-        printWarning "Stopping the cougars-ct container..."
-        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" $PROFILES down
+        print_warning "Stopping the cougars-ct container..."
+        docker compose -f "$script_dir/docker/docker-compose.yaml" $profiles down
         ;;
     "up" | "")
         # Allow container to forward graphical displays to host
         xhost +local:root
 
         if [[ "$arch" == "x86_64" ]]; then
-            printInfo "Loading the mapproxy-ct container..."
+            print_info "Loading the mapproxy-ct container..."
         fi
-        printInfo "Loading the cougars-ct container..."
-        docker compose -f "$SCRIPT_DIR/docker/docker-compose.yaml" $PROFILES up -d
+        print_info "Loading the cougars-ct container..."
+        docker compose -f "$script_dir/docker/docker-compose.yaml" $profiles up -d
 
         # Wait for './entrypoint.sh' to finish
         while [ "$(docker exec cougars-ct test -f /tmp/ready \
@@ -49,13 +49,13 @@ case $1 in
             tmux has-session -t coug_dev 2>/dev/null; then
 
             # If not, create a new 'coug_dev' tmux session
-            printWarning "Creating a new 'coug_dev' tmux session..."
+            print_warning "Creating a new 'coug_dev' tmux session..."
             docker exec -it --user frostlab-docker cougars-ct \
                 tmuxp load -d /home/frostlab-docker/.tmuxp/coug_dev.yaml
         fi
 
         # Attach to the 'coug_dev' tmux session
-        printInfo "Attaching to the 'coug_dev' tmux session..."
+        print_info "Attaching to the 'coug_dev' tmux session..."
         docker exec -it --user frostlab-docker cougars-ct \
             tmux attach -t coug_dev
         ;;

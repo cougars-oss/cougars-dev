@@ -3,14 +3,14 @@
 # 
 # Common script functions
 
-function printInfo {
+function print_info {
     echo -e "\033[0m\033[36m[ 🐟 ] $1\033[0m"
 }
 
-function printWarning {
+function print_warning {
     echo -e "\033[0m\033[33m[ 🐡 ] $1\033[0m"
 }
 
-function printError {
+function print_error {
     echo -e "\033[0m\033[31m[ 🦀 ] $1\033[0m"
 }

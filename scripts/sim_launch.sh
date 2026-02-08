@@ -12,72 +12,72 @@
 #   -m: Launch multi-agent CougUV scenario
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
 
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-source "$SCRIPT_DIR/common.sh"
+script_dir="$(dirname "$(readlink -f "$0")")"
+source "$script_dir/common.sh"
 source ~/coug_ws/install/setup.bash
 
-URDF="urdf/couguv_holoocean.urdf.xacro"
-AGENTS=1
-BAG_PATH=""
-COMPARE="false"
+urdf="urdf/couguv_holoocean.urdf.xacro"
+agents=1
+bag_path=""
+compare="false"
 
 while getopts ":bcmr:" opt; do
     case $opt in
         b)
-            URDF="urdf/bluerov2_holoocean/bluerov2_holoocean.urdf.xacro"
+            urdf="urdf/bluerov2_holoocean/bluerov2_holoocean.urdf.xacro"
             ;;
         c)
-            COMPARE="true"
+            compare="true"
             ;;
         m)
-            AGENTS=3
+            agents=3
             ;;
         r)
             if [[ "$OPTARG" == -* ]]; then
-                printError "Option -r requires an argument." >&2
+                print_error "Option -r requires an argument." >&2
                 exit 1
             fi
-            BAG_PATH="$HOME/bags/$OPTARG"
+            bag_path="$HOME/bags/$OPTARG"
             ;;
         \?)
-            printError "Invalid option: -$OPTARG" >&2
+            print_error "Invalid option: -$OPTARG" >&2
             exit 1
             ;;
         :)
-            printError "Option -$OPTARG requires an argument." >&2
+            print_error "Option -$OPTARG requires an argument." >&2
             exit 1
             ;;
     esac
 done
 
-if [ -n "$BAG_PATH" ] && [ -d "$BAG_PATH" ]; then
-    printWarning "Bag directory already exists: $BAG_PATH"
+if [ -n "$bag_path" ] && [ -d "$bag_path" ]; then
+    print_warning "Bag directory already exists: $bag_path"
     read -p "Do you want to overwrite it? (y/n) " -n 1 -r
     echo 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf "$BAG_PATH"
+        rm -rf "$bag_path"
     else
         exit 1
     fi
 fi
 
-ARGS=("urdf_file:=$URDF" "num_agents:=$AGENTS" "compare:=$COMPARE")
-if [ -n "$BAG_PATH" ]; then
-    ARGS+=("bag_path:=$BAG_PATH")
+args=("urdf_file:=$urdf" "num_agents:=$agents" "compare:=$compare")
+if [ -n "$bag_path" ]; then
+    args+=("bag_path:=$bag_path")
 fi
 
-printInfo "Launching simulation stack..."
-if [ -n "$BAG_PATH" ]; then
-    printInfo "Recording to bag: $BAG_PATH"
+print_info "Launching simulation stack..."
+if [ -n "$bag_path" ]; then
+    print_info "Recording to bag: $bag_path"
 
-    TEMP_LOG_DIR=$(mktemp -d)
-    ROS_LOG_DIR="$TEMP_LOG_DIR" ros2 launch coug_bringup sim.launch.py "${ARGS[@]}"
-    if [ -d "$BAG_PATH" ] && [ -d "$TEMP_LOG_DIR" ]; then
-        mv "$TEMP_LOG_DIR" "$BAG_PATH/log"
+    temp_log_dir=$(mktemp -d)
+    ROS_LOG_DIR="$temp_log_dir" ros2 launch coug_bringup sim.launch.py "${args[@]}"
+    if [ -d "$bag_path" ] && [ -d "$temp_log_dir" ]; then
+        mv "$temp_log_dir" "$bag_path/log"
     fi
 
-    mkdir -p "$BAG_PATH/config"
-    find -L ~/coug_ws/install -type f \( -path "*/config/*" -o -path "*/rviz/*" -o -path "*/mapviz/*" -o -path "*/plotjuggler/*" \) -exec cp {} "$BAG_PATH/config/" \;
+    mkdir -p "$bag_path/config"
+    find -L ~/coug_ws/install -type f \( -path "*/config/*" -o -path "*/rviz/*" -o -path "*/mapviz/*" -o -path "*/plotjuggler/*" \) -exec cp {} "$bag_path/config/" \;
 else
-    ros2 launch coug_bringup sim.launch.py "${ARGS[@]}"
+    ros2 launch coug_bringup sim.launch.py "${args[@]}"
 fi
