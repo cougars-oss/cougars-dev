@@ -13,7 +13,7 @@
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
 
 script_dir="$(dirname "$(readlink -f "$0")")"
-source "$script_dir/common.sh"
+source "$script_dirutils/common.sh"
 source "$script_dir/../coug_ws/install/setup.bash"
 
 if [ -z "$1" ]; then

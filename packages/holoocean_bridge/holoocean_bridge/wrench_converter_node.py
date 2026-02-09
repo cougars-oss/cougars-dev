@@ -72,7 +72,7 @@ class WrenchConverterNode(Node):
         GEO_FACTOR = 0.70710678
         fwd = (cmd[4] + cmd[5] + cmd[6] + cmd[7]) * GEO_FACTOR
         lat = (cmd[4] - cmd[5] + cmd[6] - cmd[7]) * GEO_FACTOR
-        vert = (cmd[0] + cmd[1] + cmd[2] + cmd[3])
+        vert = cmd[0] + cmd[1] + cmd[2] + cmd[3]
 
         wrench_msg = WrenchStamped()
         wrench_msg.header.stamp = self.get_clock().now().to_msg()

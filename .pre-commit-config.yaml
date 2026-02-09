@@ -10,83 +10,57 @@ repos:
       # --- C++ Auto-Format ---
       - id: ament_uncrustify
         name: ament_uncrustify
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_uncrustify --reformat "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_uncrustify
         language: system
-        files: ^coug_ws/src/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
 
       # --- C++ Linting ---
       - id: ament_cpplint
         name: ament_cpplint
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_cpplint "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_cpplint
         language: system
-        files: ^coug_ws/src/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
 
       - id: ament_cppcheck
         name: ament_cppcheck
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          export AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS=1 &&
-          ament_cppcheck "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_cppcheck
         language: system
-        files: ^coug_ws/src/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
 
       # --- Python Linting ---
       - id: ament_flake8
         name: ament_flake8
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_flake8 "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_flake8
         language: system
-        files: ^coug_ws/src/.*\.py$
+        files: ^packages/.*\.py$
         exclude: /setup\.py$
 
       - id: ament_pep257
         name: ament_pep257
-        name: ament_pep257
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_pep257 "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_pep257
         language: system
-        files: ^coug_ws/src/.*\.py$
+        files: ^packages/.*\.py$
         exclude: /setup\.py$
 
       # --- CMake & XML Linting ---
       - id: ament_lint_cmake
         name: ament_lint_cmake
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_lint_cmake "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_lint_cmake
         language: system
         files: CMakeLists\.txt$
 
       - id: ament_xmllint
         name: ament_xmllint
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_xmllint "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_xmllint
         language: system
-        files: ^coug_ws/src/.*\.xml$
+        files: ^packages/.*\.xml$
 
       # --- Copyright Check ---
       - id: ament_copyright
         name: ament_copyright
-        entry: >
-          docker exec cougars-ct /bin/bash -c
-          'source /opt/ros/humble/setup.bash &&
-          ament_copyright "$@"' --
+        entry: scripts/utils/run_precommit_hook.sh ament_copyright
         language: system
-        files: ^coug_ws/src/
+        files: ^packages/
         exclude: |
             (?x)^(
                 .*\.json|

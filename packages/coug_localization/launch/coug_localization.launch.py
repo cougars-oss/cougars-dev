@@ -77,9 +77,7 @@ def generate_launch_description():
                         "world_frame": odom_frame,
                     },
                 ],
-                remappings=[
-                    ("odometry/filtered", "odometry/local")
-                ],
+                remappings=[("odometry/filtered", "odometry/local")],
             ),
             # https://docs.ros.org/en/melodic/api/robot_localization/html/state_estimation_nodes.html
             Node(

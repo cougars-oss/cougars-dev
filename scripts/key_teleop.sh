@@ -4,7 +4,7 @@
 # Drives the BlueROV2 using the keyboard
 
 script_dir="$(dirname "$(readlink -f "$0")")"
-source "$script_dir/common.sh"
+source "$script_dirutils/common.sh"
 source "$script_dir/../coug_ws/install/setup.bash"
 
 print_info "Starting BlueROV2 keyboard teleop..."
