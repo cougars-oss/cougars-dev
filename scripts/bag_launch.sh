@@ -14,7 +14,7 @@
 
 script_dir="$(dirname "$(readlink -f "$0")")"
 source "$script_dir/common.sh"
-source ~/coug_ws/install/setup.bash
+source "$script_dir/../coug_ws/install/setup.bash"
 
 if [ -z "$1" ]; then
     print_error "Usage: $0 <bag_name> [-c] [-d <seconds>] [-r <bag_name>]"
@@ -50,7 +50,8 @@ while getopts ":cd:r:" opt; do
                 print_error "Option -r requires an argument." >&2
                 exit 1
             fi
-            record_bag_path="$HOME/bags/$OPTARG"
+            timestamp=$(date +"_%Y-%m-%d-%H-%M-%S")
+            record_bag_path="$HOME/bags/${OPTARG}${timestamp}"
             ;;
         \?)
             print_error "Invalid option: -$OPTARG" >&2

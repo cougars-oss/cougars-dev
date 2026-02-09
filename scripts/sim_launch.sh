@@ -14,7 +14,7 @@
 
 script_dir="$(dirname "$(readlink -f "$0")")"
 source "$script_dir/common.sh"
-source ~/coug_ws/install/setup.bash
+source "$script_dir/../coug_ws/install/setup.bash"
 
 coug_share=$(ros2 pkg prefix coug_description --share)
 urdf="$coug_share/urdf/couguv_holoocean.urdf.xacro"
@@ -39,7 +39,8 @@ while getopts ":bcmr:" opt; do
                 print_error "Option -r requires an argument." >&2
                 exit 1
             fi
-            bag_path="$HOME/bags/$OPTARG"
+            timestamp=$(date +"_%Y-%m-%d-%H-%M-%S")
+            bag_path="$HOME/bags/${OPTARG}${timestamp}"
             ;;
         \?)
             print_error "Invalid option: -$OPTARG" >&2

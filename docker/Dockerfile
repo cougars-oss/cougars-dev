@@ -48,9 +48,9 @@ RUN pip3 install --upgrade --no-cache-dir \
     tmuxp asciimatics Pillow
 
 # Install tmux plugins
-RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+RUN git clone https://github.com/tmux-plugins/tpm /home/frostlab-docker/.tmux/plugins/tpm
 COPY --chown=frostlab-docker:frostlab-docker docker/.tmux.conf /home/frostlab-docker/.tmux.conf
-RUN ~/.tmux/plugins/tpm/bin/install_plugins
+RUN /home/frostlab-docker/.tmux/plugins/tpm/bin/install_plugins
 
 # Install custom ROS package dependencies (rosdep)
 RUN vcs import . < cougars.repos \

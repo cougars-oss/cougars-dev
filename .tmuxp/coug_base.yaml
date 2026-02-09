@@ -1,0 +1,14 @@
+# Created by Nelson Durrant, Feb 2026
+session_name: coug_base
+start_directory: "~"
+windows:
+  - window_name: main
+    layout: main-vertical
+    panes:
+      - echo "Hello World"
+      - shell_command:
+          - cd ~/coug_ws && colcon build
+        suppress_history: false
+      - shell_command:
+          - echo "Hello World"
+        enter: false

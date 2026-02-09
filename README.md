@@ -33,10 +33,10 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
   git clone https://github.com/snelsondurrant/coug_fgo_dev.git
   ```
 
-- Enter the repository and run `./compose.sh up` to pull the latest image from Docker Hub and launch the `coug_dev` tmux window inside the `cougars-ct` container.
+- Enter the repository and run `./deploy.sh dev` to pull the latest image from Docker Hub and launch the `coug_dev` tmux window inside the `cougars-ct` container.
 
   ```bash
-  cd coug_fgo_dev && ./compose.sh up
+  cd coug_fgo_dev && ./deploy.sh dev
   ```
 
 - Choose a development workflow:
@@ -45,13 +45,13 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
   - Detatch from the tmux window using `Ctrl+b d` and build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
   
-  - When finished, launch the default HoloOcean scenario in the resulting `holoocean-ct` container using `./holoocean/compose.sh up`.
+  - When finished, launch the default HoloOcean scenario in the resulting `holoocean-ct` container using `./holoocean/launch.sh`.
   
     ```bash
-    cd coug_fgo_dev && ./holoocean/compose.sh up
+    cd coug_fgo_dev && ./holoocean/launch.sh
     ```
   
-  - Open a new terminal, attach to the `coug_dev` tmux window using `./compose.sh up`, build the `coug_ws` workspace, and launch the simulation stack using `./sim_launch.sh`.
+  - Open a new terminal, attach to the `coug_dev` tmux window using `./deploy.sh dev`, build the `coug_ws` workspace, and launch the simulation stack using `./sim_launch.sh`.
   
     ```bash
     cd ~/coug_ws && colcon build

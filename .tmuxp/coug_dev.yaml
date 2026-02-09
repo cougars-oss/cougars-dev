@@ -1,13 +1,9 @@
 # Created by Nelson Durrant, Feb 2026
 session_name: coug_dev
-start_directory: "~/scripts"
+start_directory: "~"
 windows:
   - window_name: main
     layout: main-vertical
-    options:
-      main-pane-width: 70%
     panes:
       - shell_command:
-          - python3 ~/.tmuxp/intro/display.py && clear && cat ~/.tmuxp/intro/introduction.txt
-        focus: true
-      - cd ~/coug_ws && colcon build
+          - python3 ~/.tmuxp/intro/display.py && clear && cat ~/.tmuxp/intro/tips.txt
