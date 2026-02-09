@@ -1,5 +1,6 @@
 # 🌊 CoUGARs FGO Development
 
+[![arXiv](https://img.shields.io/badge/arXiv-2511.08822-b31b1b.svg)](https://arxiv.org/pdf/2511.08822)
 [![ROS 2 CI](https://github.com/snelsondurrant/coug_fgo_dev/actions/workflows/ros2_ci.yml/badge.svg)](https://github.com/snelsondurrant/coug_fgo_dev/actions/workflows/ros2_ci.yml)
 [![Docker CI](https://github.com/snelsondurrant/coug_fgo_dev/actions/workflows/docker_ci.yml/badge.svg)](https://github.com/snelsondurrant/coug_fgo_dev/actions/workflows/docker_ci.yml)
 
