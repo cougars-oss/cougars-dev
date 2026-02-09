@@ -17,7 +17,7 @@
 #   --n_to_align <N>: Number of poses to use for alignment
 
 script_dir="$(dirname "$(readlink -f "$0")")"
-source "$script_dir/../../scriptsutils/common.sh"
+source "$script_dir/../../scripts/utils/common.sh"
 
 if [ -z "$1" ]; then
     print_error "Usage: $0 <bag_name> [evo_args...]"

@@ -16,7 +16,7 @@
 #   --n_to_align <N>: Number of poses to use for alignment
 
 script_dir="$(dirname "$(readlink -f "$0")")"
-source "$script_dir/../../scriptsutils/common.sh"
+source "$script_dir/../../scripts/utils/common.sh"
 
 print_info "Evaluating all bags..."
 

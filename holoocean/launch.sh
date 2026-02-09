@@ -13,7 +13,7 @@
 set -e
 
 script_dir="$(dirname "$(readlink -f "$0")")"
-source "$script_dir/../scriptsutils/common.sh"
+source "$script_dir/../scripts/utils/common.sh"
 
 xhost +local:root
 
