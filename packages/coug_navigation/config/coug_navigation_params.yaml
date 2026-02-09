@@ -18,5 +18,5 @@
 
       # --- Random Walk ---
       enable_rw_speed: false
-      rw_step_size: 1.0 # [RPM] Max change per step
+      rw_step_size: 5.0 # [RPM] Max change per step
       rw_start_value: 1200.0 # [RPM] Starting speed
