@@ -5,6 +5,8 @@
 **/install_isolated
 **/devel_isolated
 
+.mapproxy/*
+!.mapproxy/.gitkeep
 bags/*
 !bags/.gitkeep
 packages/*
