@@ -2,7 +2,7 @@
 # Created by Nelson Durrant, Jan 2026
 
 function print_info {
-    echo -e "\033[0m\033[36m[ 🐟 ] $1\033[0m"
+    echo -e "\033[0m\033[36m[ 🌊 ] $1\033[0m"
 }
 
 function print_warning {
