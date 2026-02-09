@@ -437,6 +437,7 @@ bool CougWaypointsPlugin::Initialize(QGLWidget * canvas)
 
 bool CougWaypointsPlugin::eventFilter(QObject * object, QEvent * event)
 {
+  (void)object;
   switch (event->type()) {
     case QEvent::MouseButtonPress:
       return handleMousePress(dynamic_cast<QMouseEvent *>(event));
@@ -549,6 +550,10 @@ bool CougWaypointsPlugin::handleMouseMove(QMouseEvent * event)
 
 void CougWaypointsPlugin::Draw(double x, double y, double scale)
 {
+  (void)x;
+  (void)y;
+  (void)scale;
+
   swri_transform_util::Transform transform;
   if (!tf_manager_->GetTransform(target_frame_, swri_transform_util::_wgs84_frame, transform)) {
     return;
@@ -577,6 +582,10 @@ void CougWaypointsPlugin::Draw(double x, double y, double scale)
 
 void CougWaypointsPlugin::Paint(QPainter * painter, double x, double y, double scale)
 {
+  (void)x;
+  (void)y;
+  (void)scale;
+
   swri_transform_util::Transform transform;
   if (!tf_manager_->GetTransform(target_frame_, swri_transform_util::_wgs84_frame, transform)) {
     return;
