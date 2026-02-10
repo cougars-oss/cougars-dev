@@ -90,6 +90,21 @@ void FactorGraphNode::setupRosInterfaces()
   imu_sub_ = create_subscription<sensor_msgs::msg::Imu>(
     params_.imu_topic, 200,
     [this](const sensor_msgs::msg::Imu::SharedPtr msg) {
+      if (!have_imu_to_dvl_tf_) {
+        try {
+          std::string parent = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : dvl_frame_;
+          std::string child = params_.imu.use_parameter_frame ?
+          params_.imu.parameter_frame : msg->header.frame_id;
+          if (!parent.empty()) {
+            imu_to_dvl_tf_ = tf_buffer_->lookupTransform(parent, child, tf2::TimePointZero);
+            have_imu_to_dvl_tf_ = true;
+            imu_frame_ = child;
+          }
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup IMU to DVL transform: %s", ex.what());
+        }
+      }
       imu_queue_.push(msg);
     },
     sensor_options);
@@ -97,6 +112,20 @@ void FactorGraphNode::setupRosInterfaces()
   gps_odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
     params_.gps_odom_topic, 20,
     [this](const nav_msgs::msg::Odometry::SharedPtr msg) {
+      if ((params_.gps.enable_gps || params_.gps.enable_gps_init_only) && !have_gps_to_dvl_tf_) {
+        try {
+          std::string parent = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : dvl_frame_;
+          std::string child = params_.gps.use_parameter_frame ?
+          params_.gps.parameter_frame : msg->child_frame_id;
+          if (!parent.empty()) {
+            gps_to_dvl_tf_ = tf_buffer_->lookupTransform(parent, child, tf2::TimePointZero);
+            have_gps_to_dvl_tf_ = true;
+          }
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup GPS to DVL transform: %s", ex.what());
+        }
+      }
       gps_queue_.push(msg);
     },
     sensor_options);
@@ -104,6 +133,20 @@ void FactorGraphNode::setupRosInterfaces()
   depth_odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
     params_.depth_odom_topic, 20,
     [this](const nav_msgs::msg::Odometry::SharedPtr msg) {
+      if (!have_depth_to_dvl_tf_) {
+        try {
+          std::string parent = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : dvl_frame_;
+          std::string child = params_.depth.use_parameter_frame ?
+          params_.depth.parameter_frame : msg->child_frame_id;
+          if (!parent.empty()) {
+            depth_to_dvl_tf_ = tf_buffer_->lookupTransform(parent, child, tf2::TimePointZero);
+            have_depth_to_dvl_tf_ = true;
+          }
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup depth to DVL transform: %s", ex.what());
+        }
+      }
       depth_queue_.push(msg);
 
       double time_since_dvl = this->get_clock()->now().seconds() - dvl_queue_.getLastTime();
@@ -130,6 +173,20 @@ void FactorGraphNode::setupRosInterfaces()
   mag_sub_ = create_subscription<sensor_msgs::msg::MagneticField>(
     params_.mag_topic, 20,
     [this](const sensor_msgs::msg::MagneticField::SharedPtr msg) {
+      if ((params_.mag.enable_mag || params_.mag.enable_mag_init_only) && !have_mag_to_dvl_tf_) {
+        try {
+          std::string parent = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : dvl_frame_;
+          std::string child = params_.mag.use_parameter_frame ?
+          params_.mag.parameter_frame : msg->header.frame_id;
+          if (!parent.empty()) {
+            mag_to_dvl_tf_ = tf_buffer_->lookupTransform(parent, child, tf2::TimePointZero);
+            have_mag_to_dvl_tf_ = true;
+          }
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup mag to DVL transform: %s", ex.what());
+        }
+      }
       mag_queue_.push(msg);
     },
     sensor_options);
@@ -137,6 +194,22 @@ void FactorGraphNode::setupRosInterfaces()
   ahrs_sub_ = create_subscription<sensor_msgs::msg::Imu>(
     params_.ahrs_topic, 20,
     [this](const sensor_msgs::msg::Imu::SharedPtr msg) {
+      if ((params_.ahrs.enable_ahrs || params_.ahrs.enable_ahrs_init_only) &&
+      !have_ahrs_to_dvl_tf_)
+      {
+        try {
+          std::string parent = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : dvl_frame_;
+          std::string child = params_.ahrs.use_parameter_frame ?
+          params_.ahrs.parameter_frame : msg->header.frame_id;
+          if (!parent.empty()) {
+            ahrs_to_dvl_tf_ = tf_buffer_->lookupTransform(parent, child, tf2::TimePointZero);
+            have_ahrs_to_dvl_tf_ = true;
+          }
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup AHRS to DVL transform: %s", ex.what());
+        }
+      }
       ahrs_queue_.push(msg);
     },
     sensor_options);
@@ -144,6 +217,19 @@ void FactorGraphNode::setupRosInterfaces()
   dvl_sub_ = create_subscription<geometry_msgs::msg::TwistWithCovarianceStamped>(
     params_.dvl_topic, 20,
     [this](const geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr msg) {
+      if (!have_dvl_to_base_tf_) {
+        try {
+          std::string frame = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : msg->header.frame_id;
+          dvl_to_base_tf_ = tf_buffer_->lookupTransform(
+            params_.base_frame, frame,
+            tf2::TimePointZero);
+          have_dvl_to_base_tf_ = true;
+          dvl_frame_ = frame;
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup DVL to base transform: %s", ex.what());
+        }
+      }
       dvl_queue_.push(msg);
 
       if (!params_.experimental.enable_dvl_preintegration) {
@@ -159,6 +245,20 @@ void FactorGraphNode::setupRosInterfaces()
   wrench_sub_ = create_subscription<geometry_msgs::msg::WrenchStamped>(
     params_.wrench_topic, 20,
     [this](const geometry_msgs::msg::WrenchStamped::SharedPtr msg) {
+      if (params_.dynamics.enable_dynamics && !have_com_to_dvl_tf_) {
+        try {
+          std::string parent = params_.dvl.use_parameter_frame ?
+          params_.dvl.parameter_frame : dvl_frame_;
+          std::string child = params_.dynamics.use_parameter_frame ?
+          params_.dynamics.parameter_frame : msg->header.frame_id;
+          if (!parent.empty()) {
+            com_to_dvl_tf_ = tf_buffer_->lookupTransform(parent, child, tf2::TimePointZero);
+            have_com_to_dvl_tf_ = true;
+          }
+        } catch (const tf2::TransformException & ex) {
+          RCLCPP_ERROR(get_logger(), "Failed to lookup COM to DVL transform: %s", ex.what());
+        }
+      }
       wrench_queue_.push(msg);
     },
     sensor_options);
@@ -193,78 +293,6 @@ FactorGraphNode::FactorGraphNode()
 
   setupRosInterfaces();
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for sensor messages...");
-}
-
-bool FactorGraphNode::lookupInitialTransforms()
-{
-  try {
-    if (params_.dvl.use_parameter_frame) {
-      dvl_frame_ = params_.dvl.parameter_frame;
-    } else {
-      dvl_frame_ = initial_dvl_->header.frame_id;
-    }
-
-    if (params_.imu.use_parameter_frame) {
-      imu_frame_ = params_.imu.parameter_frame;
-    } else {
-      imu_frame_ = initial_imu_->header.frame_id;
-    }
-
-    auto lookup = [&](const std::string & parent, const std::string & child) {
-        return tf_buffer_->lookupTransform(
-          parent, child, tf2::TimePointZero,
-          tf2::durationFromSec(0.1));
-      };
-
-    if (!have_dvl_to_base_tf_) {
-      dvl_to_base_tf_ = lookup(params_.base_frame, dvl_frame_);
-      have_dvl_to_base_tf_ = true;
-    }
-    if (!have_imu_to_dvl_tf_) {
-      std::string child_frame = imu_frame_;
-      if (!params_.imu.use_parameter_frame) {
-        child_frame = initial_imu_->header.frame_id;
-      }
-      imu_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
-      have_imu_to_dvl_tf_ = true;
-    }
-    if ((params_.gps.enable_gps || params_.gps.enable_gps_init_only) && !have_gps_to_dvl_tf_) {
-      std::string child_frame = params_.gps.use_parameter_frame ?
-        params_.gps.parameter_frame : initial_gps_->child_frame_id;
-      gps_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
-      have_gps_to_dvl_tf_ = true;
-    }
-    if (!have_depth_to_dvl_tf_) {
-      std::string child_frame = params_.depth.use_parameter_frame ?
-        params_.depth.parameter_frame : initial_depth_->child_frame_id;
-      depth_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
-      have_depth_to_dvl_tf_ = true;
-    }
-    if ((params_.mag.enable_mag || params_.mag.enable_mag_init_only) && !have_mag_to_dvl_tf_) {
-      std::string child_frame = params_.mag.use_parameter_frame ?
-        params_.mag.parameter_frame : initial_mag_->header.frame_id;
-      mag_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
-      have_mag_to_dvl_tf_ = true;
-    }
-    if ((params_.ahrs.enable_ahrs || params_.ahrs.enable_ahrs_init_only) && !have_ahrs_to_dvl_tf_) {
-      std::string child_frame = params_.ahrs.use_parameter_frame ?
-        params_.ahrs.parameter_frame : initial_ahrs_->header.frame_id;
-      ahrs_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
-      have_ahrs_to_dvl_tf_ = true;
-    }
-    if (params_.dynamics.enable_dynamics && !have_com_to_dvl_tf_) {
-      std::string child_frame = params_.dynamics.use_parameter_frame ?
-        params_.dynamics.parameter_frame : initial_wrench_->header.frame_id;
-      com_to_dvl_tf_ = lookup(dvl_frame_, child_frame);
-      have_com_to_dvl_tf_ = true;
-    }
-  } catch (const tf2::TransformException & ex) {
-    RCLCPP_ERROR_THROTTLE(
-      get_logger(), *get_clock(), 5000,
-      "Could not get required transforms: %s", ex.what());
-    return false;
-  }
-  return true;
 }
 
 boost::shared_ptr<gtsam::PreintegratedCombinedMeasurements::Params>
@@ -714,8 +742,6 @@ void FactorGraphNode::initializeGraph()
       data_averaged_ = true;
     }
   }
-
-  if (!lookupInitialTransforms()) {return;}
 
   // --- Create Initial Factor Graph ---
   gtsam::NonlinearFactorGraph initial_graph;

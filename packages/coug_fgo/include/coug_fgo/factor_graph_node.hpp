@@ -106,12 +106,6 @@ private:
   void setupRosInterfaces();
 
   /**
-   * @brief Looks up required static transforms (e.g., imu->dvl).
-   * @return True if all transforms were found.
-   */
-  bool lookupInitialTransforms();
-
-  /**
    * @brief Configures GTSAM combined IMU preintegration parameters.
    * @return GTSAM preintegration parameters.
    */
