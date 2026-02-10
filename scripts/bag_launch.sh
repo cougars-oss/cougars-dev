@@ -4,20 +4,21 @@
 # Launches the CoUGARs development stack for a rosbag
 #
 # Usage:
-#   ./scripts/bag_launch.sh <bag_name> [-c] [-d <seconds>] [-r <bag_name>]
+#   ./scripts/bag_launch.sh <bag_name> [-c] [-d <seconds>] [-r <bag_name>] [-n <namespace>]
 #
 # Arguments:
 #   <bag_name>: Name of the rosbag to play (required)
 #   -c: Launch alternative localization methods for comparison
 #   -d <seconds>: Start offset in seconds
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
+#   -n <namespace>: Namespace for the AUV (e.g. auv0)
 
 script_dir="$(dirname "$(readlink -f "$0")")"
 source "$script_dir/utils/common.sh"
 source "$script_dir/../coug_ws/install/setup.bash"
 
 if [ -z "$1" ]; then
-    print_error "Usage: $0 <bag_name> [-c] [-d <seconds>] [-r <bag_name>]"
+    print_error "Usage: $0 <bag_name> [-c] [-d <seconds>] [-r <bag_name>] [-n <namespace>]"
     exit 1
 fi
 
@@ -32,8 +33,9 @@ fi
 record_bag_path=""
 compare="false"
 delay="0.0"
+namespace="bluerov2"
 
-while getopts ":cd:r:" opt; do
+while getopts ":cd:r:n:" opt; do
     case $opt in
         c)
             compare="true"
@@ -44,6 +46,9 @@ while getopts ":cd:r:" opt; do
         r)
             timestamp=$(date +"_%Y-%m-%d-%H-%M-%S")
             record_bag_path="$HOME/bags/${OPTARG}${timestamp}"
+            ;;
+        n)
+            namespace="$OPTARG"
             ;;
         \?)
             print_error "Invalid option: -$OPTARG" >&2
@@ -67,7 +72,7 @@ if [ -n "$record_bag_path" ] && [ -d "$record_bag_path" ]; then
     fi
 fi
 
-args=("compare:=$compare" "play_bag_path:=$play_bag_path" "start_delay:=$delay")
+args=("compare:=$compare" "play_bag_path:=$play_bag_path" "start_delay:=$delay" "auv_ns:=$namespace")
 if [ -n "$record_bag_path" ]; then
     args+=("record_bag_path:=$record_bag_path")
 fi

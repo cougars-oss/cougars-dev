@@ -44,8 +44,8 @@ def launch_setup(context, *args, **kwargs):
     play_bag_path = LaunchConfiguration("play_bag_path")
     record_bag_path = LaunchConfiguration("record_bag_path")
     compare = LaunchConfiguration("compare")
-    bluerov2_viz = LaunchConfiguration("bluerov2_viz")
 
+    auv_ns_str = context.perform_substitution(auv_ns)
     play_bag_path_str = context.perform_substitution(play_bag_path)
     record_bag_path_str = context.perform_substitution(record_bag_path)
 
@@ -85,9 +85,9 @@ def launch_setup(context, *args, **kwargs):
                 "--remap",
                 "/tf:=/tf_discard",
                 "/tf_static:=/tf_static_discard",
-                "bluerov2/dvl/twist:=/bluerov2/dvl/twist_discard",
-                "bluerov2/imu/nav_sat_fix:=/bluerov2/gps/fix",
-                "bluerov2/shallow/depth_data:=/bluerov2/odometry/depth",
+                f"{auv_ns_str}/dvl/twist:=/{auv_ns_str}/dvl/twist_discard",
+                f"{auv_ns_str}/imu/nav_sat_fix:=/{auv_ns_str}/gps/fix",
+                f"{auv_ns_str}/shallow/depth_data:=/{auv_ns_str}/odometry/depth",
             ],
         )
         actions.append(play_process)
@@ -121,7 +121,7 @@ def launch_setup(context, *args, **kwargs):
             launch_arguments={
                 "use_sim_time": use_sim_time,
                 "multiagent_viz": "false",
-                "bluerov2_viz": bluerov2_viz,
+                "auv_ns": auv_ns,
             }.items(),
         )
     )
@@ -206,11 +206,6 @@ def generate_launch_description():
                 "compare",
                 default_value="false",
                 description="Launch additional localization nodes if true",
-            ),
-            DeclareLaunchArgument(
-                "bluerov2_viz",
-                default_value="true",
-                description="Load BlueROV2 specific viz config if true",
             ),
             OpaqueFunction(function=launch_setup),
         ]

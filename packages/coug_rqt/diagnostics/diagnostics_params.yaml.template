@@ -1,29 +1,29 @@
 diagnostic_aggregator:
   ros__parameters:
-    analyzers: ['auv0']
+    analyzers: ['AUV_NS']
 
-    auv0:
+    AUV_NS:
       type: diagnostic_aggregator/AnalyzerGroup
-      path: auv0
+      path: AUV_NS
       analyzers: ['factor_graph_node', 'origin_manager_node', 'waypoint_follower_node']
 
       factor_graph_node:
         type: diagnostic_aggregator/GenericAnalyzer
         path: 'factor_graph_node'
-        regex: ['.*factor_graph_node.*auv0.*']
-        find_and_remove_prefix: ['factor_graph_node: [/auv0]', 'factor_graph_node_tm: [/auv0] ']
+        regex: ['.*factor_graph_node.*AUV_NS.*']
+        find_and_remove_prefix: ['factor_graph_node: [/AUV_NS]', 'factor_graph_node_tm: [/AUV_NS] ']
         timeout: 5.0
 
       origin_manager_node:
         type: diagnostic_aggregator/GenericAnalyzer
         path: 'origin_manager_node'
-        regex: ['.*origin_manager_node.*auv0.*']
-        find_and_remove_prefix: ['origin_manager_node: [/auv0] ']
+        regex: ['.*origin_manager_node.*AUV_NS.*']
+        find_and_remove_prefix: ['origin_manager_node: [/AUV_NS] ']
         timeout: 5.0
 
       waypoint_follower_node:
         type: diagnostic_aggregator/GenericAnalyzer
         path: 'waypoint_follower_node'
-        regex: ['.*waypoint_follower_node.*auv0.*']
-        find_and_remove_prefix: ['waypoint_follower_node: [/auv0] ']
+        regex: ['.*waypoint_follower_node.*AUV_NS.*']
+        find_and_remove_prefix: ['waypoint_follower_node: [/AUV_NS] ']
         timeout: 5.0

@@ -13,38 +13,65 @@
 # limitations under the License.
 
 import os
+import tempfile
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.substitutions import LaunchConfiguration
 
 
-def generate_launch_description():
-
+def launch_setup(context, *args, **kwargs):
     use_sim_time = LaunchConfiguration("use_sim_time")
-    multiagent_viz = LaunchConfiguration("multiagent_viz")
-    bluerov2_viz = LaunchConfiguration("bluerov2_viz")
+    multiagent_viz = LaunchConfiguration("multiagent_viz").perform(context)
+    auv_ns = LaunchConfiguration("auv_ns").perform(context)
 
     pkg_share = get_package_share_directory("coug_rqt")
 
     rqt_perspective_file = os.path.join(pkg_share, "rqt", "rqt.perspective")
-    diagnostics_params_file = PythonExpression(
-        [
-            "'",
-            os.path.join(pkg_share, "diagnostics", "bluerov2_diagnostics_params.yaml"),
-            "' if '",
-            bluerov2_viz,
-            "' == 'true' else '",
-            os.path.join(pkg_share, "diagnostics", "multi_diagnostics_params.yaml"),
-            "' if '",
-            multiagent_viz,
-            "' == 'true' else '",
-            os.path.join(pkg_share, "diagnostics", "diagnostics_params.yaml"),
-            "'",
-        ]
-    )
 
+    if multiagent_viz == "true":
+        diagnostics_params_file = os.path.join(
+            pkg_share, "diagnostics", "multi_diagnostics_params.yaml"
+        )
+    else:
+        template_path = os.path.join(
+            pkg_share, "diagnostics", "diagnostics_params.yaml.template"
+        )
+        with open(template_path, "r") as f:
+            template_content = f.read()
+
+        config_content = template_content.replace("AUV_NS", auv_ns)
+
+        temp_config = tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix=".yaml"
+        )
+        temp_config.write(config_content)
+        temp_config.close()
+
+        diagnostics_params_file = temp_config.name
+
+    return [
+        Node(
+            package="diagnostic_aggregator",
+            executable="aggregator_node",
+            name="diagnostic_aggregator",
+            parameters=[
+                diagnostics_params_file,
+                {"use_sim_time": use_sim_time},
+            ],
+        ),
+        Node(
+            package="rqt_gui",
+            executable="rqt_gui",
+            name="rqt_gui",
+            arguments=["--perspective-file", rqt_perspective_file],
+            parameters=[{"use_sim_time": use_sim_time}],
+        ),
+    ]
+
+
+def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -58,25 +85,10 @@ def generate_launch_description():
                 description="Use multi-agent visualization config if true",
             ),
             DeclareLaunchArgument(
-                "bluerov2_viz",
-                default_value="false",
-                description="Load BlueROV2 specific viz config if true",
+                "auv_ns",
+                default_value="auv0",
+                description="Namespace for the AUV (e.g. auv0)",
             ),
-            Node(
-                package="diagnostic_aggregator",
-                executable="aggregator_node",
-                name="diagnostic_aggregator",
-                parameters=[
-                    diagnostics_params_file,
-                    {"use_sim_time": use_sim_time},
-                ],
-            ),
-            Node(
-                package="rqt_gui",
-                executable="rqt_gui",
-                name="rqt_gui",
-                arguments=["--perspective-file", rqt_perspective_file],
-                parameters=[{"use_sim_time": use_sim_time}],
-            ),
+            OpaqueFunction(function=launch_setup),
         ]
     )

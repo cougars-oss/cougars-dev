@@ -15,7 +15,7 @@ setup(
         (os.path.join("share", package_name, "rqt"), glob("rqt/*.perspective")),
         (
             os.path.join("share", package_name, "diagnostics"),
-            glob("diagnostics/*.yaml"),
+            glob("diagnostics/*.yaml*"),
         ),
     ],
     install_requires=["setuptools"],

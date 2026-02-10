@@ -9,9 +9,9 @@ show_status_bar: true
 show_capture_tools: true
 window_width: 1600
 window_height: 900
-view_scale: 0.117128991
-offset_x: 9.10471153
-offset_y: 1.57287228
+view_scale: 0.75131458
+offset_x: -11.2101583
+offset_y: -22.5667992
 use_latest_transforms: true
 background: "#a0a0a4"
 image_transport: raw
@@ -39,7 +39,7 @@ displays:
     config:
       visible: true
       collapsed: true
-      frame: bluerov2/base_link
+      frame: AUV_NS/base_link
       color: "#00ff00"
       draw_style: arrows
       position_tolerance: 0
@@ -51,7 +51,7 @@ displays:
     config:
       visible: true
       collapsed: true
-      topic: /bluerov2/gps/fix
+      topic: /AUV_NS/gps/fix
       color: "#55aaff"
       draw_style: points
       position_tolerance: 0
@@ -65,7 +65,7 @@ displays:
     config:
       visible: true
       collapsed: true
-      topic: /bluerov2/smoothed_path
+      topic: /AUV_NS/smoothed_path
       color: "#ff55ff"
       qos_depth: 10
       qos_history: 1
@@ -76,7 +76,7 @@ displays:
     config:
       visible: true
       collapsed: true
-      topic: /bluerov2/odometry/truth
+      topic: /AUV_NS/odometry/truth
       color: "#ffffff"
       draw_style: lines
       position_tolerance: 0
@@ -96,13 +96,13 @@ displays:
     config:
       visible: false
       collapsed: true
-      topic: /bluerov2/odometry/global_ekf
+      topic: /AUV_NS/odometry/global_ekf
       color: "#ffff00"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -116,13 +116,13 @@ displays:
     config:
       visible: false
       collapsed: true
-      topic: /bluerov2/odometry/global_ukf
+      topic: /AUV_NS/odometry/global_ukf
       color: "#ffaa00"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -136,13 +136,13 @@ displays:
     config:
       visible: false
       collapsed: true
-      topic: /bluerov2/odometry/global_iekf
+      topic: /AUV_NS/odometry/global_iekf
       color: "#ff0000"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -156,13 +156,13 @@ displays:
     config:
       visible: true
       collapsed: true
-      topic: /bluerov2/odometry/global
+      topic: /AUV_NS/odometry/global
       color: "#00ff00"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -176,13 +176,13 @@ displays:
     config:
       visible: false
       collapsed: true
-      topic: /bluerov2/odometry/global_tm
+      topic: /AUV_NS/odometry/global_tm
       color: "#55aaff"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25
@@ -196,13 +196,13 @@ displays:
     config:
       visible: true
       collapsed: true
-      topic: /bluerov2/odometry/dvl
+      topic: /AUV_NS/odometry/dvl
       color: "#aa00ff"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       show_laps: false
-      show_covariance: false
+      show_covariance: true
       show_all_covariances: false
       static_arrow_sizes: false
       arrow_size: 25

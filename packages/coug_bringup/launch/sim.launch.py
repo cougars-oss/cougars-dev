@@ -70,6 +70,7 @@ def launch_setup(context, *args, **kwargs):
             launch_arguments={
                 "use_sim_time": use_sim_time,
                 "multiagent_viz": "true" if num_agents_int > 1 else "false",
+                "auv_ns": "auv0",
             }.items(),
         )
     )

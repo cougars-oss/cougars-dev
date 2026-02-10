@@ -70,6 +70,11 @@ void CougWaypointManager::clearWaypoints(const std::string & topic)
 
 void CougWaypointManager::clearAllWaypoints() {waypoint_map_.clear();}
 
+void CougWaypointManager::removeTopic(const std::string & topic)
+{
+  waypoint_map_.erase(topic);
+}
+
 bool CougWaypointManager::saveToFile(
   const std::string & filename,
   const std::string & specific_topic) const

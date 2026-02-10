@@ -74,6 +74,12 @@ public:
   getAllWaypoints() const;
 
   /**
+   * @brief Removes a topic and its waypoints from the manager.
+   * @param topic The topic to remove.
+   */
+  void removeTopic(const std::string & topic);
+
+  /**
    * @brief Clears waypoints for a specific topic.
    * @param topic The topic name.
    */

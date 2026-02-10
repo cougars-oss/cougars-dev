@@ -293,6 +293,18 @@ void CougWaypointsPlugin::LoadWaypoints()
   }
 
   if (manager_.loadFromFile(filename.toStdString(), topic_to_load)) {
+    std::vector<std::string> unavailable_topics;
+    for (const auto & [topic, wps] : manager_.getAllWaypoints()) {
+      (void)wps;
+      if (!IsTopicAvailable(topic)) {
+        unavailable_topics.push_back(topic);
+      }
+    }
+
+    for (const auto & topic : unavailable_topics) {
+      manager_.removeTopic(topic);
+    }
+
     TopicChanged(QString::fromStdString(current_topic_));
     if (topic_to_load.empty()) {
       PrintInfo(

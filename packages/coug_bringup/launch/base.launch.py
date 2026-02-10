@@ -24,7 +24,7 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration("use_sim_time", default="false")
     multiagent_viz = LaunchConfiguration("multiagent_viz", default="false")
-    bluerov2_viz = LaunchConfiguration("bluerov2_viz", default="false")
+    auv_ns = LaunchConfiguration("auv_ns", default="auv0")
 
     coug_mapviz_dir = get_package_share_directory("coug_mapviz")
     coug_mapviz_launch_dir = os.path.join(coug_mapviz_dir, "launch")
@@ -40,7 +40,7 @@ def generate_launch_description():
         launch_arguments={
             "use_sim_time": use_sim_time,
             "multiagent_viz": multiagent_viz,
-            "bluerov2_viz": bluerov2_viz,
+            "auv_ns": auv_ns,
         }.items(),
     )
 
@@ -51,7 +51,7 @@ def generate_launch_description():
         launch_arguments={
             "use_sim_time": use_sim_time,
             "multiagent_viz": multiagent_viz,
-            "bluerov2_viz": bluerov2_viz,
+            "auv_ns": auv_ns,
         }.items(),
     )
 
@@ -62,7 +62,7 @@ def generate_launch_description():
         launch_arguments={
             "use_sim_time": use_sim_time,
             "multiagent_viz": multiagent_viz,
-            "bluerov2_viz": bluerov2_viz,
+            "auv_ns": auv_ns,
         }.items(),
     )
 
@@ -83,10 +83,10 @@ def generate_launch_description():
     )
     ld.add_action(
         DeclareLaunchArgument(
-            "bluerov2_viz",
-            default_value="false",
-            description="Load BlueROV2 specific viz config if true",
-        )
+            "auv_ns",
+            default_value="auv0",
+            description="Namespace for the AUV (e.g. auv0)",
+        ),
     )
     ld.add_action(coug_mapviz_cmd)
     ld.add_action(coug_rviz_cmd)
