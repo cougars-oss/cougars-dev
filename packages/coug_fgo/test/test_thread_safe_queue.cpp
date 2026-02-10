@@ -29,6 +29,7 @@
 using coug_fgo::utils::ThreadSafeQueue;
 
 /**
+ * @class ThreadSafeQueueTest
  * @brief Test fixture for ThreadSafeQueue tests.
  */
 class ThreadSafeQueueTest : public ::testing::Test

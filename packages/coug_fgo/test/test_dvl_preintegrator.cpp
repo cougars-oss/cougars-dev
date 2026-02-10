@@ -24,6 +24,7 @@
 #include "coug_fgo/utils/dvl_preintegrator.hpp"
 
 /**
+ * @class DvlPreintegratorTest
  * @brief Test fixture for DvlPreintegrator tests.
  */
 class DvlPreintegratorTest : public ::testing::Test

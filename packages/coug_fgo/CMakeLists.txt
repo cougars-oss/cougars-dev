@@ -151,6 +151,12 @@ if(BUILD_TESTING)
   )
   target_link_libraries(test_dvl_preintegrator gtsam)
 
+  ament_add_gtest(test_thread_safe_queue test/test_thread_safe_queue.cpp)
+  target_include_directories(test_thread_safe_queue PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  )
+  ament_target_dependencies(test_thread_safe_queue sensor_msgs rclcpp)
+
   ament_add_gtest(test_dvl_factor test/test_dvl_factor.cpp)
   target_include_directories(test_dvl_factor PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -207,11 +213,24 @@ if(BUILD_TESTING)
   )
   target_link_libraries(test_auv_dynamics_factor gtsam)
 
-  ament_add_gtest(test_thread_safe_queue test/test_thread_safe_queue.cpp)
-  target_include_directories(test_thread_safe_queue PUBLIC
+  ament_add_gtest(test_factor_graph_node test/test_factor_graph_node.cpp)
+  target_include_directories(test_factor_graph_node PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    ${GTSAM_EIGEN_INCLUDE_DIR}
   )
-  ament_target_dependencies(test_thread_safe_queue sensor_msgs rclcpp)
+  target_link_libraries(test_factor_graph_node
+    factor_graph_component
+    gtsam
+  )
+  ament_target_dependencies(test_factor_graph_node
+    rclcpp
+    sensor_msgs
+    nav_msgs
+    geometry_msgs
+    tf2
+    tf2_ros
+    tf2_geometry_msgs
+  )
 endif()
 
 ament_package()

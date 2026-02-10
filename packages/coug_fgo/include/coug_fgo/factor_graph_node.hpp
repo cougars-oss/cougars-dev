@@ -85,7 +85,7 @@ public:
     RUNNING
   };
 
-private:
+protected:
   // --- Main Logic ---
   /**
    * @brief Initializes the factor graph using averaged sensor data or parameters.
