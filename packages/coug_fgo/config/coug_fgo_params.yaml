@@ -64,7 +64,7 @@
       enable_gps: false
       enable_gps_init_only: false
       use_parameter_frame: false
-      use_parameter_covariance: true
+      use_parameter_covariance: false
       parameter_covariance:
         position_noise_sigmas: [0.015, 0.015] # [m] GPS position uncertainty sigmas.
       timeout_threshold: 2.0 # [s]
