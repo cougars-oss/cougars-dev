@@ -224,5 +224,8 @@
       enable_ahrs: false
       enable_ahrs_init_only: true
 
+    dynamics:
+      enable_dynamics: false
+
     use_parameter_child_frame: true
     use_parameter_origin: false

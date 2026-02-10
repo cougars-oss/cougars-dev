@@ -90,31 +90,23 @@ void FactorGraphNode::setupRosInterfaces()
   imu_sub_ = create_subscription<sensor_msgs::msg::Imu>(
     params_.imu_topic, 200,
     [this](const sensor_msgs::msg::Imu::SharedPtr msg) {
-      std::scoped_lock lock(imu_queue_mutex_);
-      imu_queue_.push_back(msg);
-      last_imu_time_ = this->get_clock()->now().seconds();
+      imu_queue_.push(msg);
     },
     sensor_options);
 
   gps_odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
     params_.gps_odom_topic, 20,
     [this](const nav_msgs::msg::Odometry::SharedPtr msg) {
-      std::scoped_lock lock(gps_queue_mutex_);
-      gps_queue_.push_back(msg);
-      last_gps_time_ = this->get_clock()->now().seconds();
+      gps_queue_.push(msg);
     },
     sensor_options);
 
   depth_odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
     params_.depth_odom_topic, 20,
     [this](const nav_msgs::msg::Odometry::SharedPtr msg) {
-      {
-        std::scoped_lock lock(depth_queue_mutex_);
-        depth_queue_.push_back(msg);
-      }
-      last_depth_time_ = this->get_clock()->now().seconds();
+      depth_queue_.push(msg);
 
-      double time_since_dvl = this->get_clock()->now().seconds() - last_dvl_time_;
+      double time_since_dvl = this->get_clock()->now().seconds() - dvl_queue_.getLastTime();
       bool dvl_timed_out = time_since_dvl > params_.dvl.timeout_threshold;
 
       if (params_.experimental.enable_dvl_preintegration) {
@@ -138,29 +130,21 @@ void FactorGraphNode::setupRosInterfaces()
   mag_sub_ = create_subscription<sensor_msgs::msg::MagneticField>(
     params_.mag_topic, 20,
     [this](const sensor_msgs::msg::MagneticField::SharedPtr msg) {
-      std::scoped_lock lock(mag_queue_mutex_);
-      mag_queue_.push_back(msg);
-      last_mag_time_ = this->get_clock()->now().seconds();
+      mag_queue_.push(msg);
     },
     sensor_options);
 
   ahrs_sub_ = create_subscription<sensor_msgs::msg::Imu>(
     params_.ahrs_topic, 20,
     [this](const sensor_msgs::msg::Imu::SharedPtr msg) {
-      std::scoped_lock lock(ahrs_queue_mutex_);
-      ahrs_queue_.push_back(msg);
-      last_ahrs_time_ = this->get_clock()->now().seconds();
+      ahrs_queue_.push(msg);
     },
     sensor_options);
 
   dvl_sub_ = create_subscription<geometry_msgs::msg::TwistWithCovarianceStamped>(
     params_.dvl_topic, 20,
     [this](const geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr msg) {
-      {
-        std::scoped_lock lock(dvl_queue_mutex_);
-        dvl_queue_.push_back(msg);
-      }
-      last_dvl_time_ = this->get_clock()->now().seconds();
+      dvl_queue_.push(msg);
 
       if (!params_.experimental.enable_dvl_preintegration) {
         if (!graph_initialized_) {
@@ -175,9 +159,7 @@ void FactorGraphNode::setupRosInterfaces()
   wrench_sub_ = create_subscription<geometry_msgs::msg::WrenchStamped>(
     params_.wrench_topic, 20,
     [this](const geometry_msgs::msg::WrenchStamped::SharedPtr msg) {
-      std::scoped_lock lock(wrench_queue_mutex_);
-      wrench_queue_.push_back(msg);
-      last_wrench_time_ = this->get_clock()->now().seconds();
+      wrench_queue_.push(msg);
     },
     sensor_options);
 
@@ -642,17 +624,18 @@ void FactorGraphNode::initializeGraph()
 
   // --- Wait for Sensor Data ---
   if (!sensors_ready_) {
-    std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
-      mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_, wrench_queue_mutex_);
+    bool imu_ok = !imu_queue_.empty();
+    bool gps_ok = !(params_.gps.enable_gps || params_.gps.enable_gps_init_only) ||
+      !gps_queue_.empty();
+    bool depth_ok = !depth_queue_.empty();
+    bool mag_ok = !(params_.mag.enable_mag || params_.mag.enable_mag_init_only) ||
+      !mag_queue_.empty();
+    bool ahrs_ok = !(params_.ahrs.enable_ahrs || params_.ahrs.enable_ahrs_init_only) ||
+      !ahrs_queue_.empty();
+    bool dvl_ok = !dvl_queue_.empty();
+    bool wrench_ok = !params_.dynamics.enable_dynamics || !wrench_queue_.empty();
 
-    if (!imu_queue_.empty() &&
-      (!(params_.gps.enable_gps || params_.gps.enable_gps_init_only) || !gps_queue_.empty()) &&
-      !depth_queue_.empty() &&
-      (!(params_.mag.enable_mag || params_.mag.enable_mag_init_only) || !mag_queue_.empty()) &&
-      (!(params_.ahrs.enable_ahrs || params_.ahrs.enable_ahrs_init_only) || !ahrs_queue_.empty()) &&
-      !dvl_queue_.empty() &&
-      (!params_.dynamics.enable_dynamics || !wrench_queue_.empty()))
-    {
+    if (imu_ok && gps_ok && depth_ok && mag_ok && ahrs_ok && dvl_ok && wrench_ok) {
       if (params_.prior.use_parameter_priors) {
         RCLCPP_INFO(
           get_logger(),
@@ -682,12 +665,12 @@ void FactorGraphNode::initializeGraph()
     } else {
       RCLCPP_WARN_THROTTLE(
         get_logger(), *get_clock(), 5000, "Waiting for sensors: %s%s%s%s%s%s%s",
-        imu_queue_.empty() ? "[IMU] " : "",
-        (params_.gps.enable_gps && gps_queue_.empty()) ? "[GPS] " : "",
-        (params_.mag.enable_mag && mag_queue_.empty()) ? "[Magnetometer] " : "",
-        (params_.ahrs.enable_ahrs && ahrs_queue_.empty()) ? "[AHRS] " : "",
-        depth_queue_.empty() ? "[Depth] " : "", dvl_queue_.empty() ? "[DVL] " : "",
-        (params_.dynamics.enable_dynamics && wrench_queue_.empty()) ? "[Wrench]" : "");
+        !imu_ok ? "[IMU] " : "",
+        (!gps_ok && params_.gps.enable_gps) ? "[GPS] " : "",
+        (!mag_ok && params_.mag.enable_mag) ? "[Magnetometer] " : "",
+        (!ahrs_ok && params_.ahrs.enable_ahrs) ? "[AHRS] " : "",
+        !depth_ok ? "[Depth] " : "", !dvl_ok ? "[DVL] " : "",
+        (!wrench_ok && params_.dynamics.enable_dynamics) ? "[Wrench]" : "");
       return;
     }
   }
@@ -702,26 +685,14 @@ void FactorGraphNode::initializeGraph()
         params_.prior.initialization_duration);
       return;
     } else {
-      std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_msgs;
-      std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_msgs;
-      std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_msgs;
-      std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_msgs;
-      std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_msgs;
-      std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_msgs;
-      std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_msgs;
-
-      {
-        std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
-          mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_, wrench_queue_mutex_);
-
-        imu_msgs = std::move(imu_queue_);
-        gps_msgs = std::move(gps_queue_);
-        depth_msgs = std::move(depth_queue_);
-        mag_msgs = std::move(mag_queue_);
-        ahrs_msgs = std::move(ahrs_queue_);
-        dvl_msgs = std::move(dvl_queue_);
-        wrench_msgs = std::move(wrench_queue_);
-      }
+      std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_msgs = imu_queue_.drain();
+      std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_msgs = gps_queue_.drain();
+      std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_msgs = depth_queue_.drain();
+      std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_msgs = mag_queue_.drain();
+      std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_msgs = ahrs_queue_.drain();
+      std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_msgs =
+        dvl_queue_.drain();
+      std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_msgs = wrench_queue_.drain();
 
       AveragedMeasurements avgs =
         computeAveragedMeasurements(
@@ -1090,8 +1061,7 @@ void FactorGraphNode::addPreintegratedImuFactor(
 
   // Re-queue future IMU messages
   if (!unused_imu_msgs.empty()) {
-    std::scoped_lock lock(imu_queue_mutex_);
-    imu_queue_.insert(imu_queue_.begin(), unused_imu_msgs.begin(), unused_imu_msgs.end());
+    imu_queue_.restore(unused_imu_msgs);
   }
 }
 
@@ -1137,8 +1107,7 @@ void FactorGraphNode::addPreintegratedDvlFactor(
   if (!have_imu_to_dvl_tf_ || !dvl_preintegrator_ || imu_msgs.empty()) {return;}
 
   if (imu_msgs.empty()) {
-    std::scoped_lock lock(dvl_queue_mutex_);
-    dvl_queue_.insert(dvl_queue_.begin(), dvl_msgs.begin(), dvl_msgs.end());
+    dvl_queue_.restore(dvl_msgs);
     return;
   }
 
@@ -1248,8 +1217,7 @@ void FactorGraphNode::addPreintegratedDvlFactor(
 
   // Re-queue future DVL messages
   if (!unused_dvl_msgs.empty()) {
-    std::scoped_lock lock(dvl_queue_mutex_);
-    dvl_queue_.insert(dvl_queue_.begin(), unused_dvl_msgs.begin(), unused_dvl_msgs.end());
+    dvl_queue_.restore(unused_dvl_msgs);
   }
 }
 
@@ -1383,29 +1351,37 @@ void FactorGraphNode::optimizeGraph()
   rclcpp::Time target_stamp;
   bool should_abort = false;
 
-  {
-    std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
-      mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_);
+  if (imu_queue_.empty()) {
+    return;
+  }
 
-    if (imu_queue_.empty()) {
-      return;
-    }
+  if (params_.experimental.enable_dvl_preintegration) {
+    if (depth_queue_.empty()) {return;}
+    target_stamp = depth_queue_.back()->header.stamp;
+  } else {
+    if (dvl_queue_.empty() && depth_queue_.empty()) {return;}
 
-    if (params_.experimental.enable_dvl_preintegration) {
-      if (depth_queue_.empty()) {return;}
-      target_stamp = depth_queue_.back()->header.stamp;
+    if (!dvl_queue_.empty()) {
+      target_stamp = dvl_queue_.back()->header.stamp;
     } else {
-      if (dvl_queue_.empty() && depth_queue_.empty()) {return;}
-
-      if (!dvl_queue_.empty()) {
-        target_stamp = dvl_queue_.back()->header.stamp;
-      } else {
-        target_stamp = depth_queue_.back()->header.stamp;
-      }
+      target_stamp = depth_queue_.back()->header.stamp;
     }
+  }
 
-    if (target_stamp.seconds() <= prev_time_ + 1e-6) {
-      RCLCPP_DEBUG(get_logger(), "Duplicate or out-of-order timestamp detected. Skipping.");
+  if (target_stamp.seconds() <= prev_time_ + 1e-6) {
+    RCLCPP_DEBUG(get_logger(), "Duplicate or out-of-order timestamp detected. Skipping.");
+    if (params_.experimental.enable_dvl_preintegration) {
+      depth_queue_.pop_back();
+    } else {
+      if (!dvl_queue_.empty()) {dvl_queue_.pop_back();} else {depth_queue_.pop_back();}
+    }
+    should_abort = true;
+  }
+
+  if (!should_abort && params_.max_keyframe_rate > 0.0) {
+    double min_period = 1.0 / params_.max_keyframe_rate;
+    if (target_stamp.seconds() - prev_time_ < min_period) {
+      RCLCPP_DEBUG(get_logger(), "Limiting keyframe rate. Skipping.");
       if (params_.experimental.enable_dvl_preintegration) {
         depth_queue_.pop_back();
       } else {
@@ -1413,43 +1389,18 @@ void FactorGraphNode::optimizeGraph()
       }
       should_abort = true;
     }
-
-    if (!should_abort && params_.max_keyframe_rate > 0.0) {
-      double min_period = 1.0 / params_.max_keyframe_rate;
-      if (target_stamp.seconds() - prev_time_ < min_period) {
-        RCLCPP_DEBUG(get_logger(), "Limiting keyframe rate. Skipping.");
-        if (params_.experimental.enable_dvl_preintegration) {
-          depth_queue_.pop_back();
-        } else {
-          if (!dvl_queue_.empty()) {dvl_queue_.pop_back();} else {depth_queue_.pop_back();}
-        }
-        should_abort = true;
-      }
-    }
   }
 
   if (should_abort) {return;}
 
-  std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_msgs;
-  std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_msgs;
-  std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_msgs;
-  std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_msgs;
-  std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_msgs;
-  std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_msgs;
-  std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_msgs;
-
-  {
-    std::scoped_lock lock(imu_queue_mutex_, gps_queue_mutex_, depth_queue_mutex_,
-      mag_queue_mutex_, ahrs_queue_mutex_, dvl_queue_mutex_, wrench_queue_mutex_);
-
-    imu_msgs = std::move(imu_queue_);
-    gps_msgs = std::move(gps_queue_);
-    depth_msgs = std::move(depth_queue_);
-    mag_msgs = std::move(mag_queue_);
-    ahrs_msgs = std::move(ahrs_queue_);
-    dvl_msgs = std::move(dvl_queue_);
-    wrench_msgs = std::move(wrench_queue_);
-  }
+  std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_msgs = imu_queue_.drain();
+  std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_msgs = gps_queue_.drain();
+  std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_msgs = depth_queue_.drain();
+  std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_msgs = mag_queue_.drain();
+  std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_msgs = ahrs_queue_.drain();
+  std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_msgs =
+    dvl_queue_.drain();
+  std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_msgs = wrench_queue_.drain();
 
   if (params_.experimental.enable_dvl_preintegration) {
     if (depth_msgs.size() > 1) {
@@ -1657,48 +1608,27 @@ void FactorGraphNode::checkSensorInputs(diagnostic_updater::DiagnosticStatusWrap
       }
     };
 
-  {
-    std::scoped_lock lock(imu_queue_mutex_);
-    check_queue(
-      "IMU", imu_queue_.size(), last_imu_time_, true, true,
-      params_.imu.timeout_threshold);
-  }
-  {
-    std::scoped_lock lock(gps_queue_mutex_);
-    check_queue(
-      "GPS", gps_queue_.size(), last_gps_time_, params_.gps.enable_gps, false,
-      params_.gps.timeout_threshold);
-  }
-  {
-    std::scoped_lock lock(depth_queue_mutex_);
-    check_queue(
-      "Depth", depth_queue_.size(), last_depth_time_, true, true,
-      params_.depth.timeout_threshold);
-  }
-  {
-    std::scoped_lock lock(mag_queue_mutex_);
-    check_queue(
-      "Mag", mag_queue_.size(), last_mag_time_, params_.mag.enable_mag, false,
-      params_.mag.timeout_threshold);
-  }
-  {
-    std::scoped_lock lock(ahrs_queue_mutex_);
-    check_queue(
-      "AHRS", ahrs_queue_.size(), last_ahrs_time_, params_.ahrs.enable_ahrs, false,
-      params_.ahrs.timeout_threshold);
-  }
-  {
-    std::scoped_lock lock(dvl_queue_mutex_);
-    check_queue(
-      "DVL", dvl_queue_.size(), last_dvl_time_, true, true,
-      params_.dvl.timeout_threshold);
-  }
-  {
-    std::scoped_lock lock(wrench_queue_mutex_);
-    check_queue(
-      "Wrench", wrench_queue_.size(), last_wrench_time_, params_.dynamics.enable_dynamics, false,
-      params_.dynamics.timeout_threshold);
-  }
+  check_queue(
+    "IMU", imu_queue_.size(), imu_queue_.getLastTime(), true, true,
+    params_.imu.timeout_threshold);
+  check_queue(
+    "GPS", gps_queue_.size(), gps_queue_.getLastTime(), params_.gps.enable_gps, false,
+    params_.gps.timeout_threshold);
+  check_queue(
+    "Depth", depth_queue_.size(), depth_queue_.getLastTime(), true, true,
+    params_.depth.timeout_threshold);
+  check_queue(
+    "Mag", mag_queue_.size(), mag_queue_.getLastTime(), params_.mag.enable_mag, false,
+    params_.mag.timeout_threshold);
+  check_queue(
+    "AHRS", ahrs_queue_.size(), ahrs_queue_.getLastTime(), params_.ahrs.enable_ahrs, false,
+    params_.ahrs.timeout_threshold);
+  check_queue(
+    "DVL", dvl_queue_.size(), dvl_queue_.getLastTime(), true, true,
+    params_.dvl.timeout_threshold);
+  check_queue(
+    "Wrench", wrench_queue_.size(), wrench_queue_.getLastTime(), params_.dynamics.enable_dynamics,
+    false, params_.dynamics.timeout_threshold);
 }
 
 void FactorGraphNode::checkGraphState(diagnostic_updater::DiagnosticStatusWrapper & stat)

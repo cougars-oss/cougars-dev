@@ -54,6 +54,7 @@
 
 #include "coug_fgo/utils/conversion_utils.hpp"
 #include "coug_fgo/utils/dvl_preintegrator.hpp"
+#include "coug_fgo/utils/thread_safe_queue.hpp"
 #include <coug_fgo/factor_graph_parameters.hpp>
 
 
@@ -339,13 +340,6 @@ private:
   size_t prev_step_ = 0;
   size_t current_step_ = 1;
   double prev_time_ = 0.0;
-  std::atomic<double> last_dvl_time_{0.0};
-  std::atomic<double> last_imu_time_{0.0};
-  std::atomic<double> last_gps_time_{0.0};
-  std::atomic<double> last_depth_time_{0.0};
-  std::atomic<double> last_mag_time_{0.0};
-  std::atomic<double> last_ahrs_time_{0.0};
-  std::atomic<double> last_wrench_time_{0.0};
 
   std::atomic<double> last_real_dvl_time_{0.0};
   std::atomic<double> last_depth_trigger_time_{0.0};
@@ -381,26 +375,18 @@ private:
   geometry_msgs::msg::WrenchStamped::SharedPtr latest_wrench_msg_;
 
   // --- Message Queues ---
-  std::deque<sensor_msgs::msg::Imu::SharedPtr> imu_queue_;
-  std::deque<nav_msgs::msg::Odometry::SharedPtr> gps_queue_;
-  std::deque<nav_msgs::msg::Odometry::SharedPtr> depth_queue_;
-  std::deque<sensor_msgs::msg::MagneticField::SharedPtr> mag_queue_;
-  std::deque<sensor_msgs::msg::Imu::SharedPtr> ahrs_queue_;
-  std::deque<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_queue_;
-  std::deque<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_queue_;
+  utils::ThreadSafeQueue<sensor_msgs::msg::Imu::SharedPtr> imu_queue_;
+  utils::ThreadSafeQueue<nav_msgs::msg::Odometry::SharedPtr> gps_queue_;
+  utils::ThreadSafeQueue<nav_msgs::msg::Odometry::SharedPtr> depth_queue_;
+  utils::ThreadSafeQueue<sensor_msgs::msg::MagneticField::SharedPtr> mag_queue_;
+  utils::ThreadSafeQueue<sensor_msgs::msg::Imu::SharedPtr> ahrs_queue_;
+  utils::ThreadSafeQueue<geometry_msgs::msg::TwistWithCovarianceStamped::SharedPtr> dvl_queue_;
+  utils::ThreadSafeQueue<geometry_msgs::msg::WrenchStamped::SharedPtr> wrench_queue_;
 
   // --- Multithreading ---
   rclcpp::CallbackGroup::SharedPtr sensor_cb_group_;
-
   std::mutex initialization_mutex_;
   std::mutex optimization_mutex_;
-  std::mutex imu_queue_mutex_;
-  std::mutex gps_queue_mutex_;
-  std::mutex depth_queue_mutex_;
-  std::mutex mag_queue_mutex_;
-  std::mutex ahrs_queue_mutex_;
-  std::mutex dvl_queue_mutex_;
-  std::mutex wrench_queue_mutex_;
 
   // --- Transformations ---
   std::string dvl_frame_;
