@@ -28,18 +28,7 @@
 #include "coug_fgo/factors/auv_dynamics_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the AuvDynamicsFactorArm.
- *
- * Verifies that the factor correctly implements the Fossen dynamics model.
- * V_next = V_curr + (dt/m) * (F_thrust - (linear_drag * V + quad_drag * |V| * V))
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Dynamic Identity**: Non-zero interactions (Thrust/Drag) satisfying physics.
- * 3.  **Rotation**: Vehicle rotated, sensor aligned.
- * 4.  **Mounting/Lever Arm**: Sensor offset relative to body.
- * 5.  **Combined**: Vehicle rotated + Sensor offset.
- * 6.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic and lever arm correction.
  */
 TEST(AuvDynamicsFactorArmTest, ZeroError) {
   gtsam::Key poseKey1 = gtsam::symbol_shorthand::X(1);
@@ -111,7 +100,6 @@ TEST(AuvDynamicsFactorArmTest, ZeroError) {
         gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3::Zero()),
         gtsam::Vector3(0.0, 1.0, 0.0)), 1e-9));
 
-
   // Case 4: Mounting/Lever Arm
   body_P_sensor = gtsam::Pose3(gtsam::Rot3::Yaw(M_PI_2), gtsam::Point3::Zero());
   control_force = gtsam::Vector3(10.0, 0.0, 0.0);
@@ -153,13 +141,7 @@ TEST(AuvDynamicsFactorArmTest, ZeroError) {
 }
 
 /**
- * @brief Verify Jacobians of the AuvDynamicsFactorArm using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose 1**: Orientation affects projection of v1.
- * 2.  **Velocity 1**: Nonlinear drag dependence.
- * 3.  **Pose 2**: Orientation affects projection of v2.
- * 4.  **Velocity 2**: Linear.
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(AuvDynamicsFactorArmTest, Jacobians) {
   gtsam::Key poseKey1 = gtsam::symbol_shorthand::X(1);

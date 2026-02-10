@@ -28,15 +28,7 @@
 #include "coug_fgo/factors/dvl_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the DvlFactor.
- *
- * Computes the residual error between the DVL measurement (body-frame velocity)
- * and the estimated velocity (converted from world to body frame via pose orientation).
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Rotation**: Vehicle rotated, sensor aligned.
- * 3.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic.
  */
 TEST(DvlFactorTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
@@ -66,11 +58,7 @@ TEST(DvlFactorTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the DvlFactor using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose**: Orientation affects the world-to-body projection.
- * 2.  **Velocity**: Linear relationship.
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(DvlFactorTest, Jacobians) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);

@@ -28,16 +28,7 @@
 #include "coug_fgo/factors/mag_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the MagFactorArm.
- *
- * Verifies that the factor correctly accounts for rotation and mounting offsets.
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Rotation**: Vehicle rotated, sensor aligned.
- * 3.  **Mounting Offset**: Sensor rotation relative to body.
- * 4.  **Combined**: Vehicle rotated + Sensor offset.
- * 5.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic and lever arm correction.
  */
 TEST(MagFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
@@ -62,7 +53,7 @@ TEST(MagFactorArmTest, ErrorEvaluation) {
       gtsam::Vector3::Zero(),
       factor2.evaluateError(pose_90), 1e-9));
 
-  // Case 3: Mounting Offset
+  // Case 3: Mounting/Lever Arm
   gtsam::Rot3 base_R_sensor = gtsam::Rot3::Yaw(M_PI_2);
   gtsam::Vector3 measured_mount = base_R_sensor.unrotate(reference_field_world);
   coug_fgo::factors::MagFactorArm factor3(poseKey, measured_mount, reference_field_world,
@@ -92,10 +83,7 @@ TEST(MagFactorArmTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the MagFactorArm using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose**: Orientation affects the measured field direction.
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(MagFactorArmTest, Jacobians) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);

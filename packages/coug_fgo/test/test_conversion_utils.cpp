@@ -26,7 +26,7 @@
 #include "coug_fgo/utils/conversion_utils.hpp"
 
 /**
- * @brief Tests basic geometry conversions from ROS messages to GTSAM types.
+ * @brief Verify basic geometry conversions from ROS messages to GTSAM types.
  */
 TEST(ConversionUtilsTest, RosToGtsam_Geometry) {
   geometry_msgs::msg::Point pt_msg;
@@ -70,7 +70,7 @@ TEST(ConversionUtilsTest, RosToGtsam_Geometry) {
 }
 
 /**
- * @brief Tests linear algebra conversions from STL containers to GTSAM types.
+ * @brief Verify linear algebra conversions from STL containers to GTSAM types.
  */
 TEST(ConversionUtilsTest, RosToGtsam_Matrices) {
   std::array<double, 9> cov9;
@@ -93,7 +93,7 @@ TEST(ConversionUtilsTest, RosToGtsam_Matrices) {
 }
 
 /**
- * @brief Tests helper functions for matrix extraction and creation.
+ * @brief Verify helper functions for matrix extraction and creation.
  */
 TEST(ConversionUtilsTest, Helpers_MatrixLogic) {
   std::array<double, 36> cov36;
@@ -124,7 +124,7 @@ TEST(ConversionUtilsTest, Helpers_MatrixLogic) {
 }
 
 /**
- * @brief Tests conversions from GTSAM types back to ROS messages.
+ * @brief Verify conversions from GTSAM types back to ROS messages.
  */
 TEST(ConversionUtilsTest, GtsamToRos_Geometry) {
   gtsam::Point3 pt(1.0, 2.0, 3.0);
@@ -146,7 +146,7 @@ TEST(ConversionUtilsTest, GtsamToRos_Geometry) {
 }
 
 /**
- * @brief Tests GTSAM to ROS covariance conversions.
+ * @brief Verify GTSAM to ROS covariance conversions.
  */
 TEST(ConversionUtilsTest, GtsamToRos_Covariance) {
   gtsam::Matrix33 m33 = gtsam::Matrix33::Identity() * 5.0;

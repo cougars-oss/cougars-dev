@@ -28,16 +28,7 @@
 #include "coug_fgo/factors/depth_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the DepthFactorArm.
- *
- * Verifies the factor's residual calculation: `error = measured_depth - (pose.z + lever_arm_z)`.
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Rotation**: Vehicle rotated, sensor aligned.
- * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
- * 4.  **Combined**: Vehicle rotated + Sensor offset.
- * 5.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic and lever arm correction.
  */
 TEST(DepthFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
@@ -89,10 +80,7 @@ TEST(DepthFactorArmTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the DepthFactorArm using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose**: Z-component relates to depth measurement.
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(DepthFactorArmTest, Jacobians) {
   coug_fgo::factors::DepthFactorArm factor(gtsam::symbol_shorthand::X(1), 5.0,

@@ -28,17 +28,7 @@
 #include "coug_fgo/factors/ahrs_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the AhrsYawFactorArm.
- *
- * Verifies that the factor correctly accounts for the mounting rotation (offset)
- * between the vehicle's body frame and the AHRS sensor frame.
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Rotation**: Vehicle rotated, sensor aligned.
- * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
- * 4.  **Combined**: Vehicle rotated + Sensor offset.
- * 5.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic and lever arm correction.
  */
 TEST(AhrsYawFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
@@ -85,10 +75,7 @@ TEST(AhrsYawFactorArmTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the AhrsYawFactorArm using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose**: Orientation affects the error (rotational difference).
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(AhrsYawFactorArmTest, Jacobians) {
   coug_fgo::factors::AhrsYawFactorArm factor(gtsam::symbol_shorthand::X(1),

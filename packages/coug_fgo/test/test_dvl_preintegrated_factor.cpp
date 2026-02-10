@@ -28,16 +28,7 @@
 #include "coug_fgo/factors/dvl_preintegrated_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the DvlPreintegratedFactor.
- *
- * Checks that the factor correctly equates the relative pose displacement between
- * nodes `i` and `j` to the preintegrated DVL measurement.
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Correct Translation**: Standard translation check.
- * 3.  **Rotation + Translation**: Rotated frame check.
- * 4.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic.
  */
 TEST(DvlPreintegratedFactorTest, ErrorEvaluation) {
   gtsam::Key poseIKey = gtsam::symbol_shorthand::X(1);
@@ -77,11 +68,7 @@ TEST(DvlPreintegratedFactorTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the DvlPreintegratedFactor using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose I**: Orientation and position affect the prediction.
- * 2.  **Pose J**: Position affects relative displacement.
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(DvlPreintegratedFactorTest, Jacobians) {
   gtsam::Key poseIKey = gtsam::symbol_shorthand::X(1);

@@ -28,15 +28,7 @@
 #include "coug_fgo/factors/constant_velocity_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the ConstantVelocityFactor.
- *
- * Verifies that the factor correctly constrains the body-frame velocity to be
- * constant between two poses.
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Rotation**: Zero error when body velocity constant despite rotation.
- * 3.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic.
  */
 TEST(ConstantVelocityFactorTest, ErrorEvaluation) {
   gtsam::Key poseKey1 = gtsam::symbol_shorthand::X(1);
@@ -75,13 +67,7 @@ TEST(ConstantVelocityFactorTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the ConstantVelocityFactor using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose 1**: Orientation affects projection of v1.
- * 2.  **Velocity 1**: Linear.
- * 3.  **Pose 2**: Orientation affects projection of v2.
- * 4.  **Velocity 2**: Linear.
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(ConstantVelocityFactorTest, Jacobians) {
   gtsam::Key poseKey1 = gtsam::symbol_shorthand::X(1);

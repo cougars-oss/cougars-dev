@@ -14,8 +14,8 @@
 
 /**
  * @file test_factor_graph_node.cpp
- * @brief Unit tests for FactorGraphNode initialization logic.
- * @author Nelson Durrant
+ * @brief Unit tests for factor_graph_node.hpp.
+ * @author Nelson Durrant (w Gemini 3 Pro)
  * @date Feb 2026
  */
 
@@ -66,7 +66,7 @@ public:
 
 /**
  * @class FactorGraphNodeTest
- * @brief Test fixture for FactorGraphNode unit tests.
+ * @brief Test fixture for FactorGraphNode tests.
  */
 class FactorGraphNodeTest : public ::testing::Test
 {
@@ -100,7 +100,7 @@ protected:
 };
 
 /**
- * @brief Test that incrementAverages() correctly handles orientation wrapping.
+ * @brief Verify orientation wrapping and average accumulation.
  */
 TEST_F(FactorGraphNodeTest, IncrementAverages) {
   node->params_.ahrs.enable_ahrs = true;
@@ -117,7 +117,7 @@ TEST_F(FactorGraphNodeTest, IncrementAverages) {
 }
 
 /**
- * @brief Test that computeInitialOrientation() yields the expected result from gravity and mag.
+ * @brief Verify gravity alignment and magnetometer logic.
  */
 TEST_F(FactorGraphNodeTest, ComputeInitialOrientation) {
   // Case 1: Tilted Gravity
@@ -153,7 +153,7 @@ TEST_F(FactorGraphNodeTest, ComputeInitialOrientation) {
 }
 
 /**
- * @brief Test that computeInitialPosition() calculates correctly with rotated lever arms and Depth override.
+ * @brief Verify lever arm rotation and depth override.
  */
 TEST_F(FactorGraphNodeTest, ComputeInitialPosition) {
   node->params_.prior.use_parameter_priors = false;
@@ -180,7 +180,7 @@ TEST_F(FactorGraphNodeTest, ComputeInitialPosition) {
 }
 
 /**
- * @brief Test that computeInitialVelocity() correctly rotates body-frame velocity.
+ * @brief Verify velocity frame rotation.
  */
 TEST_F(FactorGraphNodeTest, ComputeInitialVelocity) {
   node->params_.prior.use_parameter_priors = false;
@@ -195,7 +195,7 @@ TEST_F(FactorGraphNodeTest, ComputeInitialVelocity) {
 }
 
 /**
- * @brief Test that computeInitialBias() correctly prioritizes configuration parameters.
+ * @brief Verify bias initialization and parameter priority.
  */
 TEST_F(FactorGraphNodeTest, ComputeInitialBias) {
   node->params_.prior.use_parameter_priors = true;
@@ -210,7 +210,7 @@ TEST_F(FactorGraphNodeTest, ComputeInitialBias) {
 }
 
 /**
- * @brief Test that getInterpolatedOrientation() correctly calculates interpolation.
+ * @brief Verify orientation interpolation.
  */
 TEST_F(FactorGraphNodeTest, GetInterpolatedOrientation) {
   std::deque<sensor_msgs::msg::Imu::SharedPtr> msgs;

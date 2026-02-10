@@ -28,17 +28,7 @@
 #include "coug_fgo/factors/gps_factor.hpp"
 
 /**
- * @brief Test the error evaluation logic of the Gps2dFactorArm.
- *
- * Verifies that the factor correctly accounts for the lever arm offset between
- * the vehicle's body origin (Pose) and the GPS antenna location.
- *
- * Cases tested:
- * 1.  **Identity**: Everything aligned. Zero error.
- * 2.  **Rotation**: Vehicle rotated, sensor aligned.
- * 3.  **Mounting/Lever Arm**: Sensor offset relative to body.
- * 4.  **Combined**: Vehicle rotated + Sensor offset.
- * 5.  **Error Check**: Verifies non-zero error magnitude.
+ * @brief Verify error evaluation logic and lever arm correction.
  */
 TEST(Gps2dFactorArmTest, ErrorEvaluation) {
   gtsam::Key poseKey = gtsam::symbol_shorthand::X(1);
@@ -80,10 +70,7 @@ TEST(Gps2dFactorArmTest, ErrorEvaluation) {
 }
 
 /**
- * @brief Verify Jacobians of the Gps2dFactorArm using numerical differentiation.
- *
- * Validates the analytical Jacobians with respect to:
- * 1.  **Pose**: Position and orientation (due to lever arm).
+ * @brief Verify Jacobians against numerical differentiation.
  */
 TEST(Gps2dFactorArmTest, Jacobians) {
   coug_fgo::factors::Gps2dFactorArm factor(gtsam::symbol_shorthand::X(1),
