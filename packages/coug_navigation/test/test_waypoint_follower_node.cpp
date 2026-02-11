@@ -16,7 +16,7 @@
  * @file test_waypoint_follower_node.cpp
  * @brief Unit tests for waypoint_follower_node.hpp.
  * @author Nelson Durrant
- * @date Feb 2026
+ * @date Jan 2026
  */
 
 #include <gtest/gtest.h>

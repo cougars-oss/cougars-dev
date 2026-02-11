@@ -16,7 +16,7 @@
  * @file test_thread_safe_queue.cpp
  * @brief Unit tests for thread_safe_queue.hpp.
  * @author Nelson Durrant (w Gemini 3 Pro)
- * @date Feb 2026
+ * @date Jan 2026
  */
 
 #include <gtest/gtest.h>

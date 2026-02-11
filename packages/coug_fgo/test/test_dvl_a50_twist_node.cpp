@@ -16,7 +16,7 @@
  * @file test_dvl_a50_twist_node.cpp
  * @brief Unit tests for dvl_a50_twist_node.hpp.
  * @author Nelson Durrant (w Gemini 3 Pro)
- * @date Feb 2026
+ * @date Jan 2026
  */
 
 #include <gtest/gtest.h>
