@@ -21,6 +21,9 @@ factor_graph_node:
   publish_imu_bias_cov:
     type: bool
     default_value: false
+  publish_diagnostics:
+    type: bool
+    default_value: false
 
   # --- GTSAM Settings ---
   solver_type:
@@ -42,7 +45,7 @@ factor_graph_node:
   # --- ROS Topics and Frames ---
   imu_topic:
     type: string
-    default_value: "imu/data"
+    default_value: "imu/data_raw"
   gps_odom_topic:
     type: string
     default_value: "odometry/gps"

@@ -10,6 +10,7 @@
     publish_pose_cov: true # Publish the pose covariance along with the pose.
     publish_velocity_cov: false # Publish the velocity covariance along with the velocity.
     publish_imu_bias_cov: false # Publish the IMU bias covariance along with the bias.
+    publish_diagnostics: true # Publish diagnostic information.
 
     # --- GTSAM Smoother Settings ---
     #
@@ -24,7 +25,7 @@
     relinearize_skip: 1 # Number of updates to skip between relinearizations.
 
     # --- ROS Topics and Frames ---
-    imu_topic: "imu/data"
+    imu_topic: "imu/data_raw"
     gps_odom_topic: "odometry/gps"
     depth_odom_topic: "odometry/depth"
     mag_topic: "imu/mag"
@@ -225,6 +226,7 @@
 
 /bluerov2/**:
   ros__parameters:
+    imu_topic: "imu/data"
     ahrs_topic: "imu/data"
 
     imu:

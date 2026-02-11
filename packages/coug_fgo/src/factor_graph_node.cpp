@@ -267,21 +267,23 @@ void FactorGraphNode::setupRosInterfaces()
     sensor_options);
 
   // --- ROS Diagnostics ---
-  std::string ns = this->get_namespace();
-  std::string clean_ns = (ns == "/") ? "" : ns;
-  diagnostic_updater_.setHardwareID(clean_ns + "/factor_graph_node");
+  if (params_.publish_diagnostics) {
+    std::string ns = this->get_namespace();
+    std::string clean_ns = (ns == "/") ? "" : ns;
+    diagnostic_updater_.setHardwareID(clean_ns + "/factor_graph_node");
 
-  std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
-  std::string suffix = params_.experimental.enable_dvl_preintegration ? " (TM)" : "";
+    std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
+    std::string suffix = params_.experimental.enable_dvl_preintegration ? " (TM)" : "";
 
-  std::string sensor_task = prefix + "Sensor Inputs" + suffix;
-  diagnostic_updater_.add(sensor_task, this, &FactorGraphNode::checkSensorInputs);
+    std::string sensor_task = prefix + "Sensor Inputs" + suffix;
+    diagnostic_updater_.add(sensor_task, this, &FactorGraphNode::checkSensorInputs);
 
-  std::string state_task = prefix + "Graph State" + suffix;
-  diagnostic_updater_.add(state_task, this, &FactorGraphNode::checkGraphState);
+    std::string state_task = prefix + "Graph State" + suffix;
+    diagnostic_updater_.add(state_task, this, &FactorGraphNode::checkGraphState);
 
-  std::string overflow_task = prefix + "Processing Overflow" + suffix;
-  diagnostic_updater_.add(overflow_task, this, &FactorGraphNode::checkProcessingOverflow);
+    std::string overflow_task = prefix + "Processing Overflow" + suffix;
+    diagnostic_updater_.add(overflow_task, this, &FactorGraphNode::checkProcessingOverflow);
+  }
 }
 
 FactorGraphNode::FactorGraphNode(const rclcpp::NodeOptions & options)

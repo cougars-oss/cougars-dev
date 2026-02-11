@@ -60,6 +60,23 @@ def generate_launch_description():
                 default_value="false",
                 description="Launch additional localization nodes if true",
             ),
+            # https://github.com/CCNYRoboticsLab/imu_tools/tree/humble/imu_filter_madgwick
+            Node(
+                package="imu_filter_madgwick",
+                executable="imu_filter_madgwick_node",
+                name="imu_filter_madgwick_node",
+                condition=IfCondition(LaunchConfiguration("compare")),
+                parameters=[
+                    params_file,
+                    {
+                        "use_sim_time": use_sim_time,
+                    },
+                ],
+                remappings=[
+                    ("imu/data_raw", "imu/data_raw"),
+                    ("imu/data", "imu/data"),
+                ],
+            ),
             # https://docs.ros.org/en/melodic/api/robot_localization/html/state_estimation_nodes.html
             Node(
                 package="robot_localization",
@@ -75,7 +92,7 @@ def generate_launch_description():
                         "world_frame": odom_frame,
                     },
                 ],
-                remappings=[("odometry/filtered", "odometry/local")],
+                remappings=[("odometry/filtered", "odometry/local_ekf")],
             ),
             # https://docs.ros.org/en/melodic/api/robot_localization/html/state_estimation_nodes.html
             Node(

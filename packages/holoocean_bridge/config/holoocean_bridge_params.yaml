@@ -2,7 +2,7 @@
   imu_converter_node:
     ros__parameters:
       input_topic: "IMUSensor"
-      output_topic: "imu/data"
+      output_topic: "imu/data_raw"
 
       override_covariance: true
       accel_noise_sigma: 0.0078 # [m/s^2] Standard deviation of accelerometer measurements.

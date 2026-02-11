@@ -1,4 +1,11 @@
 /**:
+  imu_filter_madgwick_node:
+    ros__parameters:
+      use_mag: false
+      publish_tf: false
+      gain: 0.05
+      orientation_stddev: 0.01
+
   ekf_filter_node_odom:
     ros__parameters:
       frequency: 30.0
@@ -16,7 +23,7 @@
 
       imu0: imu/data
       imu0_config: [false, false, false, # X, Y, Z
-                    false, false, false, # Roll, Pitch, Yaw
+                    true, true, false, # Roll, Pitch, Yaw
                     false, false, false, # Vx, Vy, Vz
                     true,  true,  true,  # Vroll, Vpitch, Vyaw
                     true,  true,  true]  # Ax, Ay, Az
@@ -54,15 +61,15 @@
       odom1_differential: false
       odom1_relative: false # Absolute depth in the map frame.
 
-      odom2: odometry/gps
-      odom2_config: [true,  true,  false, # X, Y, Z
-                     false, false, false, # Roll, Pitch, Yaw
-                     false, false, false, # Vx, Vy, Vz
-                     false, false, false, # Vroll, Vpitch, Vyaw
-                     false, false, false] # Ax, Ay, Az
-      odom2_queue_size: 2
-      odom2_differential: false
-      odom2_relative: false # Absolute GPS position in the map frame.
+      # odom2: odometry/gps
+      # odom2_config: [true,  true,  false, # X, Y, Z
+      #                false, false, false, # Roll, Pitch, Yaw
+      #                false, false, false, # Vx, Vy, Vz
+      #                false, false, false, # Vroll, Vpitch, Vyaw
+      #                false, false, false] # Ax, Ay, Az
+      # odom2_queue_size: 2
+      # odom2_differential: false
+      # odom2_relative: false # Absolute GPS position in the map frame.
 
       imu0: imu/ahrs
       imu0_config: [false, false, false, # X, Y, Z
@@ -101,15 +108,15 @@
       odom1_differential: false
       odom1_relative: false # Absolute depth in the map frame.
 
-      odom2: odometry/gps
-      odom2_config: [true,  true,  false, # X, Y, Z
-                     false, false, false, # Roll, Pitch, Yaw
-                     false, false, false, # Vx, Vy, Vz
-                     false, false, false, # Vroll, Vpitch, Vyaw
-                     false, false, false] # Ax, Ay, Az
-      odom2_queue_size: 2
-      odom2_differential: false
-      odom2_relative: false # Absolute GPS position in the map frame.
+      # odom2: odometry/gps
+      # odom2_config: [true,  true,  false, # X, Y, Z
+      #                false, false, false, # Roll, Pitch, Yaw
+      #                false, false, false, # Vx, Vy, Vz
+      #                false, false, false, # Vroll, Vpitch, Vyaw
+      #                false, false, false] # Ax, Ay, Az
+      # odom2_queue_size: 2
+      # odom2_differential: false
+      # odom2_relative: false # Absolute GPS position in the map frame.
 
       imu0: imu/ahrs
       imu0_config: [false, false, false, # X, Y, Z

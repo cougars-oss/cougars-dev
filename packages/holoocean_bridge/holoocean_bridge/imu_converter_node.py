@@ -29,7 +29,7 @@ class ImuConverterNode(Node):
         super().__init__("imu_converter_node")
 
         self.declare_parameter("input_topic", "auv0/IMUSensor")
-        self.declare_parameter("output_topic", "imu/data")
+        self.declare_parameter("output_topic", "imu/data_raw")
         self.declare_parameter("imu_frame", "imu_link")
         self.declare_parameter("override_covariance", True)
         self.declare_parameter("accel_noise_sigma", 0.0078)
