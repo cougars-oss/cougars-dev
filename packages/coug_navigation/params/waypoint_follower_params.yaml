@@ -14,6 +14,9 @@ waypoint_follower_node:
   depth_topic:
     type: string
     default_value: "depth"
+  publish_diagnostics:
+    type: bool
+    default_value: false
 
   capture_radius:
     type: double

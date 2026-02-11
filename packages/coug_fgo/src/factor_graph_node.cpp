@@ -1543,8 +1543,10 @@ void FactorGraphNode::optimizeGraph()
       prev_imu_bias_ =
         inc_smoother_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
-      total_factors_ = inc_smoother_->getFactors().size();
-      total_variables_ = inc_smoother_->getLinearizationPoint().size();
+      if (params_.publish_diagnostics) {
+        total_factors_ = inc_smoother_->getFactors().size();
+        total_variables_ = inc_smoother_->getLinearizationPoint().size();
+      }
 
     } else if (isam_) {
       auto update_start = std::chrono::high_resolution_clock::now();
@@ -1557,8 +1559,10 @@ void FactorGraphNode::optimizeGraph()
       prev_imu_bias_ =
         isam_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
-      total_factors_ = isam_->getFactorsUnsafe().size();
-      total_variables_ = isam_->getLinearizationPoint().size();
+      if (params_.publish_diagnostics) {
+        total_factors_ = isam_->getFactorsUnsafe().size();
+        total_variables_ = isam_->getLinearizationPoint().size();
+      }
     }
 
     imu_preintegrator_->resetIntegrationAndSetBias(prev_imu_bias_);

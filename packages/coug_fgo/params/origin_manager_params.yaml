@@ -17,6 +17,9 @@ origin_manager_node:
   initialization_duration:
     type: double
     default_value: 0.0
+  publish_diagnostics:
+    type: bool
+    default_value: false
   timeout_threshold:
     type: double
     default_value: 2.0

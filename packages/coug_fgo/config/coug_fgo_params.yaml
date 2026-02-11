@@ -5,12 +5,12 @@
     publish_smoothed_path: true # Publish the full smoothed path for visualization.
     publish_velocity: true # Publish the estimated velocity (at the DVL frame in the map frame).
     publish_imu_bias: true # Publish the estimated IMU biases (accel + gyro).
+    publish_diagnostics: true # Publish diagnostic information.
 
     # These are computationally expensive to calculate, so disable if not needed.
     publish_pose_cov: true # Publish the pose covariance along with the pose.
     publish_velocity_cov: false # Publish the velocity covariance along with the velocity.
     publish_imu_bias_cov: false # Publish the IMU bias covariance along with the bias.
-    publish_diagnostics: true # Publish diagnostic information.
 
     # --- GTSAM Smoother Settings ---
     #
@@ -169,6 +169,7 @@
     # --- Node Settings ---
     origin_pub_rate: 1.0 # [Hz] Rate at which to publish the GPS origin.
     initialization_duration: 0.0 # [s] Time duration to average GPS data before setting origin.
+    publish_diagnostics: true # Publish diagnostic information.
     timeout_threshold: 2.0 # [s]
 
     simulate_dropout: false
@@ -190,6 +191,7 @@
 /**/dvl_a50_twist_node:
   ros__parameters:
     # --- Node Settings ---
+    publish_diagnostics: true # Publish diagnostic information.
     timeout_threshold: 0.5 # [s]
 
     simulate_dropout: false

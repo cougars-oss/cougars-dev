@@ -47,13 +47,15 @@ DvlA50TwistNode::DvlA50TwistNode(const rclcpp::NodeOptions & options)
     params_.output_topic, 10);
 
   // --- ROS Diagnostics ---
-  std::string ns = this->get_namespace();
-  std::string clean_ns = (ns == "/") ? "" : ns;
-  diagnostic_updater_.setHardwareID(clean_ns + "/dvl_a50_twist_node");
+  if (params_.publish_diagnostics) {
+    std::string ns = this->get_namespace();
+    std::string clean_ns = (ns == "/") ? "" : ns;
+    diagnostic_updater_.setHardwareID(clean_ns + "/dvl_a50_twist_node");
 
-  std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
-  std::string dvl_task = prefix + "DVL Status";
-  diagnostic_updater_.add(dvl_task, this, &DvlA50TwistNode::checkDvlStatus);
+    std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
+    std::string dvl_task = prefix + "DVL Status";
+    diagnostic_updater_.add(dvl_task, this, &DvlA50TwistNode::checkDvlStatus);
+  }
 
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for DVL data...");
 }

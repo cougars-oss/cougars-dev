@@ -90,17 +90,19 @@ OriginManagerNode::OriginManagerNode(const rclcpp::NodeOptions & options)
   }
 
   // --- ROS Diagnostics ---
-  std::string ns = this->get_namespace();
-  std::string clean_ns = (ns == "/") ? "" : ns;
-  diagnostic_updater_.setHardwareID(clean_ns + "/origin_manager_node");
+  if (params_.publish_diagnostics) {
+    std::string ns = this->get_namespace();
+    std::string clean_ns = (ns == "/") ? "" : ns;
+    diagnostic_updater_.setHardwareID(clean_ns + "/origin_manager_node");
 
-  std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
+    std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
 
-  std::string origin_task = prefix + "GPS Origin";
-  diagnostic_updater_.add(origin_task, this, &OriginManagerNode::checkOriginStatus);
+    std::string origin_task = prefix + "GPS Origin";
+    diagnostic_updater_.add(origin_task, this, &OriginManagerNode::checkOriginStatus);
 
-  std::string fix_task = prefix + "GPS Fix";
-  diagnostic_updater_.add(fix_task, this, &OriginManagerNode::checkNavSatFix);
+    std::string fix_task = prefix + "GPS Fix";
+    diagnostic_updater_.add(fix_task, this, &OriginManagerNode::checkNavSatFix);
+  }
 
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for fix...");
 }

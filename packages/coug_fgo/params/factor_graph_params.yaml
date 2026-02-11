@@ -288,7 +288,7 @@ factor_graph_node:
       default_value: false
     parameter_frame:
       type: string
-      default_value: "base_link"
+      default_value: "com_link"
     prediction_noise_sigmas:
       type: double_array
       default_value: [0.1, 0.1, 0.1]

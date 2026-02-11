@@ -60,17 +60,19 @@ WaypointFollowerNode::WaypointFollowerNode(const rclcpp::NodeOptions & options)
     std::bind(&WaypointFollowerNode::checkOdomTimeout, this));
 
   // --- ROS Diagnostics ---
-  std::string ns = this->get_namespace();
-  std::string clean_ns = (ns == "/") ? "" : ns;
-  diagnostic_updater_.setHardwareID(clean_ns + "/waypoint_follower_node");
+  if (params_.publish_diagnostics) {
+    std::string ns = this->get_namespace();
+    std::string clean_ns = (ns == "/") ? "" : ns;
+    diagnostic_updater_.setHardwareID(clean_ns + "/waypoint_follower_node");
 
-  std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
+    std::string prefix = clean_ns.empty() ? "" : "[" + clean_ns + "] ";
 
-  std::string mission_task = prefix + "Mission Status";
-  diagnostic_updater_.add(mission_task, this, &WaypointFollowerNode::checkMissionStatus);
+    std::string mission_task = prefix + "Mission Status";
+    diagnostic_updater_.add(mission_task, this, &WaypointFollowerNode::checkMissionStatus);
 
-  std::string odom_task = prefix + "Odometry Link";
-  diagnostic_updater_.add(odom_task, this, &WaypointFollowerNode::checkOdometryStatus);
+    std::string odom_task = prefix + "Odometry Link";
+    diagnostic_updater_.add(odom_task, this, &WaypointFollowerNode::checkOdometryStatus);
+  }
 
   RCLCPP_INFO(get_logger(), "Startup complete! Waiting for mission...");
 }

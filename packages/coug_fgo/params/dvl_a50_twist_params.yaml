@@ -5,6 +5,9 @@ dvl_a50_twist_node:
   output_topic:
     type: string
     default_value: "dvl/twist"
+  publish_diagnostics:
+    type: bool
+    default_value: false
   timeout_threshold:
     type: double
     default_value: 0.5
