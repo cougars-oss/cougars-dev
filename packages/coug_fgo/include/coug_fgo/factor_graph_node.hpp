@@ -323,6 +323,9 @@ protected:
   std::atomic<double> last_update_duration_{0.0};
   std::atomic<double> last_cov_duration_{0.0};
   std::atomic<bool> processing_overflow_{false};
+  std::atomic<size_t> new_factors_{0};
+  std::atomic<size_t> total_factors_{0};
+  std::atomic<size_t> total_variables_{0};
   std::map<rclcpp::Time, gtsam::Key> time_to_key_;
 
   // --- GTSAM Objects ---

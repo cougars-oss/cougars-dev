@@ -1528,6 +1528,7 @@ void FactorGraphNode::optimizeGraph()
   try {
     auto prep_end = std::chrono::high_resolution_clock::now();
     last_prep_duration_ = std::chrono::duration<double>(prep_end - opt_start).count();
+    new_factors_ = new_graph.size();
 
     if (inc_smoother_) {
       auto update_start = std::chrono::high_resolution_clock::now();
@@ -1540,6 +1541,9 @@ void FactorGraphNode::optimizeGraph()
       prev_imu_bias_ =
         inc_smoother_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
+      total_factors_ = inc_smoother_->getFactors().size();
+      total_variables_ = inc_smoother_->getLinearizationPoint().size();
+
     } else if (isam_) {
       auto update_start = std::chrono::high_resolution_clock::now();
       isam_->update(new_graph, new_values);
@@ -1550,6 +1554,9 @@ void FactorGraphNode::optimizeGraph()
       prev_vel_ = isam_->calculateEstimate<gtsam::Vector3>(V(current_step_));
       prev_imu_bias_ =
         isam_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
+
+      total_factors_ = isam_->getFactorsUnsafe().size();
+      total_variables_ = isam_->getLinearizationPoint().size();
     }
 
     imu_preintegrator_->resetIntegrationAndSetBias(prev_imu_bias_);
@@ -1707,6 +1714,10 @@ void FactorGraphNode::checkProcessingOverflow(diagnostic_updater::DiagnosticStat
   stat.add("Data Prep Duration (s)", last_prep_duration_.load());
   stat.add("Update Duration (s)", last_update_duration_.load());
   stat.add("Covariance Duration (s)", last_cov_duration_.load());
+
+  stat.add("New Factors", new_factors_.load());
+  stat.add("Total Factors", total_factors_.load());
+  stat.add("Total Variables", total_variables_.load());
 }
 
 }  // namespace coug_fgo
