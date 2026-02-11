@@ -6,8 +6,6 @@
 
 CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autonomy research by the [Field Robotic Systems Lab (FROST Lab)](https://frostlab.byu.edu) at [Brigham Young University](https://byu.edu).
 
---
-
 ## 🚀 Get Started
 
 <img src=".github/assets/welcome.gif" width="400">
@@ -74,8 +72,6 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
     cd ~/scripts && ./viz_launch.sh <bag_name>
     ```
 
---
-
 ## 🤝 Contributing
 
 - **Create a Branch:** Create a new branch using the format `name/feature` (e.g., `nelson/repo-docs`).
@@ -89,8 +85,6 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 - **Sync Frequently:** Regularly rebase your branch against `main` (or merge `main` into your branch) to prevent conflicts.
 
 - **Submit a PR:** Open a pull request, ensure required tests pass, and merge once approved.
-
---
 
 ## 📚 Citations
 
