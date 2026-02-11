@@ -10,23 +10,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # --- Dependencies ---
-find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(nav_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(geographic_msgs REQUIRED)
-find_package(geodesy REQUIRED)
-find_package(tf2 REQUIRED)
-find_package(tf2_ros REQUIRED)
-find_package(tf2_geometry_msgs REQUIRED)
-find_package(diagnostic_updater REQUIRED)
-find_package(dvl_msgs REQUIRED)
 find_package(GTSAM REQUIRED)
 find_package(generate_parameter_library REQUIRED)
 
@@ -55,7 +41,7 @@ generate_parameter_library(
 )
 
 # --- Component Library ---
-add_library(factor_graph_component SHARED
+ament_auto_add_library(factor_graph_component SHARED
   src/factor_graph_node.cpp
   src/origin_manager_node.cpp
   src/dvl_a50_twist_node.cpp
@@ -74,21 +60,6 @@ target_link_libraries(factor_graph_component
   dvl_a50_twist_parameters
 )
 
-ament_target_dependencies(factor_graph_component
-  rclcpp
-  rclcpp_components
-  nav_msgs
-  sensor_msgs
-  geometry_msgs
-  geographic_msgs
-  geodesy
-  tf2
-  tf2_ros
-  tf2_geometry_msgs
-  diagnostic_updater
-  dvl_msgs
-)
-
 rclcpp_components_register_nodes(factor_graph_component
   "coug_fgo::FactorGraphNode"
   "coug_fgo::OriginManagerNode"
@@ -96,47 +67,14 @@ rclcpp_components_register_nodes(factor_graph_component
 )
 
 # --- Executables ---
-add_executable(factor_graph src/factor_graph_main.cpp)
+ament_auto_add_executable(factor_graph src/factor_graph_main.cpp)
 target_link_libraries(factor_graph factor_graph_component)
-ament_target_dependencies(factor_graph rclcpp rclcpp_components)
 
-add_executable(origin_manager src/origin_manager_main.cpp)
+ament_auto_add_executable(origin_manager src/origin_manager_main.cpp)
 target_link_libraries(origin_manager factor_graph_component)
-ament_target_dependencies(origin_manager rclcpp rclcpp_components)
 
-add_executable(dvl_a50_twist src/dvl_a50_twist_main.cpp)
+ament_auto_add_executable(dvl_a50_twist src/dvl_a50_twist_main.cpp)
 target_link_libraries(dvl_a50_twist factor_graph_component)
-ament_target_dependencies(dvl_a50_twist rclcpp rclcpp_components)
-
-# --- Install ---
-install(TARGETS
-  factor_graph_component
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-install(TARGETS
-  factor_graph
-  origin_manager
-  dvl_a50_twist
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-install(DIRECTORY launch config params
-  DESTINATION share/${PROJECT_NAME}
-)
-
-ament_export_dependencies(
-  rclcpp
-  rclcpp_components
-  nav_msgs
-  sensor_msgs
-  geometry_msgs
-  geographic_msgs
-  geodesy
-)
-ament_export_libraries(factor_graph_component)
 
 # --- Testing ---
 if(BUILD_TESTING)
@@ -269,4 +207,10 @@ if(BUILD_TESTING)
   )
 endif()
 
-ament_package()
+ament_auto_package(
+  INSTALL_TO_SHARE
+  launch
+  config
+  params
+  USE_SCOPED_HEADER_INSTALL_DIR
+)

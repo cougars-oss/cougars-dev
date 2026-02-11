@@ -20,7 +20,7 @@ origin_manager_node:
   timeout_threshold:
     type: double
     default_value: 2.0
-  
+
   simulate_dropout:
     type: bool
     default_value: false
@@ -30,18 +30,18 @@ origin_manager_node:
   dropout_duration:
     type: double
     default_value: 5.0
-  
+
   map_frame:
     type: string
     default_value: "map"
-  
+
   use_parameter_child_frame:
     type: bool
     default_value: false
   parameter_child_frame:
     type: string
     default_value: "gps_link"
-  
+
   use_parameter_origin:
     type: bool
     default_value: false

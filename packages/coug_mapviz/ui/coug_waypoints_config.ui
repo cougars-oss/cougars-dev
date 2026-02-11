@@ -41,7 +41,7 @@
    <property name="verticalSpacing">
     <number>6</number>
    </property>
-   
+
    <!-- Row 0: Waypoints Topic Selection -->
    <item row="0" column="0">
     <widget class="QLabel" name="label_topic">

@@ -51,28 +51,28 @@ METRICS=("trans_part" "angle_deg")
 
 for agent in "${AGENTS[@]}"; do
     truth="/${agent}/odometry/truth"
-    
+
     if ! grep -q "name: $truth" "$metadata_file"; then
         print_warning "Agent $agent not found, skipping..."
         continue
     fi
 
     print_info "Processing $agent..."
-    
+
     est_topics=()
     for s in "${SUFFIXES[@]}"; do est_topics+=("/${agent}/${s}"); done
 
     for i in "${!est_topics[@]}"; do
         topic="${est_topics[$i]}"
         label="${LABELS[$i]}"
-        
+
         if ! grep -q "name: $topic" "$metadata_file"; then
             print_warning "Topic $topic not found, skipping..."
             continue
         fi
 
         print_info "Evaluating ${agent}/${label}..."
-        
+
         for metric in "${METRICS[@]}"; do
             mkdir -p "$bag_path/evo/${agent}/${label}"
 
@@ -94,7 +94,7 @@ for agent in "${AGENTS[@]}"; do
             fi
         done
     done
-    
+
     print_info "Exporting ${agent} metrics..."
     if [ ! -f "$bag_path/evo/${agent}/metrics_ape_trans.csv" ]; then
         evo_res "$bag_path/evo/${agent}"/*/ape_trans_part.zip --save_table "$bag_path/evo/${agent}/metrics_ape_trans.csv"

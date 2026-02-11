@@ -43,15 +43,15 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
   **Simulation (HoloOcean):**
 
   - Detatch from the tmux window using `Ctrl+b d` and build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
-  
+
   - When finished, launch the default HoloOcean scenario in the resulting `holoocean-ct` container using `./holoocean/launch.sh`.
-  
+
     ```bash
     cd coug_fgo_dev && ./holoocean/launch.sh
     ```
-  
+
   - Open a new terminal, attach to the `coug_dev` tmux window using `./deploy.sh dev`, build the `coug_ws` workspace, and launch the simulation stack using `./sim_launch.sh`.
-  
+
     ```bash
     cd ~/coug_ws && colcon build
     cd ~/scripts && ./sim_launch.sh
@@ -62,14 +62,14 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
   - On your host machine, copy your `rosbag2` bag into the `bags` folder at the root of the repository.
 
   - Inside of the `coug_dev` tmux window, build the `coug_ws` workspace and launch the development stack using `./bag_launch.sh <bag_name>`. Provide the name of your bag as the script argument.
-  
+
     ```bash
     cd ~/coug_ws && colcon build
     cd ~/scripts && ./bag_launch.sh <bag_name>
     ```
 
   - To simply visualize the playback without launching any new nodes, use `./viz_launch.sh <bag_name>`.
-  
+
     ```bash
     cd ~/scripts && ./viz_launch.sh <bag_name>
     ```
@@ -99,26 +99,26 @@ Please cite our relevant publications if you find this repository useful for you
 ### CoUGARs
 ```bibtex
 @misc{durrant2025lowcostmultiagentfleetacoustic,
-  title={Low-cost Multi-agent Fleet for Acoustic Cooperative Localization Research}, 
+  title={Low-cost Multi-agent Fleet for Acoustic Cooperative Localization Research},
   author={Nelson Durrant and Braden Meyers and Matthew McMurray and Clayton Smith and Brighton Anderson and Tristan Hodgins and Kalliyan Velasco and Joshua G. Mangelson},
   year={2025},
   eprint={2511.08822},
   archivePrefix={arXiv},
   primaryClass={cs.RO},
-  url={https://arxiv.org/abs/2511.08822}, 
+  url={https://arxiv.org/abs/2511.08822},
 }
 ```
 
 ### HoloOcean-ROS
 ```bibtex
 @misc{meyers2025testingevaluationunderwatervehicle,
-  title={Testing and Evaluation of Underwater Vehicle Using Hardware-In-The-Loop Simulation with HoloOcean}, 
+  title={Testing and Evaluation of Underwater Vehicle Using Hardware-In-The-Loop Simulation with HoloOcean},
   author={Braden Meyers and Joshua G. Mangelson},
   year={2025},
   eprint={2511.07687},
   archivePrefix={arXiv},
   primaryClass={cs.RO},
-  url={https://arxiv.org/abs/2511.07687}, 
+  url={https://arxiv.org/abs/2511.07687},
 }
 ```
 
@@ -137,12 +137,12 @@ Please cite our relevant publications if you find this repository useful for you
 ### HoloOcean 2.0 (Features)
 ```bibtex
 @misc{romrell2025previewholoocean20,
-  title={A Preview of HoloOcean 2.0}, 
+  title={A Preview of HoloOcean 2.0},
   author={Blake Romrell and Abigail Austin and Braden Meyers and Ryan Anderson and Carter Noh and Joshua G. Mangelson},
   year={2025},
   eprint={2510.06160},
   archivePrefix={arXiv},
   primaryClass={cs.RO},
-  url={https://arxiv.org/abs/2510.06160}, 
+  url={https://arxiv.org/abs/2510.06160},
 }
 ```

@@ -20,7 +20,7 @@ updates:
 
   - package-ecosystem: "docker"
     directory: "/docker/gtsam"
-    schedule: 
+    schedule:
       interval: "monthly"
     commit-message:
       prefix: "🐳"

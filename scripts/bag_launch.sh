@@ -64,7 +64,7 @@ done
 if [ -n "$record_bag_path" ] && [ -d "$record_bag_path" ]; then
     print_warning "Bag directory already exists: $record_bag_path"
     read -p "Do you want to overwrite it? (y/n) " -n 1 -r
-    echo 
+    echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         rm -rf "$record_bag_path"
     else

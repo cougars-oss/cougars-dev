@@ -144,7 +144,7 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
   <link name="com_link"/>
-  
+
   <!-- IMUSocket -->
   <joint name="imu_joint" type="fixed">
     <parent link="com_link"/>

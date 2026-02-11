@@ -1,6 +1,6 @@
 #!/bin/bash
 # Created by Nelson Durrant, Jan 2026
-# 
+#
 # Drives the BlueROV2 using the keyboard
 
 script_dir="$(dirname "$(readlink -f "$0")")"

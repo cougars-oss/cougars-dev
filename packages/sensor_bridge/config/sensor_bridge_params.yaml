@@ -11,5 +11,5 @@
       gps_odom_topic: "odometry/gps"
       ahrs_topic: "imu/data"
       output_topic: "odometry/truth"
-      
+
       max_position_covariance: 0.01 # [m^2]

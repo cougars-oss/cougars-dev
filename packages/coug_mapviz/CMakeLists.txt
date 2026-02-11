@@ -21,11 +21,8 @@ if(NOT "$ENV{ROS_BUILD_ARCH}" STREQUAL "amd64")
   return()
 endif()
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+# --- Dependencies ---
+find_package(ament_cmake_auto REQUIRED)
 
 find_package(geometry_msgs REQUIRED)
 find_package(mapviz REQUIRED)
@@ -36,6 +33,7 @@ find_package(tf2 REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Core Gui OpenGL Widgets)
 find_package(OpenGL REQUIRED)
 
+# --- Qt Setup ---
 add_definitions(-DWFlags=WindowFlags)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -46,7 +44,8 @@ set(HEADER_FILES include/${PROJECT_NAME}/coug_waypoints_plugin.hpp)
 qt5_wrap_ui(UI_SRC_FILES ${UI_FILES})
 qt5_wrap_cpp(MOC_FILES ${HEADER_FILES})
 
-add_library(${PROJECT_NAME} SHARED
+# --- Component Library ---
+ament_auto_add_library(${PROJECT_NAME} SHARED
   ${MOC_FILES}
   ${SRC_FILES}
   ${UI_SRC_FILES}
@@ -76,23 +75,9 @@ target_link_libraries(${PROJECT_NAME}
   OpenGL::GL
 )
 
-install(DIRECTORY include/
-  DESTINATION include/${PROJECT_NAME}
-  FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY launch mapviz
-  DESTINATION share/${PROJECT_NAME}
-)
-
-install(TARGETS ${PROJECT_NAME}
-  EXPORT export_${PROJECT_NAME}
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
+# --- Export ---
 pluginlib_export_plugin_description_file(mapviz mapviz_plugins.xml)
 
-ament_export_targets(export_${PROJECT_NAME})
 ament_export_dependencies(
   geometry_msgs
   mapviz
@@ -102,17 +87,15 @@ ament_export_dependencies(
   tf2
 )
 
+# --- Testing ---
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
-  # set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
-  # set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
-
 endif()
 
-ament_package()
+ament_auto_package(
+  INSTALL_TO_SHARE
+  launch
+  mapviz
+  USE_SCOPED_HEADER_INSTALL_DIR
+)
