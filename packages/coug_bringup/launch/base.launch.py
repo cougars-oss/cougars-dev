@@ -32,6 +32,8 @@ def generate_launch_description():
     coug_rviz_launch_dir = os.path.join(coug_rviz_dir, "launch")
     coug_rqt_dir = get_package_share_directory("coug_rqt")
     coug_rqt_launch_dir = os.path.join(coug_rqt_dir, "launch")
+    coug_plotjuggler_dir = get_package_share_directory("coug_plotjuggler")
+    coug_plotjuggler_launch_dir = os.path.join(coug_plotjuggler_dir, "launch")
 
     coug_mapviz_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -66,6 +68,16 @@ def generate_launch_description():
         }.items(),
     )
 
+    coug_plotjuggler_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(coug_plotjuggler_launch_dir, "coug_plotjuggler.launch.py")
+        ),
+        launch_arguments={
+            "use_sim_time": use_sim_time,
+            "auv_ns": auv_ns,
+        }.items(),
+    )
+
     ld = LaunchDescription()
     ld.add_action(
         DeclareLaunchArgument(
@@ -91,5 +103,6 @@ def generate_launch_description():
     ld.add_action(coug_mapviz_cmd)
     ld.add_action(coug_rviz_cmd)
     ld.add_action(coug_rqt_cmd)
+    ld.add_action(coug_plotjuggler_cmd)
 
     return ld
