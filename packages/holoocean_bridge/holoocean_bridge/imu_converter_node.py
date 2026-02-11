@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Imu
@@ -19,7 +20,9 @@ from sensor_msgs.msg import Imu
 
 class ImuConverterNode(Node):
     """
-    Converts IMU data from HoloOcean to a standard IMU message.
+    Converts IMU data from HoloOcean to standard IMU messages.
+
+    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -31,7 +34,6 @@ class ImuConverterNode(Node):
         self.declare_parameter("input_topic", "IMUSensor")
         self.declare_parameter("output_topic", "imu/data_raw")
         self.declare_parameter("imu_frame", "imu_link")
-        self.declare_parameter("override_covariance", True)
         self.declare_parameter("accel_noise_sigma", 0.0078)
         self.declare_parameter("gyro_noise_sigma", 0.0012)
 
@@ -43,9 +45,6 @@ class ImuConverterNode(Node):
         )
         self.imu_frame = (
             self.get_parameter("imu_frame").get_parameter_value().string_value
-        )
-        self.override_covariance = (
-            self.get_parameter("override_covariance").get_parameter_value().bool_value
         )
         self.accel_noise_sigma = (
             self.get_parameter("accel_noise_sigma").get_parameter_value().double_value
@@ -70,17 +69,26 @@ class ImuConverterNode(Node):
         :param msg: Imu message containing IMU data.
         """
         msg.header.frame_id = self.imu_frame
-        if self.override_covariance:
-            accel_covariance = self.accel_noise_sigma * self.accel_noise_sigma
-            gyro_covariance = self.gyro_noise_sigma * self.gyro_noise_sigma
 
-            msg.linear_acceleration_covariance[0] = accel_covariance
-            msg.linear_acceleration_covariance[4] = accel_covariance
-            msg.linear_acceleration_covariance[8] = accel_covariance
+        # HoloOcean doesn't add noise, so we add it ourselves
+        msg.linear_acceleration.x += random.gauss(0, self.accel_noise_sigma)
+        msg.linear_acceleration.y += random.gauss(0, self.accel_noise_sigma)
+        msg.linear_acceleration.z += random.gauss(0, self.accel_noise_sigma)
 
-            msg.angular_velocity_covariance[0] = gyro_covariance
-            msg.angular_velocity_covariance[4] = gyro_covariance
-            msg.angular_velocity_covariance[8] = gyro_covariance
+        msg.angular_velocity.x += random.gauss(0, self.gyro_noise_sigma)
+        msg.angular_velocity.y += random.gauss(0, self.gyro_noise_sigma)
+        msg.angular_velocity.z += random.gauss(0, self.gyro_noise_sigma)
+
+        accel_covariance = self.accel_noise_sigma * self.accel_noise_sigma
+        gyro_covariance = self.gyro_noise_sigma * self.gyro_noise_sigma
+
+        msg.linear_acceleration_covariance[0] = accel_covariance
+        msg.linear_acceleration_covariance[4] = accel_covariance
+        msg.linear_acceleration_covariance[8] = accel_covariance
+
+        msg.angular_velocity_covariance[0] = gyro_covariance
+        msg.angular_velocity_covariance[4] = gyro_covariance
+        msg.angular_velocity_covariance[8] = gyro_covariance
 
         self.publisher.publish(msg)
 

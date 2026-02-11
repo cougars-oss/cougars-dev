@@ -22,7 +22,9 @@ from geometry_msgs.msg import Quaternion, Vector3Stamped
 
 class AhrsConverterNode(Node):
     """
-    Converts rotation sensor data from HoloOcean to a standard IMU message.
+    Converts AHRS data from HoloOcean to standard IMU messages.
+
+    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026

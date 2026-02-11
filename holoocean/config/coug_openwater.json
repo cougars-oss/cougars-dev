@@ -15,8 +15,6 @@
                     "socket": "IMUSocket",
                     "Hz": 200,
                     "configuration": {
-                        "AccelSigma": 0.0078,
-                        "AngVelSigma": 0.0012,
                         "AccelBiasSigma": 1.05e-05,
                         "AngVelBiasSigma": 3.91e-06,
                         "ReturnBias": true
@@ -28,9 +26,7 @@
                     "socket": "COM",
                     "Hz": 1,
                     "configuration": {
-                        "Sigma": 0.015,
-                        "Depth": 0.5,
-                        "DepthSigma": 0.025
+                        "Depth": 0.5
                     },
                     "ros_publish": true
                 },
@@ -39,7 +35,6 @@
                     "socket": "DepthSocket",
                     "Hz": 10,
                     "configuration": {
-                        "Sigma": 0.02
                     },
                     "ros_publish": true
                 },
@@ -48,7 +43,6 @@
                     "socket": "IMUSocket",
                     "Hz": 100,
                     "configuration": {
-                        "Sigma": 0.003,
                         "MagneticVector": [
                             0.07857,
                             0.41316,
@@ -68,7 +62,6 @@
                     "socket": "DVLSocket",
                     "Hz": 15,
                     "configuration": {
-                        "VelSigma": 0.02,
                         "DebugLines": false
                     },
                     "ros_publish": true

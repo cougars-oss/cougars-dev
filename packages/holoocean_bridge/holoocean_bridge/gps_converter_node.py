@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
@@ -21,7 +22,9 @@ import math
 
 class GpsConverterNode(Node):
     """
-    Converts GPS data from HoloOcean to a navigation satellite fix message.
+    Converts GPS data from HoloOcean to standard NavSatFix messages.
+
+    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -36,7 +39,6 @@ class GpsConverterNode(Node):
         self.declare_parameter("origin_latitude", 40.23890)
         self.declare_parameter("origin_longitude", -111.74212)
         self.declare_parameter("origin_altitude", 1412.0)
-        self.declare_parameter("override_covariance", True)
         self.declare_parameter("position_noise_sigma", 0.015)
         self.declare_parameter("altitude_noise_sigma", 0.025)
 
@@ -57,9 +59,6 @@ class GpsConverterNode(Node):
         )
         self.origin_alt = (
             self.get_parameter("origin_altitude").get_parameter_value().double_value
-        )
-        self.override_covariance = (
-            self.get_parameter("override_covariance").get_parameter_value().bool_value
         )
         self.position_noise_sigma = (
             self.get_parameter("position_noise_sigma")
@@ -93,8 +92,8 @@ class GpsConverterNode(Node):
         navsat_msg.status.status = navsat_msg.status.STATUS_FIX
         navsat_msg.status.service = navsat_msg.status.SERVICE_GPS
 
-        d_east = msg.pose.pose.position.x
-        d_north = msg.pose.pose.position.y
+        d_east = msg.pose.pose.position.x + random.gauss(0, self.position_noise_sigma)
+        d_north = msg.pose.pose.position.y + random.gauss(0, self.position_noise_sigma)
 
         lat, lon = self.calculate_inverse_haversine(
             self.origin_lat, self.origin_lon, d_north, d_east
@@ -102,32 +101,19 @@ class GpsConverterNode(Node):
 
         navsat_msg.latitude = lat
         navsat_msg.longitude = lon
-        navsat_msg.altitude = self.origin_alt + msg.pose.pose.position.z
+        navsat_msg.altitude = (
+            self.origin_alt
+            + msg.pose.pose.position.z
+            + random.gauss(0, self.altitude_noise_sigma)
+        )
 
-        if self.override_covariance:
+        position_covariance = self.position_noise_sigma * self.position_noise_sigma
+        altitude_covariance = self.altitude_noise_sigma * self.altitude_noise_sigma
 
-            position_covariance = self.position_noise_sigma * self.position_noise_sigma
-            altitude_covariance = self.altitude_noise_sigma * self.altitude_noise_sigma
-
-            navsat_msg.position_covariance[0] = position_covariance  # East
-            navsat_msg.position_covariance[4] = position_covariance  # North
-            navsat_msg.position_covariance[8] = altitude_covariance  # Up
-            navsat_msg.position_covariance_type = (
-                navsat_msg.COVARIANCE_TYPE_DIAGONAL_KNOWN
-            )
-
-        else:
-
-            navsat_msg.position_covariance[0] = msg.pose.covariance[0]
-            navsat_msg.position_covariance[1] = msg.pose.covariance[1]
-            navsat_msg.position_covariance[2] = msg.pose.covariance[2]
-            navsat_msg.position_covariance[3] = msg.pose.covariance[6]
-            navsat_msg.position_covariance[4] = msg.pose.covariance[7]
-            navsat_msg.position_covariance[5] = msg.pose.covariance[8]
-            navsat_msg.position_covariance[6] = msg.pose.covariance[12]
-            navsat_msg.position_covariance[7] = msg.pose.covariance[13]
-            navsat_msg.position_covariance[8] = msg.pose.covariance[14]
-            navsat_msg.position_covariance_type = navsat_msg.COVARIANCE_TYPE_KNOWN
+        navsat_msg.position_covariance[0] = position_covariance  # East
+        navsat_msg.position_covariance[4] = position_covariance  # North
+        navsat_msg.position_covariance[8] = altitude_covariance  # Up
+        navsat_msg.position_covariance_type = navsat_msg.COVARIANCE_TYPE_DIAGONAL_KNOWN
 
         self.publisher.publish(navsat_msg)
 

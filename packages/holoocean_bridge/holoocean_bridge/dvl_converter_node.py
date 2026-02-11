@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
+import random
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import TwistWithCovarianceStamped
@@ -20,9 +22,12 @@ from dvl_msgs.msg import DVL
 
 class DvlConverterNode(Node):
     """
-    Converts DVL data from HoloOcean to a Waterlinked DVL message.
+    Converts DVL data from HoloOcean to Waterlinked DVL messages.
 
-    :author: Nelson Durrant
+    Injects beam-based Gaussian noise to replicate HoloOcean's internal sensor
+    noise model (Janus configuration).
+
+    :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
     """
 
@@ -32,7 +37,6 @@ class DvlConverterNode(Node):
         self.declare_parameter("input_topic", "DVLSensorVelocity")
         self.declare_parameter("output_topic", "dvl/data")
         self.declare_parameter("dvl_frame", "dvl_link")
-        self.declare_parameter("override_covariance", True)
         self.declare_parameter("noise_sigma", 0.02)
 
         input_topic = (
@@ -44,12 +48,19 @@ class DvlConverterNode(Node):
         self.dvl_frame = (
             self.get_parameter("dvl_frame").get_parameter_value().string_value
         )
-        self.override_covariance = (
-            self.get_parameter("override_covariance").get_parameter_value().bool_value
-        )
         self.noise_sigma = (
             self.get_parameter("noise_sigma").get_parameter_value().double_value
         )
+
+        # From the DVLSensor.h file
+        elevation_rad = math.radians(22.5)
+        self.sin_elev = math.sin(elevation_rad)
+        self.cos_elev = math.cos(elevation_rad)
+
+        self.inv_2s = 1.0 / (2.0 * self.sin_elev)
+        self.inv_4c = 1.0 / (4.0 * self.cos_elev)
+        self.cov_val_h = (self.noise_sigma**2) / (2.0 * self.sin_elev**2)
+        self.cov_val_v = (self.noise_sigma**2) / (4.0 * self.cos_elev**2)
 
         self.subscription = self.create_subscription(
             TwistWithCovarianceStamped, input_topic, self.listener_callback, 10
@@ -72,9 +83,14 @@ class DvlConverterNode(Node):
         dvl_msg.header = msg.header
         dvl_msg.header.frame_id = self.dvl_frame
 
-        dvl_msg.velocity.x = msg.twist.twist.linear.x
-        dvl_msg.velocity.y = msg.twist.twist.linear.y
-        dvl_msg.velocity.z = msg.twist.twist.linear.z
+        s = [random.gauss(0, self.noise_sigma) for _ in range(4)]
+        noise_x = self.inv_2s * (s[0] - s[2])
+        noise_y = self.inv_2s * (s[1] - s[3])
+        noise_z = self.inv_4c * (s[0] + s[1] + s[2] + s[3])
+
+        dvl_msg.velocity.x = msg.twist.twist.linear.x + noise_x
+        dvl_msg.velocity.y = msg.twist.twist.linear.y + noise_y
+        dvl_msg.velocity.z = msg.twist.twist.linear.z + noise_z
 
         dvl_msg.velocity_valid = True
 
@@ -83,23 +99,10 @@ class DvlConverterNode(Node):
             msg.header.stamp.sec * 1e6 + msg.header.stamp.nanosec / 1e3
         )
 
-        if self.override_covariance:
-            covariance = self.noise_sigma * self.noise_sigma
-            dvl_msg.covariance = [0.0] * 9
-            dvl_msg.covariance[0] = covariance
-            dvl_msg.covariance[4] = covariance
-            dvl_msg.covariance[8] = covariance
-        else:
-            dvl_msg.covariance = [0.0] * 9
-            dvl_msg.covariance[0] = msg.twist.covariance[0]
-            dvl_msg.covariance[1] = msg.twist.covariance[1]
-            dvl_msg.covariance[2] = msg.twist.covariance[2]
-            dvl_msg.covariance[3] = msg.twist.covariance[6]
-            dvl_msg.covariance[4] = msg.twist.covariance[7]
-            dvl_msg.covariance[5] = msg.twist.covariance[8]
-            dvl_msg.covariance[6] = msg.twist.covariance[12]
-            dvl_msg.covariance[7] = msg.twist.covariance[13]
-            dvl_msg.covariance[8] = msg.twist.covariance[14]
+        dvl_msg.covariance = [0.0] * 9
+        dvl_msg.covariance[0] = self.cov_val_h
+        dvl_msg.covariance[4] = self.cov_val_h
+        dvl_msg.covariance[8] = self.cov_val_v
 
         self.publisher.publish(dvl_msg)
 

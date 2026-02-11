@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
@@ -19,7 +20,9 @@ from nav_msgs.msg import Odometry
 
 class DepthConverterNode(Node):
     """
-    Converts depth data from HoloOcean to an odometry message.
+    Converts depth data from HoloOcean to odometry messages.
+
+    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -32,7 +35,6 @@ class DepthConverterNode(Node):
         self.declare_parameter("output_topic", "odometry/depth")
         self.declare_parameter("depth_frame", "depth_link")
         self.declare_parameter("map_frame", "map")
-        self.declare_parameter("override_covariance", True)
         self.declare_parameter("noise_sigma", 0.02)
 
         input_topic = (
@@ -46,9 +48,6 @@ class DepthConverterNode(Node):
         )
         self.map_frame = (
             self.get_parameter("map_frame").get_parameter_value().string_value
-        )
-        self.override_covariance = (
-            self.get_parameter("override_covariance").get_parameter_value().bool_value
         )
         self.noise_sigma = (
             self.get_parameter("noise_sigma").get_parameter_value().double_value
@@ -73,8 +72,10 @@ class DepthConverterNode(Node):
         msg.header.frame_id = self.map_frame
         msg.child_frame_id = self.depth_frame
 
-        if self.override_covariance:
-            msg.pose.covariance[14] = self.noise_sigma * self.noise_sigma
+        msg.pose.covariance[14] = self.noise_sigma * self.noise_sigma
+
+        # HoloOcean doesn't add noise, so we add it ourselves
+        msg.pose.pose.position.z += random.gauss(0, self.noise_sigma)
 
         self.publisher.publish(msg)
 

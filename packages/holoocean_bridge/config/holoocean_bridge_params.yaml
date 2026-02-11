@@ -4,9 +4,8 @@
       input_topic: "IMUSensor"
       output_topic: "imu/data_raw"
 
-      override_covariance: true
-      accel_noise_sigma: 0.0078 # [m/s^2] Standard deviation of accelerometer measurements.
-      gyro_noise_sigma: 0.0012 # [rad/s] Standard deviation of gyroscope measurements.
+      accel_noise_sigma: 0.0078 # [m/s^2] Accelerometer measurement noise sigmas.
+      gyro_noise_sigma: 0.0012 # [rad/s] Gyroscope measurement noise sigmas.
 
   gps_converter_node:
     ros__parameters:
@@ -17,33 +16,30 @@
       origin_longitude: -111.90721 # -111.74212
       origin_altitude: 1412.0
 
-      override_covariance: true
-      position_noise_sigma: 0.015 # [m] Standard deviation of GPS position measurements.
-      altitude_noise_sigma: 0.025 # [m] Standard deviation of GPS altitude measurements.
+      position_noise_sigma: 0.015 # [m] GPS position uncertainty sigmas.
+      altitude_noise_sigma: 0.025 # [m] GPS altitude uncertainty sigmas.
 
   depth_converter_node:
     ros__parameters:
       input_topic: "DepthSensor"
       output_topic: "odometry/depth"
 
-      override_covariance: true
-      noise_sigma: 0.02 # [m] Standard deviation of depth measurements.
+      noise_sigma: 0.02 # [m] Depth sensor Z-position uncertainty sigma.
 
   ahrs_converter_node:
     ros__parameters:
       input_topic: "RotationSensor"
       output_topic: "imu/ahrs"
 
-      yaw_noise_sigma: 0.01745 # [rad] Standard deviation of yaw measurements.
-      roll_pitch_noise_sigma: 0.00349 # [rad] Standard deviation of roll and pitch measurements.
+      yaw_noise_sigma: 0.01745 # [rad] AHRS sensor yaw uncertainty sigma.
+      roll_pitch_noise_sigma: 0.00349 # [rad] AHRS sensor roll and pitch uncertainty sigmas.
 
   dvl_converter_node:
     ros__parameters:
       input_topic: "DVLSensorVelocity"
       output_topic: "dvl/data"
 
-      override_covariance: true
-      noise_sigma: 0.02 # [m/s] Standard deviation of DVL body-frame velocity measurements.
+      noise_sigma: 0.02 # [m/s] DVL body-velocity uncertainty sigmas.
 
   truth_converter_node:
     ros__parameters:
@@ -76,8 +72,7 @@
       input_topic: "MagnetometerSensor"
       output_topic: "imu/mag"
 
-      override_covariance: true
-      noise_sigma: 0.003 # [normalized] Standard deviation of magnetometer measurements.
+      noise_sigma: 0.003 # [normalized] Magnetic field uncertainty sigmas.
 
   wrench_converter_node:
     ros__parameters:

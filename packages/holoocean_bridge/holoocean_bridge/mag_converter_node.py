@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import MagneticField
@@ -19,7 +20,9 @@ from sensor_msgs.msg import MagneticField
 
 class MagConverterNode(Node):
     """
-    Converts Magnetic data from HoloOcean to a standard MagneticField message.
+    Converts magnetometer data from HoloOcean to standard MagneticField messages.
+
+    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -31,7 +34,6 @@ class MagConverterNode(Node):
         self.declare_parameter("input_topic", "MagnetometerSensor")
         self.declare_parameter("output_topic", "imu/mag")
         self.declare_parameter("mag_frame", "imu_link")
-        self.declare_parameter("override_covariance", True)
         self.declare_parameter("noise_sigma", 0.003)
 
         input_topic = (
@@ -42,9 +44,6 @@ class MagConverterNode(Node):
         )
         self.mag_frame = (
             self.get_parameter("mag_frame").get_parameter_value().string_value
-        )
-        self.override_covariance = (
-            self.get_parameter("override_covariance").get_parameter_value().bool_value
         )
         self.noise_sigma = (
             self.get_parameter("noise_sigma").get_parameter_value().double_value
@@ -66,12 +65,17 @@ class MagConverterNode(Node):
         :param msg: MagneticField message.
         """
         msg.header.frame_id = self.mag_frame
-        if self.override_covariance:
-            variance = self.noise_sigma * self.noise_sigma
 
-            msg.magnetic_field_covariance[0] = variance
-            msg.magnetic_field_covariance[4] = variance
-            msg.magnetic_field_covariance[8] = variance
+        # HoloOcean doesn't add noise, so we add it ourselves
+        msg.magnetic_field.x += random.gauss(0, self.noise_sigma)
+        msg.magnetic_field.y += random.gauss(0, self.noise_sigma)
+        msg.magnetic_field.z += random.gauss(0, self.noise_sigma)
+
+        variance = self.noise_sigma * self.noise_sigma
+
+        msg.magnetic_field_covariance[0] = variance
+        msg.magnetic_field_covariance[4] = variance
+        msg.magnetic_field_covariance[8] = variance
 
         self.publisher.publish(msg)
 

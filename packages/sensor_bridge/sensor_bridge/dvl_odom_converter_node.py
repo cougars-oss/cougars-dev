@@ -25,7 +25,7 @@ from tf2_geometry_msgs import do_transform_pose
 
 class DvlOdomConverterNode(Node):
     """
-    Converts DVL dead-reckoned data to an odometry message.
+    Converts DVL dead-reckoned data to odometry messages.
 
     Optionally publishes the dvl_odom->base_link transform.
 
