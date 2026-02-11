@@ -1562,11 +1562,7 @@ void FactorGraphNode::optimizeGraph()
         inc_smoother_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
       if (params_.publish_diagnostics || params_.publish_graph_metrics) {
-        size_t active_factors = 0;
-        for (const auto & factor : inc_smoother_->getFactors()) {
-          if (factor) {active_factors++;}
-        }
-        total_factors_ = active_factors;
+        total_factors_ = inc_smoother_->getFactors().nrFactors();
         total_variables_ = inc_smoother_->getLinearizationPoint().size();
       }
 
@@ -1582,7 +1578,7 @@ void FactorGraphNode::optimizeGraph()
         isam_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
       if (params_.publish_diagnostics || params_.publish_graph_metrics) {
-        total_factors_ = isam_->getFactorsUnsafe().size();
+        total_factors_ = isam_->getFactorsUnsafe().nrFactors();
         total_variables_ = isam_->getLinearizationPoint().size();
       }
     }
