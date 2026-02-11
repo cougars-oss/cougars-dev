@@ -6,6 +6,7 @@
     publish_velocity: true # Publish the estimated velocity (at the DVL frame in the map frame).
     publish_imu_bias: true # Publish the estimated IMU biases (accel + gyro).
     publish_diagnostics: true # Publish diagnostic information.
+    publish_graph_metrics: true # Publish high-frequency timing and graph metadata.
 
     # These are computationally expensive to calculate, so disable if not needed.
     publish_pose_cov: true # Publish the pose covariance along with the pose.
@@ -38,6 +39,7 @@
     # Topic for the IMU bias. Published as a TwistWithCovarianceStamped,
     # where 'linear' holds accelerometer bias and 'angular' holds gyroscope bias.
     imu_bias_topic: "~/imu_bias"
+    graph_metrics_topic: "~/metrics"
 
     # --- Factor Settings ---
     #

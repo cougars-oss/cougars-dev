@@ -24,6 +24,9 @@ factor_graph_node:
   publish_diagnostics:
     type: bool
     default_value: false
+  publish_graph_metrics:
+    type: bool
+    default_value: false
 
   # --- GTSAM Settings ---
   solver_type:
@@ -70,6 +73,9 @@ factor_graph_node:
   smoothed_path_topic:
     type: string
     default_value: "smoothed_path"
+  graph_metrics_topic:
+    type: string
+    default_value: "~/metrics"
   velocity_topic:
     type: string
     default_value: "~/velocity"

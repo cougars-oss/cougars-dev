@@ -83,6 +83,8 @@ void FactorGraphNode::setupRosInterfaces()
     create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(params_.velocity_topic, 10);
   imu_bias_pub_ =
     create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(params_.imu_bias_topic, 10);
+  graph_metrics_pub_ =
+    create_publisher<coug_fgo::msg::GraphMetrics>(params_.graph_metrics_topic, 10);
 
   // --- ROS Callback Groups ---
   sensor_cb_group_ = create_callback_group(rclcpp::CallbackGroupType::Reentrant);
@@ -1373,6 +1375,22 @@ void FactorGraphNode::publishImuBias(
   imu_bias_pub_->publish(imu_bias_msg);
 }
 
+void FactorGraphNode::publishGraphMetrics(const rclcpp::Time & timestamp)
+{
+  coug_fgo::msg::GraphMetrics metrics_msg;
+  metrics_msg.header.stamp = timestamp;
+
+  metrics_msg.opt_duration = last_opt_duration_.load();
+  metrics_msg.prep_duration = last_prep_duration_.load();
+  metrics_msg.update_duration = last_update_duration_.load();
+  metrics_msg.cov_duration = last_cov_duration_.load();
+  metrics_msg.new_factors = static_cast<uint32_t>(new_factors_.load());
+  metrics_msg.total_factors = static_cast<uint32_t>(total_factors_.load());
+  metrics_msg.total_variables = static_cast<uint32_t>(total_variables_.load());
+
+  graph_metrics_pub_->publish(metrics_msg);
+}
+
 void FactorGraphNode::optimizeGraph()
 {
   // --- Handle Processing Overflow ---
@@ -1543,8 +1561,12 @@ void FactorGraphNode::optimizeGraph()
       prev_imu_bias_ =
         inc_smoother_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
-      if (params_.publish_diagnostics) {
-        total_factors_ = inc_smoother_->getFactors().size();
+      if (params_.publish_diagnostics || params_.publish_graph_metrics) {
+        size_t active_factors = 0;
+        for (const auto & factor : inc_smoother_->getFactors()) {
+          if (factor) {active_factors++;}
+        }
+        total_factors_ = active_factors;
         total_variables_ = inc_smoother_->getLinearizationPoint().size();
       }
 
@@ -1559,7 +1581,7 @@ void FactorGraphNode::optimizeGraph()
       prev_imu_bias_ =
         isam_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
-      if (params_.publish_diagnostics) {
+      if (params_.publish_diagnostics || params_.publish_graph_metrics) {
         total_factors_ = isam_->getFactorsUnsafe().size();
         total_variables_ = isam_->getLinearizationPoint().size();
       }
@@ -1634,6 +1656,11 @@ void FactorGraphNode::optimizeGraph()
     // --- Publish IMU Bias ---
     if (params_.publish_imu_bias) {
       publishImuBias(prev_imu_bias_, bias_cov, target_stamp);
+    }
+
+    // --- Publish Graph Metrics ---
+    if (params_.publish_graph_metrics) {
+      publishGraphMetrics(target_stamp);
     }
 
     prev_time_ = target_time;
