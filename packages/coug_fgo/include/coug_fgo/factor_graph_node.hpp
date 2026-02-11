@@ -319,8 +319,9 @@ protected:
   double prev_time_ = 0.0;
 
   std::atomic<double> last_opt_duration_{0.0};
-  std::atomic<double> total_opt_duration_{0.0};
-  std::atomic<size_t> opt_count_{0};
+  std::atomic<double> last_prep_duration_{0.0};
+  std::atomic<double> last_update_duration_{0.0};
+  std::atomic<double> last_cov_duration_{0.0};
   std::atomic<bool> processing_overflow_{false};
   std::map<rclcpp::Time, gtsam::Key> time_to_key_;
 

@@ -27,6 +27,8 @@
 #include <gtsam/slam/PriorFactor.h>
 
 #include <algorithm>
+#include <chrono>
+
 #include <rclcpp_components/register_node_macro.hpp>
 
 #include "coug_fgo/factors/depth_factor.hpp"
@@ -1375,7 +1377,7 @@ void FactorGraphNode::optimizeGraph()
   std::unique_lock<std::mutex> opt_lock(optimization_mutex_, std::try_to_lock);
   if (!opt_lock.owns_lock()) {return;}
 
-  double opt_start = this->get_clock()->now().seconds();
+  auto opt_start = std::chrono::high_resolution_clock::now();
   rclcpp::Time target_stamp;
   bool should_abort = false;
 
@@ -1524,23 +1526,27 @@ void FactorGraphNode::optimizeGraph()
   new_timestamps[B(current_step_)] = target_time;
 
   try {
-    gtsam::Matrix new_pose_cov;
+    auto prep_end = std::chrono::high_resolution_clock::now();
+    last_prep_duration_ = std::chrono::duration<double>(prep_end - opt_start).count();
+
     if (inc_smoother_) {
+      auto update_start = std::chrono::high_resolution_clock::now();
       inc_smoother_->update(new_graph, new_values, new_timestamps);
+      auto update_end = std::chrono::high_resolution_clock::now();
+      last_update_duration_ = std::chrono::duration<double>(update_end - update_start).count();
+
       prev_pose_ = inc_smoother_->calculateEstimate<gtsam::Pose3>(X(current_step_));
-      new_pose_cov = params_.publish_pose_cov ?
-        inc_smoother_->marginalCovariance(X(current_step_)) :
-        gtsam::Matrix::Identity(6, 6) * -1.0;
       prev_vel_ = inc_smoother_->calculateEstimate<gtsam::Vector3>(V(current_step_));
       prev_imu_bias_ =
         inc_smoother_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
 
     } else if (isam_) {
+      auto update_start = std::chrono::high_resolution_clock::now();
       isam_->update(new_graph, new_values);
+      auto update_end = std::chrono::high_resolution_clock::now();
+      last_update_duration_ = std::chrono::duration<double>(update_end - update_start).count();
+
       prev_pose_ = isam_->calculateEstimate<gtsam::Pose3>(X(current_step_));
-      new_pose_cov = params_.publish_pose_cov ?
-        isam_->marginalCovariance(X(current_step_)) :
-        gtsam::Matrix::Identity(6, 6) * -1.0;
       prev_vel_ = isam_->calculateEstimate<gtsam::Vector3>(V(current_step_));
       prev_imu_bias_ =
         isam_->calculateEstimate<gtsam::imuBias::ConstantBias>(B(current_step_));
@@ -1557,6 +1563,38 @@ void FactorGraphNode::optimizeGraph()
           rclcpp::Duration::from_seconds(params_.smoother_lag)));
     }
 
+    // --- Calculate Covariances ---
+    auto cov_start = std::chrono::high_resolution_clock::now();
+    gtsam::Matrix new_pose_cov = gtsam::Matrix::Identity(6, 6) * -1.0;
+    if (params_.publish_pose_cov) {
+      if (inc_smoother_) {
+        new_pose_cov = inc_smoother_->marginalCovariance(X(current_step_));
+      } else if (isam_) {
+        new_pose_cov = isam_->marginalCovariance(X(current_step_));
+      }
+    }
+
+    gtsam::Matrix vel_cov = gtsam::Matrix::Identity(3, 3) * -1.0;
+    if (params_.publish_velocity && params_.publish_velocity_cov) {
+      if (inc_smoother_) {
+        vel_cov = inc_smoother_->marginalCovariance(V(current_step_));
+      } else if (isam_) {
+        vel_cov = isam_->marginalCovariance(V(current_step_));
+      }
+    }
+
+    gtsam::Matrix bias_cov = gtsam::Matrix::Identity(6, 6) * -1.0;
+    if (params_.publish_imu_bias && params_.publish_imu_bias_cov) {
+      if (inc_smoother_) {
+        bias_cov = inc_smoother_->marginalCovariance(B(current_step_));
+      } else if (isam_) {
+        bias_cov = isam_->marginalCovariance(B(current_step_));
+      }
+    }
+    auto opt_end = std::chrono::high_resolution_clock::now();
+    last_cov_duration_ = std::chrono::duration<double>(opt_end - cov_start).count();
+    last_opt_duration_ = std::chrono::duration<double>(opt_end - opt_start).count();
+
     // --- Publish Global Odometry ---
     gtsam::Pose3 T_base_dvl = toGtsam(dvl_to_base_tf_.transform);
     publishGlobalOdom(prev_pose_ * T_base_dvl.inverse(), new_pose_cov, target_stamp);
@@ -1566,6 +1604,7 @@ void FactorGraphNode::optimizeGraph()
       broadcastGlobalTf(prev_pose_ * T_base_dvl.inverse(), target_stamp);
     }
 
+    // --- Publish Smoothed Path ---
     if (params_.publish_smoothed_path) {
       if (inc_smoother_) {
         publishSmoothedPath(inc_smoother_->calculateEstimate(), target_stamp);
@@ -1576,36 +1615,17 @@ void FactorGraphNode::optimizeGraph()
 
     // --- Publish Velocity ---
     if (params_.publish_velocity) {
-      gtsam::Matrix vel_cov;
-      if (inc_smoother_) {
-        vel_cov = inc_smoother_->marginalCovariance(V(current_step_));
-      } else if (isam_) {
-        vel_cov = isam_->marginalCovariance(V(current_step_));
-      }
       publishVelocity(prev_vel_, vel_cov, target_stamp);
     }
 
     // --- Publish IMU Bias ---
     if (params_.publish_imu_bias) {
-      gtsam::Matrix bias_cov;
-      if (inc_smoother_) {
-        bias_cov = inc_smoother_->marginalCovariance(B(current_step_));
-      } else if (isam_) {
-        bias_cov = isam_->marginalCovariance(B(current_step_));
-      }
       publishImuBias(prev_imu_bias_, bias_cov, target_stamp);
     }
 
     prev_time_ = target_time;
     prev_step_ = current_step_;
     current_step_++;
-
-    double opt_end = this->get_clock()->now().seconds();
-    double duration = opt_end - opt_start;
-    last_opt_duration_ = duration;
-    double current_total = total_opt_duration_.load();
-    total_opt_duration_.store(current_total + duration);
-    opt_count_++;
   } catch (const std::exception & e) {
     RCLCPP_FATAL(get_logger(), "%s", e.what());
     rclcpp::shutdown();
@@ -1684,13 +1704,9 @@ void FactorGraphNode::checkProcessingOverflow(diagnostic_updater::DiagnosticStat
     stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "No processing overflow detected.");
   }
   stat.add("Optimization Duration (s)", last_opt_duration_.load());
-  double total_duration = total_opt_duration_.load();
-  size_t count = opt_count_.load();
-  if (count > 0) {
-    stat.add("Avg Optimization Duration (s)", total_duration / static_cast<double>(count));
-  } else {
-    stat.add("Avg Optimization Duration (s)", 0.0);
-  }
+  stat.add("Data Prep Duration (s)", last_prep_duration_.load());
+  stat.add("Update Duration (s)", last_update_duration_.load());
+  stat.add("Covariance Duration (s)", last_cov_duration_.load());
 }
 
 }  // namespace coug_fgo

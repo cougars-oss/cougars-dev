@@ -1,7 +1,7 @@
 #!/bin/bash
 # Created by Nelson Durrant, Jan 2026
 #
-# Generates APE/RPE benchmark metrics for FGO evaluation
+# Generates APE/RPE metrics for FGO evaluation
 #
 # Usage:
 #   ./evo_eval.sh <bag_name> [evo_args...]
