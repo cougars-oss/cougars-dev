@@ -1,7 +1,7 @@
 #!/bin/bash
 # Created by Nelson Durrant, Jan 2026
 #
-# Drives the BlueROV2 using the keyboard
+# Drives the BlueROV2 in HoloOcean using the keyboard
 
 script_dir="$(dirname "$(readlink -f "$0")")"
 source "$script_dir/utils/common.sh"
