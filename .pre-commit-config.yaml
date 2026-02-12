@@ -1,5 +1,4 @@
 repos:
-  # --- Standard Checks ---
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -11,76 +10,26 @@ repos:
       - id: check-added-large-files
         args: ['--maxkb=10000']
 
-  # --- Python Auto-Format ---
   - repo: https://github.com/psf/black
     rev: 26.1.0
     hooks:
       - id: black
 
-  - repo: local
+  - repo: https://github.com/snelsondurrant/coug-hooks
+    rev: 38b761a58f17a436b0e00792eb33485e51e43e61
     hooks:
-      # --- C++ Auto-Format ---
       - id: ament_uncrustify
-        name: ament_uncrustify
-        entry: scripts/utils/run_precommit_hook.sh ament_uncrustify
-        args: ["--reformat"]
-        language: system
         files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
-
-      # --- C++ Linting ---
       - id: ament_cpplint
-        name: ament_cpplint
-        entry: scripts/utils/run_precommit_hook.sh ament_cpplint
-        language: system
         files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
-
       # - id: ament_cppcheck
-      #   name: ament_cppcheck
-      #   entry: scripts/utils/run_precommit_hook.sh ament_cppcheck
-      #   language: system
       #   files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
-
-      # --- Python Linting ---
       - id: ament_flake8
-        name: ament_flake8
-        entry: scripts/utils/run_precommit_hook.sh ament_flake8
-        language: system
         files: ^packages/.*\.py$
-        exclude: /setup\.py$
-
       - id: ament_pep257
-        name: ament_pep257
-        entry: scripts/utils/run_precommit_hook.sh ament_pep257
-        language: system
         files: ^packages/.*\.py$
-        exclude: /setup\.py$
-
-      # --- CMake & XML Linting ---
       - id: ament_lint_cmake
-        name: ament_lint_cmake
-        entry: scripts/utils/run_precommit_hook.sh ament_lint_cmake
-        language: system
-        files: CMakeLists\.txt$
-
       - id: ament_xmllint
-        name: ament_xmllint
-        entry: scripts/utils/run_precommit_hook.sh ament_xmllint
-        language: system
         files: ^packages/.*\.xml$
-
-      # --- Copyright Check ---
       - id: ament_copyright
-        name: ament_copyright
-        entry: scripts/utils/run_precommit_hook.sh ament_copyright
-        language: system
         files: ^packages/
-        exclude: |
-            (?x)^(
-                .*\.json|
-                .*\.yaml|
-                .*\.yml|
-                .*\.xml|
-                .*\.repos|
-                .*\.txt|
-                .*/setup\.py
-            )$
