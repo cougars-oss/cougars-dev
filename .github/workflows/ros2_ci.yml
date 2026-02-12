@@ -46,8 +46,6 @@ jobs:
           echo "Trigger: ${{ github.event.client_payload.repo }}"
           echo "Trigger SHA: ${{ github.event.client_payload.sha }}"
       - uses: actions/checkout@v4
-        with:
-          path: packages
       - uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/coug_ws/.ccache
