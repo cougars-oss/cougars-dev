@@ -1,7 +1,7 @@
 repositories:
   coug_fgo:
     type: git
-    url: git@github.com:snelsondurrant/coug_fgo.git
+    url: https://github.com/snelsondurrant/coug_fgo.git
     version: main
   holoocean_interfaces:
     type: zip
