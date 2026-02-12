@@ -109,6 +109,6 @@ jobs:
           push: true
           tags: snelsondurrant/cougars:latest
           build-args: |
-            VCS_VERSION=${{ github.event.client_payload.sha || github.sha }}
+            CACHE_VERSION=${{ github.event.client_payload.sha || github.sha }}
           cache-from: type=registry,ref=snelsondurrant/cougars:buildcache-latest
           cache-to: type=registry,ref=snelsondurrant/cougars:buildcache-latest,mode=max
