@@ -78,7 +78,7 @@ RUN echo "" >> /home/frostlab-docker/.bashrc \
     && echo "# Source ROS 2 environment" >> /home/frostlab-docker/.bashrc \
     && echo "source /opt/ros/humble/setup.bash" >> /home/frostlab-docker/.bashrc \
     && echo "[ -f /home/frostlab-docker/coug_ws/install/setup.bash ] \
-        && source /home/frostlab-docker/coug_ws/install/setup.bash" >> /home/frostlab-docker/.bashrc \
+    && source /home/frostlab-docker/coug_ws/install/setup.bash" >> /home/frostlab-docker/.bashrc \
     && echo "" >> /home/frostlab-docker/.bashrc \
     && echo "# Script tab completions" >> /home/frostlab-docker/.bashrc \
     && echo "[ -f /completions.sh ] && source /completions.sh" >> /home/frostlab-docker/.bashrc \
