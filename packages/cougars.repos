@@ -1,4 +1,8 @@
 repositories:
+  coug_fgo:
+    type: git
+    url: git@github.com:snelsondurrant/coug_fgo.git
+    version: main
   holoocean_interfaces:
     type: zip
     url: https://github.com/byu-holoocean/holoocean-ros/archive/refs/heads/main.zip

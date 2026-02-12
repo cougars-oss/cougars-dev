@@ -27,11 +27,11 @@ services:
     volumes:
       - ../config:/home/ue4/config
       - ./entrypoint.sh:/entrypoint.sh
-      - /dev:/dev:rw
-      - /etc/udev:/etc/udev:rw
-      - /dev/shm:/dev/shm
-      - /etc/localtime:/etc/localtime:ro
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/udev:/etc/udev
+      - /dev/shm:/dev/shm
+      - /dev:/dev
     stdin_open: true
     tty: true
     restart: always

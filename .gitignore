@@ -10,7 +10,14 @@
 bags/*
 !bags/.gitkeep
 packages/*
-!packages/coug_*
+!packages/coug_bringup
+!packages/coug_description
+!packages/coug_localization
+!packages/coug_mapviz
+!packages/coug_navigation
+!packages/coug_plotjuggler
+!packages/coug_rqt
+!packages/coug_rviz
 !packages/holoocean_bridge
 !packages/sensor_bridge
 !packages/cougars.repos
