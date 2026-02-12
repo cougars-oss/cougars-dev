@@ -36,6 +36,11 @@ jobs:
       gtsam: ${{ steps.filter.outputs.gtsam == 'true' && github.event_name != 'repository_dispatch' }}
       cougars: ${{ steps.filter.outputs.cougars == 'true' || github.event_name == 'repository_dispatch' }}
     steps:
+      - name: Display trigger info
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "Triggered by sub-repo: ${{ github.event.client_payload.repo }}"
+          echo "Sub-repo SHA: ${{ github.event.client_payload.sha }}"
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
