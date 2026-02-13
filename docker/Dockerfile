@@ -67,7 +67,8 @@ RUN --mount=type=ssh \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     --mount=type=cache,target=/home/frostlab-docker/.ros/rosdep,uid=1000,gid=1000 \
-    export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" \
+    mkdir -p /etc/ssh && ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts \
+    && export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" \
     && vcs import . < cougars.repos \
     && vcs custom --git --args submodule update --init --recursive \
     && chown -R frostlab-docker:frostlab-docker . \
