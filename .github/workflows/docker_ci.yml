@@ -75,7 +75,8 @@ jobs:
         run: |
           if [ -f docker/.env ]; then
             grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT" || true
-            cat docker/.env
+            echo "Loaded environment variables:"
+            grep -v '^#' docker/.env | grep -v '^\s*$'
           fi
       - uses: docker/build-push-action@v6
         with:
@@ -114,7 +115,8 @@ jobs:
         run: |
           if [ -f docker/.env ]; then
             grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT" || true
-            cat docker/.env
+            echo "Loaded environment variables:"
+            grep -v '^#' docker/.env | grep -v '^\s*$'
           fi
       - uses: docker/build-push-action@v6
         with:
