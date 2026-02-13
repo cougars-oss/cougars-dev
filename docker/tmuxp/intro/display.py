@@ -32,7 +32,7 @@ class Background(Effect):
 
 def display(screen):
     """
-    Displays a spinning gif of a wave and the text "COUGARS" in ASCII art.
+    Displays ASCII art screen on startup.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Feb 2026
