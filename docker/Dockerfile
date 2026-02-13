@@ -25,6 +25,9 @@ FROM snelsondurrant/cougars:gtsam
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
+ARG DOCKER_USER=frostlab-docker
+ENV DOCKER_USER=$DOCKER_USER
+
 # Used to skip building architecture-incompatible packages
 ENV ROS_BUILD_ARCH=$TARGETARCH
 ENV RCUTILS_COLORIZED_OUTPUT=1

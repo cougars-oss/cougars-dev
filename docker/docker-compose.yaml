@@ -39,6 +39,8 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+      args:
+        - DOCKER_USER=${DOCKER_USER}
       ssh:
         - default
     container_name: cougars-ct

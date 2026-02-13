@@ -24,6 +24,7 @@ on:
       - "docker/entrypoint.sh"
       - "docker/completions.sh"
       - "docker/.tmux.conf"
+      - "docker/.env"
       - "packages/cougars.repos"
       - "packages/**/package.xml"
   repository_dispatch:
@@ -49,8 +50,8 @@ jobs:
             gtsam:
               - '.github/workflows/docker_ci.yml'
               - 'docker/gtsam/Dockerfile'
+              - 'docker/.env'
             cougars:
-              - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile'
               - 'docker/entrypoint.sh'
               - 'docker/completions.sh'
@@ -74,7 +75,7 @@ jobs:
         shell: bash
         run: |
           if [ -f docker/.env ]; then
-            grep -v '^#' docker/.env | grep -v '^\s*$' | xargs -d '\n' echo >> "$GITHUB_OUTPUT"
+            grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT"
           fi
       - uses: docker/build-push-action@v6
         with:
@@ -109,6 +110,12 @@ jobs:
         with:
           username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
+      - id: dotenv
+        shell: bash
+        run: |
+          if [ -f docker/.env ]; then
+            grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT"
+          fi
       - uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}"
@@ -119,6 +126,7 @@ jobs:
           ssh: |
             default=${{ env.SSH_AUTH_SOCK }}
           build-args: |
+            DOCKER_USER=${{ steps.dotenv.outputs.DOCKER_USER }}
             TRIGGER_REPO=${{ github.event.client_payload.repo || '' }}
             CACHE_BUST=${{ github.run_id }}
           cache-from: |
