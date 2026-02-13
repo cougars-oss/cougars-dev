@@ -41,6 +41,11 @@ runs:
         ssh-private-key: ${{ inputs.ssh-key }}
     - shell: bash
       run: |
+        if [ -n "${{ inputs.ssh-key }}" ]; then
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+        fi
+
         apt update && apt install -y ccache
         mkdir -p coug_ws/src
 
