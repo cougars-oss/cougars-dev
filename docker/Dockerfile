@@ -62,20 +62,21 @@ WORKDIR /home/frostlab-docker/coug_ws/src
 COPY --from=cacher --chown=frostlab-docker:frostlab-docker /tmp/packages .
 
 # Install custom ROS package dependencies (rosdep)
-USER frostlab-docker
 ARG CACHE_VERSION=unknown
 RUN --mount=type=ssh \
-    mkdir -p ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts \
+    export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" \
     && echo "CACHE_VERSION: $CACHE_VERSION" \
-    && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" vcs import . < cougars.repos \
-    && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" vcs custom --git --args submodule update --init --recursive \
-    && rosdep update \
-    && sudo apt update \
-    && rosdep install --from-paths . --ignore-src -y \
-    && sudo rm -rf /var/lib/apt/lists/* \
-    && sudo rm -rf ./*
+    && vcs import . < cougars.repos \
+    && vcs custom --git --args submodule update --init --recursive \
+    && chown -R frostlab-docker:frostlab-docker . \
+    && gosu frostlab-docker rosdep update \
+    && apt update \
+    && gosu frostlab-docker rosdep install --from-paths . --ignore-src -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf ./*
 
 # Configure bash environment
+USER frostlab-docker
 RUN echo "" >> /home/frostlab-docker/.bashrc \
     && echo "# Source ROS 2 environment" >> /home/frostlab-docker/.bashrc \
     && echo "source /opt/ros/humble/setup.bash" >> /home/frostlab-docker/.bashrc \
