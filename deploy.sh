@@ -13,7 +13,6 @@
 set -e
 
 DOCKER_USER=frostlab-docker
-
 script_dir="$(dirname "$(readlink -f "$0")")"
 source "$script_dir/scripts/utils/common.sh"
 
