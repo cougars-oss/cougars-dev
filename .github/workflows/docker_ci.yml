@@ -72,10 +72,10 @@ jobs:
           username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - id: dotenv
-        shell: bash
         run: |
           if [ -f docker/.env ]; then
-            grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT"
+            grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT" || true
+            cat docker/.env
           fi
       - uses: docker/build-push-action@v6
         with:
@@ -111,10 +111,10 @@ jobs:
           username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - id: dotenv
-        shell: bash
         run: |
           if [ -f docker/.env ]; then
-            grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT"
+            grep -v '^#' docker/.env | grep -v '^\s*$' >> "$GITHUB_OUTPUT" || true
+            cat docker/.env
           fi
       - uses: docker/build-push-action@v6
         with:
