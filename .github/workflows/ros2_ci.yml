@@ -57,6 +57,7 @@ jobs:
           packages-path: 'packages'
           trigger-repo: ${{ github.event.client_payload.repo }}
           trigger-sha: ${{ github.event.client_payload.sha }}
+          ssh-key: ${{ secrets.SSH_KEY }}
       - uses: ./.github/actions/build-test-ros2
         with:
           packages-path: 'packages'
