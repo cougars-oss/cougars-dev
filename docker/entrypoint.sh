@@ -7,8 +7,8 @@
 
 set -e
 
-# GitHub Actions
-if [ "$CI" = "true" ]; then
+# Skip GitHub Actions
+if [ "$CI" = "true" ] || [ "$GITHUB_ACTIONS" = "true" ]; then
     exec "$@"
 fi
 
