@@ -30,6 +30,12 @@ find "/home/$DOCKER_USER" \
     -not -user "$DOCKER_USER" \
     -exec chown -R $DOCKER_USER:$DOCKER_USER {} + 2>/dev/null || true
 
+# Set up SSH (host keys)
+if [ -d "/home/$DOCKER_USER/.ssh" ]; then
+    cat /home/$DOCKER_USER/.ssh/*.pub >> /home/$DOCKER_USER/.ssh_internal/authorized_keys 2>/dev/null || true
+    sort -u /home/$DOCKER_USER/.ssh_internal/authorized_keys -o /home/$DOCKER_USER/.ssh_internal/authorized_keys
+fi
+
 # Install external ROS packages (vcs)
 git config --system --add safe.directory "*"
 if curl -s --head https://github.com | grep "200" > /dev/null; then

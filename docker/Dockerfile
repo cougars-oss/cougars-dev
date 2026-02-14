@@ -52,7 +52,7 @@ RUN useradd -ms /bin/bash "$DOCKER_USER" \
     && mkdir -p /home/$DOCKER_USER/ros2_ws/src \
     && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER
 
-# Set up SSH
+# Set up SSH (internal keys)
 RUN mkdir -p /var/run/sshd && ssh-keygen -A \
     && echo "Port 2222" >> /etc/ssh/sshd_config \
     && echo "StrictModes no" >> /etc/ssh/sshd_config \
