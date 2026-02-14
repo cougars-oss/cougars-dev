@@ -56,6 +56,9 @@ RUN useradd -ms /bin/bash "$DOCKER_USER" \
 RUN mkdir -p /var/run/sshd \
     && ssh-keygen -A \
     && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
+    && sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config \
+    && echo "StrictModes no" >> /etc/ssh/sshd_config \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config
 
 # Install Python dependencies
