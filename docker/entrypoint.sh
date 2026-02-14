@@ -7,6 +7,10 @@
 
 set -e
 
+if [ "$CI" == "true" ]; then
+    exec "$@"
+fi
+
 # Fix permissions
 DOCKER_USER=${DOCKER_USER}
 target_uid=$(stat -c '%u' /home/$DOCKER_USER/ros2_ws/src)

@@ -53,6 +53,7 @@ jobs:
           UPSTREAM_WORKSPACE: packages/cougars.repos
           TARGET_WORKSPACE: packages
           CCACHE_DIR: ${{ github.workspace }}/.ccache
+          DOCKER_RUN_OPTS: "-e CI=true"
           AFTER_SETUP_UPSTREAM_WORKSPACE: |
             git config --global --add safe.directory "*"
             vcs custom --git --args submodule update --init --recursive

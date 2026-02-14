@@ -50,23 +50,23 @@ case $target in
         ;;
     *)
         if ! docker exec --user frostlab-docker cougars-ct \
-            ssh -p 2222 -o StrictHostKeyChecking=no -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
+            ssh -p 2222 -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
             frostlab-docker@"$target" "tmux has-session -t coug_auv" 2>/dev/null; then
 
             print_warning "Creating a new 'coug_auv' tmux session on $target..."
             docker exec --user frostlab-docker cougars-ct \
-                ssh -p 2222 -o StrictHostKeyChecking=no -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
+                ssh -p 2222 -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
                 frostlab-docker@"$target" "/home/frostlab-docker/.local/bin/tmuxp load -d coug_auv"
         fi
 
         print_info "Attaching to the 'coug_auv' tmux session on $target..."
         docker exec -it --user frostlab-docker cougars-ct \
-            mosh --ssh="ssh -p 2222 -o StrictHostKeyChecking=no -i /home/frostlab-docker/.ssh_internal/id_ed25519" \
+            mosh --ssh="ssh -p 2222 -i /home/frostlab-docker/.ssh_internal/id_ed25519" \
             frostlab-docker@"$target" -- tmux attach -t coug_auv
 
         print_info "Cleaning up 'coug_auv' on $target..."
         docker exec --user frostlab-docker cougars-ct \
-            ssh -p 2222 -o StrictHostKeyChecking=no -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
+            ssh -p 2222 -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
             frostlab-docker@"$target" "tmux kill-session -t coug_auv"
         ;;
 esac
