@@ -37,26 +37,22 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-      ssh:
-        - default
     container_name: cougars-ct
     user: root
     network_mode: host
-    # privileged: true
     environment:
       - DISPLAY=$DISPLAY
       - QT_X11_NO_MITSHM=1
-      - SSH_AUTH_SOCK=/ssh_agent
     volumes:
       - ../bags:/home/frostlab-docker/bags
       - ../config:/home/frostlab-docker/config
       - ../packages:/home/frostlab-docker/ros2_ws/src
       - ../scripts:/home/frostlab-docker/scripts
-      - ./tmuxp:/home/frostlab-docker/.tmuxp
+      - ../tmuxp:/home/frostlab-docker/.tmuxp
       - ./.tmux.conf:/home/frostlab-docker/.tmux.conf
       - ./entrypoint.sh:/entrypoint.sh
       - ./completions.sh:/completions.sh
-      - ${SSH_AUTH_SOCK}:/ssh_agent
+      - ~/.ssh:/home/frostlab-docker/.ssh
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
       - /etc/udev:/etc/udev

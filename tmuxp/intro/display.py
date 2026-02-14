@@ -32,7 +32,7 @@ class Background(Effect):
 
 def display(screen):
     """
-    Displays ASCII art screen on startup.
+    Displays an ASCII art display on startup.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Feb 2026

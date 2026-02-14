@@ -6,4 +6,5 @@ windows:
     layout: main-vertical
     panes:
       - shell_command:
+          # This all has to be on one line for the display to work
           - python3 ~/.tmuxp/intro/display.py && clear && cat ~/.tmuxp/intro/tips.txt

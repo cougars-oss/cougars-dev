@@ -8,7 +8,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
 ## 🚀 Get Started
 
-> **Prerequisites:** Several gigabytes of storage, 64-bit Linux or Windows, and a competent NVIDIA GPU.
+> **Prerequisites:** Several gigabytes of storage, 64-bit Linux or Windows, and a competent NVIDIA GPU (for HoloOcean simulation).
 
 - Install Docker and set up the Linux development environment.
 
