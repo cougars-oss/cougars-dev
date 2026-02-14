@@ -69,6 +69,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: snelsondurrant/cougars:gtsam-${{ matrix.arch }}
+          provenance: false
           cache-from: |
             type=gha
             type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }}
@@ -85,14 +86,17 @@ jobs:
           username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker manifest create --amend snelsondurrant/cougars:gtsam \
+          docker buildx imagetools create -t snelsondurrant/cougars:gtsam \
             snelsondurrant/cougars:gtsam-amd64 \
             snelsondurrant/cougars:gtsam-arm64
-          docker manifest push snelsondurrant/cougars:gtsam
 
   build-cougars:
-    needs: build-gtsam
-    if: always() && !cancelled() && !contains(needs.build-gtsam.result, 'failure')
+    needs: [build-gtsam, manifest-gtsam]
+    if: |
+      always() && 
+      !cancelled() && 
+      !contains(needs.build-gtsam.result, 'failure') && 
+      !contains(needs.manifest-gtsam.result, 'failure')
     strategy:
       matrix:
         include:
@@ -122,6 +126,7 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: snelsondurrant/cougars:latest-${{ matrix.arch }}
+          provenance: false
           cache-from: |
             type=gha
             type=registry,ref=snelsondurrant/cougars:buildcache-latest-${{ matrix.arch }}
@@ -138,7 +143,6 @@ jobs:
           username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker manifest create --amend snelsondurrant/cougars:latest \
+          docker buildx imagetools create -t snelsondurrant/cougars:latest \
             snelsondurrant/cougars:latest-amd64 \
             snelsondurrant/cougars:latest-arm64
-          docker manifest push snelsondurrant/cougars:latest

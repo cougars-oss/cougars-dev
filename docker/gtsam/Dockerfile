@@ -39,14 +39,14 @@ RUN --mount=type=cache,target=/root/.ccache \
     ccache -z \
     && git clone --depth 1 --branch 4.2.0 https://github.com/borglab/gtsam.git \
     && cmake -B gtsam/build -S gtsam \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
-      -DGTSAM_BUILD_UNSTABLE=ON \
-      -DGTSAM_BUILD_TESTS=OFF \
-      -DGTSAM_BUILD_EXAMPLES_ALWAYS=OFF \
-      -DGTSAM_WITH_TBB=ON \
-      -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-      -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
+    -DGTSAM_BUILD_UNSTABLE=ON \
+    -DGTSAM_BUILD_TESTS=OFF \
+    -DGTSAM_BUILD_EXAMPLES_ALWAYS=OFF \
+    -DGTSAM_WITH_TBB=ON \
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     && make -C gtsam/build -j$(nproc) \
     && sudo make -C gtsam/build install \
     && sudo ldconfig \
