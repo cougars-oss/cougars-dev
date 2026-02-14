@@ -42,6 +42,11 @@ case $target in
 
         print_info "Attaching to '$session'..."
         docker exec -it --user frostlab-docker cougars-ct tmux attach -t "$session"
+
+        if [[ "$target" == "base" ]]; then
+            print_info "Cleaning up '$session'..."
+            docker exec --user frostlab-docker cougars-ct tmux kill-session -t "$session"
+        fi
         ;;
     *)
         if ! docker exec --user frostlab-docker cougars-ct \
@@ -58,5 +63,10 @@ case $target in
         docker exec -it --user frostlab-docker cougars-ct \
             mosh --ssh="ssh -p 2222 -o StrictHostKeyChecking=no -i /home/frostlab-docker/.ssh_internal/id_ed25519" \
             frostlab-docker@"$target" -- tmux attach -t coug_auv
+
+        print_info "Cleaning up 'coug_auv' on $target..."
+        docker exec --user frostlab-docker cougars-ct \
+            ssh -p 2222 -o StrictHostKeyChecking=no -i /home/frostlab-docker/.ssh_internal/id_ed25519 \
+            frostlab-docker@"$target" "tmux kill-session -t coug_auv"
         ;;
 esac
