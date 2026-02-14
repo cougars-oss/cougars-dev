@@ -60,6 +60,7 @@ RUN mkdir -p /var/run/sshd && ssh-keygen -A \
     && mkdir -p /home/$DOCKER_USER/.ssh_internal \
     && ssh-keygen -t ed25519 -f /home/$DOCKER_USER/.ssh_internal/id_ed25519 -N "" \
     && cp /home/$DOCKER_USER/.ssh_internal/id_ed25519.pub /home/$DOCKER_USER/.ssh_internal/authorized_keys \
+    && echo "Host *" >> /etc/ssh/ssh_config && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
     && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER/.ssh_internal \
     && chmod 700 /home/$DOCKER_USER/.ssh_internal \
     && chmod 600 /home/$DOCKER_USER/.ssh_internal/*

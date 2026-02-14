@@ -7,12 +7,6 @@
 
 set -e
 
-# Skip GitHub Actions
-if [ "$CI" = "true" ] || [ "$GITHUB_ACTIONS" = "true" ]; then
-    echo "Running in GitHub Actions. Skipping..."
-    exec "$@"
-fi
-
 # Fix permissions
 DOCKER_USER=${DOCKER_USER}
 target_uid=$(stat -c '%u' /home/$DOCKER_USER/ros2_ws/src)
