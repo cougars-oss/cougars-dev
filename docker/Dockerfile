@@ -62,8 +62,7 @@ RUN --mount=type=cache,target=/home/$DOCKER_USER/.cache/pip,uid=1000,gid=1000 \
     tmuxp asciimatics Pillow
 
 # Install tmux plugins
-RUN git config --system --add safe.directory "*" \
-    && git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 COPY --chown=$DOCKER_USER:$DOCKER_USER docker/.tmux.conf /home/$DOCKER_USER/.tmux.conf
 RUN ~/.tmux/plugins/tpm/bin/install_plugins
 
@@ -78,7 +77,8 @@ RUN --mount=type=ssh \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     --mount=type=cache,target=/home/$DOCKER_USER/.ros/rosdep,uid=1000,gid=1000 \
-    vcs import . < cougars.repos \
+    git config --system --add safe.directory "*" \
+    && vcs import . < cougars.repos \
     && vcs custom --git --args submodule update --init --recursive \
     && chown -R $DOCKER_USER:$DOCKER_USER . \
     && apt update \
