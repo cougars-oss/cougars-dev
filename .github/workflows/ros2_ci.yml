@@ -53,4 +53,3 @@ jobs:
           UPSTREAM_WORKSPACE: packages/cougars.repos
           TARGET_WORKSPACE: packages
           CCACHE_DIR: ${{ github.workspace }}/.ccache
-          DOCKER_RUN_OPTS: '-e SSH_AUTH_SOCK -v $SSH_AUTH_SOCK:$SSH_AUTH_SOCK'
