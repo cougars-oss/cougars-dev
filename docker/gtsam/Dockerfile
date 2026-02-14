@@ -16,31 +16,14 @@ FROM ros:humble-ros-base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG DOCKER_USER=frostlab-docker
-ENV DOCKER_USER=$DOCKER_USER
-
-# Create the user
-RUN useradd -ms /bin/bash "$DOCKER_USER" \
-    && usermod -aG sudo "$DOCKER_USER" \
-    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
-    && echo "$DOCKER_USER:$DOCKER_USER" | chpasswd
-
-# Install system dependencies
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt update && apt install -y --no-install-recommends \
-    # Install basic system utilities - Nelson Durrant, Jan 2026
-    curl wget git vim nano python3-pip python3-venv gosu procps ccache \
-    # Install remote access utilities - Nelson Durrant, Jan 2026
-    openssh-server mosh tmux xclip \
-    # Install graphical utilities - Nelson Durrant, Jan 2026
-    x11-apps x11-utils x11-xserver-utils xauth
-
-# Install GTSAM (build from source for ARM)
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt update && apt install -y --no-install-recommends \
-    build-essential cmake libboost-dev libtbb-dev \
+    build-essential \
+    cmake \
+    git \
+    libboost-dev \
+    libtbb-dev \
     libboost-serialization-dev \
     libboost-system-dev \
     libboost-filesystem-dev \
@@ -49,21 +32,23 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     libboost-date-time-dev \
     libboost-timer-dev \
     libboost-chrono-dev \
-    libboost-regex-dev
-WORKDIR /home/$DOCKER_USER
-RUN git clone --depth 1 --branch 4.2.0 https://github.com/borglab/gtsam.git \
+    libboost-regex-dev \
+    ccache
+
+RUN --mount=type=cache,target=/root/.ccache \
+    ccache -z \
+    && git clone --depth 1 --branch 4.2.0 https://github.com/borglab/gtsam.git \
     && cmake -B gtsam/build -S gtsam \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
-    -DGTSAM_BUILD_UNSTABLE=ON \
-    -DGTSAM_BUILD_TESTS=OFF \
-    -DGTSAM_BUILD_EXAMPLES_ALWAYS=OFF \
-    -DGTSAM_WITH_TBB=ON \
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
+      -DGTSAM_BUILD_UNSTABLE=ON \
+      -DGTSAM_BUILD_TESTS=OFF \
+      -DGTSAM_BUILD_EXAMPLES_ALWAYS=OFF \
+      -DGTSAM_WITH_TBB=ON \
+      -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+      -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     && make -C gtsam/build -j$(nproc) \
     && sudo make -C gtsam/build install \
     && sudo ldconfig \
-    && rm -rf gtsam
-
-CMD ["bash"]
+    && rm -rf gtsam \
+    && ccache -s

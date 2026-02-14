@@ -27,19 +27,15 @@ on:
       - "packages/cougars.repos"
       - "packages/**/package.xml"
   repository_dispatch:
-    types: [subrepo_docker_update]
+    types: [docker_dispatch]
 
 jobs:
-  changes:
+  check-changes:
     runs-on: ubuntu-latest
     outputs:
-      gtsam: ${{ steps.filter.outputs.gtsam == 'true' && github.event_name != 'repository_dispatch' }}
-      cougars: ${{ steps.filter.outputs.cougars == 'true' || github.event_name == 'repository_dispatch' }}
+      gtsam: ${{ steps.filter.outputs.gtsam }}
     steps:
       - uses: actions/checkout@v4
-      - if: github.event_name == 'repository_dispatch'
-        shell: bash
-        run: echo "Triggered by:${{ github.event.client_payload.repo }} @ ${{ github.event.client_payload.sha }}"
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -47,21 +43,20 @@ jobs:
             gtsam:
               - '.github/workflows/docker_ci.yml'
               - 'docker/gtsam/Dockerfile'
-            cougars:
-              - 'docker/Dockerfile'
-              - 'docker/entrypoint.sh'
-              - 'docker/completions.sh'
-              - 'docker/.tmux.conf'
-              - 'packages/cougars.repos'
-              - 'packages/**/package.xml'
 
   build-gtsam:
-    needs: changes
-    if: ${{ needs.changes.outputs.gtsam == 'true' }}
-    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.gtsam == 'true'
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -69,30 +64,52 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}"
+          context: .
           file: docker/gtsam/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.arch }}
           push: true
-          tags: snelsondurrant/cougars:gtsam
+          tags: snelsondurrant/cougars:gtsam-${{ matrix.arch }}
           cache-from: |
-            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam
-            type=registry,ref=snelsondurrant/cougars:gtsam
-          cache-to: type=registry,ref=snelsondurrant/cougars:buildcache-gtsam,mode=max
+            type=gha
+            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }}
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }},mode=max
+
+  manifest-gtsam:
+    needs: build-gtsam
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          username: snelsondurrant
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - run: |
+          docker manifest create --amend snelsondurrant/cougars:gtsam \
+            snelsondurrant/cougars:gtsam-amd64 \
+            snelsondurrant/cougars:gtsam-arm64
+          docker manifest push snelsondurrant/cougars:gtsam
 
   build-cougars:
-    needs: [changes, build-gtsam]
-    if: |
-      always() &&
-      !failure() &&
-      !cancelled() &&
-      (needs.build-gtsam.result == 'success' || (needs.build-gtsam.result == 'skipped' && needs.changes.outputs.cougars == 'true'))
-    runs-on: ubuntu-latest
+    needs: build-gtsam
+    if: always() && !cancelled() && !contains(needs.build-gtsam.result, 'failure')
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
       - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-      - uses: docker/setup-qemu-action@v3
+      - run: |
+          sudo apt update && sudo apt install -y python3-vcstool
+          vcs import packages < packages/cougars.repos
+          vcs custom --git --args submodule update --init --recursive
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -100,17 +117,28 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}"
+          context: .
           file: docker/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.arch }}
           push: true
-          tags: snelsondurrant/cougars:latest
-          ssh: |
-            default=${{ env.SSH_AUTH_SOCK }}
-          build-args: |
-            TRIGGER_REPO=${{ github.event.client_payload.repo || '' }}
-            CACHE_BUST=${{ github.run_id }}
+          tags: snelsondurrant/cougars:latest-${{ matrix.arch }}
           cache-from: |
-            type=registry,ref=snelsondurrant/cougars:buildcache-latest
-            type=registry,ref=snelsondurrant/cougars:latest
-          cache-to: type=registry,ref=snelsondurrant/cougars:buildcache-latest,mode=max
+            type=gha
+            type=registry,ref=snelsondurrant/cougars:buildcache-latest-${{ matrix.arch }}
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=snelsondurrant/cougars:buildcache-latest-${{ matrix.arch }},mode=max
+
+  manifest-cougars:
+    needs: build-cougars
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          username: snelsondurrant
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - run: |
+          docker manifest create --amend snelsondurrant/cougars:latest \
+            snelsondurrant/cougars:latest-amd64 \
+            snelsondurrant/cougars:latest-arm64
+          docker manifest push snelsondurrant/cougars:latest
