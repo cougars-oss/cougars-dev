@@ -19,12 +19,12 @@ on:
     branches: ["main"]
     paths:
       - ".github/workflows/ros2_ci.yml"
-      - "packages/**"
+      - "ros2_ws/src/**"
   pull_request:
     branches: ["main"]
     paths:
       - ".github/workflows/ros2_ci.yml"
-      - "packages/**"
+      - "ros2_ws/src/**"
   repository_dispatch:
     types: [ros2_dispatch]
 
@@ -48,10 +48,10 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
       - uses: ros-industrial/industrial_ci@master
         env:
-          DOCKER_IMAGE: snelsondurrant/cougars:latest
+          DOCKER_IMAGE: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev
           DOCKER_PULL: true
-          UPSTREAM_WORKSPACE: packages/cougars.repos
-          TARGET_WORKSPACE: packages
+          UPSTREAM_WORKSPACE: ros2_ws/src/packages.repos
+          TARGET_WORKSPACE: ros2_ws/src
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           DOCKER_RUN_OPTS: "-e CI=true"
           AFTER_SETUP_UPSTREAM_WORKSPACE: |

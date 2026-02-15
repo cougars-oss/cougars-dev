@@ -19,17 +19,17 @@ repos:
     rev: v1.0.0
     hooks:
       - id: ament_uncrustify
-        files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        files: ^ros2_ws/src/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
       - id: ament_cpplint
-        files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        files: ^ros2_ws/src/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
       # - id: ament_cppcheck
-      #   files: ^packages/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+      #   files: ^ros2_ws/src/.*\.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
       - id: ament_flake8
-        files: ^packages/.*\.py$
+        files: ^ros2_ws/src/.*\.py$
       - id: ament_pep257
-        files: ^packages/.*\.py$
+        files: ^ros2_ws/src/.*\.py$
       - id: ament_lint_cmake
       - id: ament_xmllint
-        files: ^packages/.*\.xml$
+        files: ^ros2_ws/src/.*\.xml$
       - id: ament_copyright
-        files: ^packages/
+        files: ^ros2_ws/src/

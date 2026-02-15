@@ -12,33 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ros:humble-ros-base
+# --- Build Stage ---
+FROM ubuntu:22.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt update && apt install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    git \
-    libboost-dev \
-    libtbb-dev \
-    libboost-serialization-dev \
-    libboost-system-dev \
-    libboost-filesystem-dev \
-    libboost-thread-dev \
-    libboost-program-options-dev \
-    libboost-date-time-dev \
-    libboost-timer-dev \
-    libboost-chrono-dev \
-    libboost-regex-dev \
-    ccache
+    apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake git ca-certificates ccache \
+    libboost-all-dev libtbb-dev
 
+WORKDIR /tmp/gtsam-build
 RUN --mount=type=cache,target=/root/.ccache \
     ccache -z \
-    && git clone --depth 1 --branch 4.2.0 https://github.com/borglab/gtsam.git \
-    && cmake -B gtsam/build -S gtsam \
+    && git clone --depth 1 --branch 4.2.0 https://github.com/borglab/gtsam.git . \
+    && cmake -B build -S . \
     -DCMAKE_BUILD_TYPE=Release \
     -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
     -DGTSAM_BUILD_UNSTABLE=ON \
@@ -47,8 +36,24 @@ RUN --mount=type=cache,target=/root/.ccache \
     -DGTSAM_WITH_TBB=ON \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-    && make -C gtsam/build -j$(nproc) \
-    && sudo make -C gtsam/build install \
-    && sudo ldconfig \
-    && rm -rf gtsam \
+    && make -C build -j$(nproc) \
+    && make -C build install \
     && ccache -s
+
+# --- Runtime Stage ---
+FROM ros:humble-ros-base
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libboost-serialization1.74.0 \
+    libboost-filesystem1.74.0 \
+    libboost-thread1.74.0 \
+    libboost-program-options1.74.0 \
+    libboost-timer1.74.0 \
+    libboost-chrono1.74.0 \
+    libboost-regex1.74.0 \
+    libtbb12
+
+COPY --from=builder /usr/local /usr/local
+RUN ldconfig

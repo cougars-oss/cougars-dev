@@ -20,8 +20,8 @@ on:
     paths:
       - ".github/workflows/docker_ci.yml"
       - "docker/**"
-      - "packages/cougars.repos"
-      - "packages/**/package.xml"
+      - "ros2_ws/src/packages.repos"
+      - "ros2_ws/src/**/package.xml"
   repository_dispatch:
     types: [docker_dispatch]
 
@@ -56,7 +56,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: snelsondurrant
+          username: ${{ vars.DOCKER_ORG }}
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
@@ -64,14 +64,14 @@ jobs:
           file: docker/gtsam/Dockerfile
           platforms: linux/${{ matrix.arch }}
           push: true
-          tags: snelsondurrant/cougars:gtsam-${{ matrix.arch }}
+          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-${{ matrix.arch }}
           provenance: false
           cache-from: |
             type=gha
-            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }}
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-gtsam-${{ matrix.arch }}
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }},mode=max
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-gtsam-${{ matrix.arch }},mode=max
 
   manifest-gtsam:
     needs: build-gtsam
@@ -79,14 +79,14 @@ jobs:
     steps:
       - uses: docker/login-action@v3
         with:
-          username: snelsondurrant
+          username: ${{ vars.DOCKER_ORG }}
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker buildx imagetools create -t snelsondurrant/cougars:gtsam \
-            snelsondurrant/cougars:gtsam-amd64 \
-            snelsondurrant/cougars:gtsam-arm64
+          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-amd64 \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-arm64
 
-  build-cougars:
+  build-base:
     needs: [build-gtsam, manifest-gtsam]
     if: |
       always() &&
@@ -110,38 +110,57 @@ jobs:
           sudo apt update && sudo apt install -y python3-pip
           pip3 install --user vcstool
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          vcs import packages < packages/cougars.repos
+          vcs import ros2_ws/src < ros2_ws/src/packages.repos
           vcs custom --git --args submodule update --init --recursive
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: snelsondurrant
+          username: ${{ vars.DOCKER_ORG }}
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Dockerfile
+          target: runtime
           platforms: linux/${{ matrix.arch }}
           push: true
-          tags: snelsondurrant/cougars:latest-${{ matrix.arch }}
+          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime-${{ matrix.arch }}
           provenance: false
           cache-from: |
             type=gha
-            type=registry,ref=snelsondurrant/cougars:buildcache-latest-${{ matrix.arch }}
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-runtime-${{ matrix.arch }}
           cache-to: |
             type=gha,mode=max
-            type=registry,ref=snelsondurrant/cougars:buildcache-latest-${{ matrix.arch }},mode=max
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-runtime-${{ matrix.arch }},mode=max
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: dev
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-${{ matrix.arch }}
+          provenance: false
+          cache-from: |
+            type=gha
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-${{ matrix.arch }}
+          cache-to: |
+            type=gha,mode=max
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-${{ matrix.arch }},mode=max
 
-  manifest-cougars:
-    needs: build-cougars
-    if: always() && !cancelled() && !contains(needs.build-cougars.result, 'failure')
+  manifest-base:
+    needs: build-base
+    if: always() && !cancelled() && !contains(needs.build-base.result, 'failure')
     runs-on: ubuntu-latest
     steps:
       - uses: docker/login-action@v3
         with:
-          username: snelsondurrant
+          username: ${{ vars.DOCKER_ORG }}
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker buildx imagetools create -t snelsondurrant/cougars:latest \
-            snelsondurrant/cougars:latest-amd64 \
-            snelsondurrant/cougars:latest-arm64
+          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime-amd64 \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime-arm64
+          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-amd64 \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-arm64

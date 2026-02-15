@@ -16,11 +16,11 @@
 FROM ubuntu:22.04 AS cacher
 
 WORKDIR /tmp/packages
-COPY packages .
+COPY ros2_ws/src .
 RUN find . -type f \! \( -name "package.xml" -o -name "*.repos" \) -delete
 
-# --- Main Stage ---
-FROM snelsondurrant/cougars:gtsam
+# --- Base Stage ---
+FROM snelsondurrant/cougars:gtsam AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
@@ -31,34 +31,77 @@ ENV DOCKER_USER=$DOCKER_USER \
     RCUTILS_COLORIZED_OUTPUT=1 \
     PATH="$PATH:/home/$DOCKER_USER/.local/bin"
 
-# Install system dependencies
+# Install core system dependencies
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt update && apt install -y --no-install-recommends \
-    # Utilities
-    gosu procps curl wget vim nano python3-pip python3-venv \
-    openssh-server mosh tmux xclip \
-    x11-apps x11-utils x11-xserver-utils xauth \
-    # ROS Packages
+    apt-get update && apt-get install -y --no-install-recommends \
+    gosu procps curl wget python3-pip python3-venv
+
+# Create user
+RUN useradd -ms /bin/bash "$DOCKER_USER" \
+    && usermod -aG sudo "$DOCKER_USER" \
+    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+    && echo "$DOCKER_USER:$DOCKER_USER" | chpasswd \
+    && mkdir -p /home/$DOCKER_USER/ros2_ws/src \
+    && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER \
+    && echo "Host *" >> /etc/ssh/ssh_config \
+    && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+# Configure bash environment
+RUN echo 'source /opt/ros/humble/setup.bash' >> /home/$DOCKER_USER/.bashrc \
+    && echo '[ -f ~/ros2_ws/install/setup.bash ] && source ~/ros2_ws/install/setup.bash' >> /home/$DOCKER_USER/.bashrc \
+    && touch /home/$DOCKER_USER/.hushlogin \
+    && chown $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER/.bashrc /home/$DOCKER_USER/.hushlogin
+
+# --- Runtime Stage ---
+FROM base AS runtime
+
+# Install ROS packages
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp ros-${ROS_DISTRO}-rmw-zenoh-cpp \
     ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy ros-${ROS_DISTRO}-teleop-twist-keyboard \
-    ros-${ROS_DISTRO}-rosbag2-storage-mcap \
+    ros-${ROS_DISTRO}-rosbag2-storage-mcap
+
+# Install ROS dependencies (rosdep)
+WORKDIR /home/$DOCKER_USER/ros2_ws/src
+COPY --from=cacher --chown=$DOCKER_USER:$DOCKER_USER /tmp/packages .
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/home/$DOCKER_USER/.ros/rosdep,uid=1000,gid=1000 \
+    apt-get update \
+    && rosdep update \
+    && rosdep install --from-paths . --ignore-src -y \
+    && rm -rf ./*
+
+USER root
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+WORKDIR /home/$DOCKER_USER
+ENTRYPOINT ["/entrypoint.sh"]
+CMD gosu $DOCKER_USER /bin/bash
+
+# --- Development Stage ---
+FROM runtime AS dev
+
+# Install development tools
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake git \
+    vim nano openssh-server mosh tmux xclip \
+    x11-apps x11-utils x11-xserver-utils xauth \
     # Docker CLI
     ca-certificates gnupg lsb-release \
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
-    && apt update && apt install -y docker-ce-cli
+    && apt-get update && apt-get install -y docker-ce-cli
 
-# Create user
-RUN useradd -ms /bin/bash "$DOCKER_USER" \
-    && usermod -aG sudo "$DOCKER_USER" \
-    && groupadd docker || true \
-    && usermod -aG docker "$DOCKER_USER" \
-    && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
-    && echo "$DOCKER_USER:$DOCKER_USER" | chpasswd \
-    && mkdir -p /home/$DOCKER_USER/ros2_ws/src \
-    && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER
+# Setup docker group
+RUN groupadd docker || true && usermod -aG docker "$DOCKER_USER"
 
 # Set up SSH (internal keys)
 RUN mkdir -p /var/run/sshd && ssh-keygen -A \
@@ -68,12 +111,11 @@ RUN mkdir -p /var/run/sshd && ssh-keygen -A \
     && mkdir -p /home/$DOCKER_USER/.ssh_internal \
     && ssh-keygen -t ed25519 -f /home/$DOCKER_USER/.ssh_internal/id_ed25519 -N "" \
     && cp /home/$DOCKER_USER/.ssh_internal/id_ed25519.pub /home/$DOCKER_USER/.ssh_internal/authorized_keys \
-    && echo "Host *" >> /etc/ssh/ssh_config && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
     && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER/.ssh_internal \
     && chmod 700 /home/$DOCKER_USER/.ssh_internal \
     && chmod 600 /home/$DOCKER_USER/.ssh_internal/*
 
-# Install Python dependencies
+# Install Python development dependencies
 USER $DOCKER_USER
 RUN --mount=type=cache,target=/home/$DOCKER_USER/.cache/pip,uid=1000,gid=1000 \
     pip3 install --upgrade vcstool tmuxp asciimatics Pillow
@@ -83,29 +125,6 @@ RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 COPY --chown=$DOCKER_USER:$DOCKER_USER docker/.tmux.conf /home/$DOCKER_USER/.tmux.conf
 RUN ~/.tmux/plugins/tpm/bin/install_plugins || true
 
-# Configure bash environment
-RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh \
-    && echo 'source /completions.sh' >> ~/.bashrc \
-    && echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc \
-    && echo '[ -f ~/ros2_ws/install/setup.bash ] && source ~/ros2_ws/install/setup.bash' >> ~/.bashrc \
-    && touch ~/.hushlogin
-
-# Install ROS dependencies (rosdep)
-WORKDIR /home/$DOCKER_USER/ros2_ws/src
-COPY --from=cacher --chown=$DOCKER_USER:$DOCKER_USER /tmp/packages .
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    --mount=type=cache,target=/home/$DOCKER_USER/.ros/rosdep,uid=1000,gid=1000 \
-    sudo apt update \
-    && rosdep update \
-    && rosdep install --from-paths . --ignore-src -y \
-    && rm -rf ./*
+RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh
 
 USER root
-COPY docker/entrypoint.sh /entrypoint.sh
-COPY docker/completions.sh /completions.sh
-RUN chmod +x /entrypoint.sh /completions.sh
-
-WORKDIR /home/$DOCKER_USER
-ENTRYPOINT ["/entrypoint.sh"]
-CMD gosu $DOCKER_USER /bin/bash

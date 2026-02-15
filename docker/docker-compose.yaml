@@ -37,6 +37,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+      target: dev
     container_name: cougars-ct
     user: root
     network_mode: host
@@ -48,7 +49,7 @@ services:
     volumes:
       - ../bags:/home/frostlab-docker/bags
       - ../config:/home/frostlab-docker/config
-      - ../packages:/home/frostlab-docker/ros2_ws/src
+      - ../ros2_ws:/home/frostlab-docker/ros2_ws
       - ../scripts:/home/frostlab-docker/scripts
       - ../tmuxp:/home/frostlab-docker/.tmuxp
       - ./.tmux.conf:/home/frostlab-docker/.tmux.conf
