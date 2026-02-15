@@ -17,7 +17,12 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution, EnvironmentVariable
+from launch.substitutions import (
+    LaunchConfiguration,
+    PythonExpression,
+    PathJoinSubstitution,
+    EnvironmentVariable,
+)
 
 
 def generate_launch_description():
@@ -30,7 +35,11 @@ def generate_launch_description():
         os.path.expanduser("~"), "config", "fleet", "holoocean_bridge_params.yaml"
     )
     auv_params = PathJoinSubstitution(
-        [EnvironmentVariable("HOME"), "config", PythonExpression(["'", auv_ns, "' + '_params.yaml'"])]
+        [
+            EnvironmentVariable("HOME"),
+            "config",
+            PythonExpression(["'", auv_ns, "' + '_params.yaml'"]),
+        ]
     )
 
     base_link_frame = PythonExpression(
