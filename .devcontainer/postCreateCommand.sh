@@ -18,3 +18,7 @@ set -e
 vcs import packages < cougars.repos
 vcs custom --git --args submodule update --init --recursive
 find . -maxdepth 4 -name '.pre-commit-config.yaml' -execdir pre-commit install \;
+
+sudo chown -R frostlab-docker:frostlab-docker /home/frostlab-docker/.bash_history
+sudo chown -R frostlab-docker:frostlab-docker /home/frostlab-docker/.local/share/tmux/resurrect
+sudo chown -R frostlab-docker:frostlab-docker /home/frostlab-docker/ros2_ws
