@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright (c) 2026 BYU FROST Lab
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
+FROM snelsondurrant/cougars:base
 
-source /opt/ros/humble/setup.bash
-[ -f /ros2_ws/install/setup.bash ] && source /ros2_ws/install/setup.bash
-[ -f $HOME/ros2_ws/install/setup.bash ] && source $HOME/ros2_ws/install/setup.bash
+ARG DEBIAN_FRONTEND=noninteractive
 
-exec "$@"
+SHELL ["/bin/bash", "-c"]
+
+WORKDIR /ros2_ws
+COPY ros2_ws/src ./src
+
+# Build the ROS workspace
+RUN --mount=type=cache,target=/ros2_ws/build \
+    --mount=type=cache,target=/ros2_ws/log \
+    source /opt/ros/humble/setup.sh && \
+    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+RUN echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc \
+    && echo '[ -f /ros2_ws/install/setup.bash ] && source /ros2_ws/install/setup.bash' >> /root/.bashrc
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["ros2", "--help"]

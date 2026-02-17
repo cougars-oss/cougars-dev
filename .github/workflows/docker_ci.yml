@@ -19,17 +19,26 @@ on:
     branches: ["main"]
     paths:
       - ".github/workflows/docker_ci.yml"
-      - "docker/**"
+      - "docker/Dockerfile.gtsam"
+      - "docker/Dockerfile.base"
+      - "docker/Dockerfile.dev"
+      - "docker/entrypoint.sh"
       - "ros2_ws/src/packages.repos"
       - "ros2_ws/src/**/package.xml"
   repository_dispatch:
     types: [docker_dispatch]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check-changes:
     runs-on: ubuntu-latest
     outputs:
       gtsam: ${{ steps.filter.outputs.gtsam }}
+      base: ${{ steps.filter.outputs.base }}
+      dev: ${{ steps.filter.outputs.dev }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -38,7 +47,14 @@ jobs:
           filters: |
             gtsam:
               - '.github/workflows/docker_ci.yml'
-              - 'docker/gtsam/Dockerfile'
+              - 'docker/Dockerfile.gtsam'
+            base:
+              - 'docker/Dockerfile.base'
+              - "docker/entrypoint.sh"
+              - "ros2_ws/src/packages.repos"
+              - "ros2_ws/src/**/package.xml"
+            dev:
+              - 'docker/Dockerfile.dev'
 
   build-gtsam:
     needs: check-changes
@@ -61,22 +77,23 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/gtsam/Dockerfile
+          file: docker/Dockerfile.gtsam
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-${{ matrix.arch }}
           provenance: false
           cache-from: |
-            type=gha
+            type=gha,scope=gtsam-${{ matrix.arch }}
             type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-gtsam-${{ matrix.arch }}
           cache-to: |
-            type=gha,mode=max
+            type=gha,mode=max,scope=gtsam-${{ matrix.arch }}
             type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-gtsam-${{ matrix.arch }},mode=max
 
   manifest-gtsam:
     needs: build-gtsam
     runs-on: ubuntu-latest
     steps:
+      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKER_ORG }}
@@ -91,6 +108,7 @@ jobs:
     if: |
       always() &&
       !cancelled() &&
+      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true') &&
       !contains(needs.build-gtsam.result, 'failure') &&
       !contains(needs.manifest-gtsam.result, 'failure')
     strategy:
@@ -120,47 +138,91 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/Dockerfile
-          target: runtime
+          file: docker/Dockerfile.base
           platforms: linux/${{ matrix.arch }}
+          pull: true
           push: true
-          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime-${{ matrix.arch }}
+          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base-${{ matrix.arch }}
           provenance: false
           cache-from: |
-            type=gha
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-runtime-${{ matrix.arch }}
+            type=gha,scope=base-${{ matrix.arch }}
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-base-${{ matrix.arch }}
           cache-to: |
-            type=gha,mode=max
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-runtime-${{ matrix.arch }},mode=max
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/Dockerfile
-          target: dev
-          platforms: linux/${{ matrix.arch }}
-          push: true
-          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-${{ matrix.arch }}
-          provenance: false
-          cache-from: |
-            type=gha
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-${{ matrix.arch }}
-          cache-to: |
-            type=gha,mode=max
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-${{ matrix.arch }},mode=max
+            type=gha,mode=max,scope=base-${{ matrix.arch }}
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-base-${{ matrix.arch }},mode=max
 
   manifest-base:
-    needs: build-base
-    if: always() && !cancelled() && !contains(needs.build-base.result, 'failure')
+    needs: [check-changes, build-base]
+    if: |
+      always() &&
+      !cancelled() &&
+      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true') &&
+      !contains(needs.build-base.result, 'failure')
     runs-on: ubuntu-latest
     steps:
+      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKER_ORG }}
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime \
-            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime-amd64 \
-            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:runtime-arm64
+          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base-amd64 \
+            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base-arm64
+
+  build-dev:
+    needs: [check-changes, manifest-base]
+    if: |
+      always() &&
+      !cancelled() &&
+      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true' || needs.check-changes.outputs.dev == 'true') &&
+      !contains(needs.manifest-base.result, 'failure')
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_ORG }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.dev
+          platforms: linux/${{ matrix.arch }}
+          pull: true
+          push: true
+          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-${{ matrix.arch }}
+          provenance: false
+          cache-from: |
+            type=gha,scope=dev-${{ matrix.arch }}
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-${{ matrix.arch }}
+          cache-to: |
+            type=gha,mode=max,scope=dev-${{ matrix.arch }}
+            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-${{ matrix.arch }},mode=max
+
+  manifest-dev:
+    needs: [check-changes, build-dev]
+    if: |
+      always() &&
+      !cancelled() &&
+      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true' || needs.check-changes.outputs.dev == 'true') &&
+      !contains(needs.build-dev.result, 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_ORG }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - run: |
           docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev \
             ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-amd64 \
             ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev-arm64

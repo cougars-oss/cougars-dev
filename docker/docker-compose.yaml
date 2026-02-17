@@ -17,7 +17,7 @@ services:
     image: snelsondurrant/cougars:gtsam
     build:
       context: ..
-      dockerfile: docker/gtsam/Dockerfile
+      dockerfile: docker/Dockerfile.gtsam
     profiles:
       - build-reqs
 
@@ -27,7 +27,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ../.mapproxy:/mapproxy
+      - ~/.mapproxy:/mapproxy
     restart: always
     profiles:
       - mapproxy
@@ -56,7 +56,6 @@ services:
       - ./entrypoint.sh:/entrypoint.sh
       - ./completions.sh:/completions.sh
       - ~/.ssh:/home/frostlab-docker/.ssh
-      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
       - /etc/udev:/etc/udev

@@ -17,6 +17,9 @@ FROM ubuntu:22.04 AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+SHELL ["/bin/bash", "-c"]
+
+# Install build tools
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -40,9 +43,10 @@ RUN --mount=type=cache,target=/root/.ccache \
     && make -C build install \
     && ccache -s
 
-# --- Runtime Stage ---
+# --- Main Stage ---
 FROM ros:humble-ros-base
 
+# Install runtime dependencies
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
