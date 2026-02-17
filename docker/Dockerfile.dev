@@ -49,7 +49,10 @@ RUN --mount=type=cache,target=/home/$DOCKER_USER/.cache/pip,uid=1000,gid=1000 \
 # Install tmux plugins
 RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 COPY --chown=$DOCKER_USER:$DOCKER_USER docker/.tmux.conf /home/$DOCKER_USER/.tmux.conf
-RUN ~/.tmux/plugins/tpm/bin/install_plugins || true
+RUN ~/.tmux/plugins/tpm/scripts/install_plugins.sh || true
+
+# VSCode devcontainer permissions
+USER root
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/bash"]

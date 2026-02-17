@@ -23,8 +23,9 @@ on:
       - "docker/Dockerfile.base"
       - "docker/Dockerfile.dev"
       - "docker/entrypoint.sh"
-      - "ros2_ws/src/packages.repos"
-      - "ros2_ws/src/**/package.xml"
+      - "docker/.tmuxp.conf"
+      - "cougars.repos"
+      - "**/package.xml"
   repository_dispatch:
     types: [docker_dispatch]
 
@@ -52,11 +53,12 @@ jobs:
               - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile.base'
               - "docker/entrypoint.sh"
-              - "ros2_ws/src/packages.repos"
-              - "ros2_ws/src/**/package.xml"
+              - "cougars.repos"
+              - "**/package.xml"
             dev:
               - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile.dev'
+              - 'docker/.tmuxp.conf'
 
   build-gtsam:
     needs: check-changes
@@ -74,7 +76,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_ORG }}
+          username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
@@ -82,14 +84,14 @@ jobs:
           file: docker/Dockerfile.gtsam
           platforms: linux/${{ matrix.arch }}
           push: true
-          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-${{ matrix.arch }}
+          tags: snelsondurrant/cougars:gtsam-${{ matrix.arch }}
           provenance: false
           cache-from: |
             type=gha,scope=gtsam-${{ matrix.arch }}
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-gtsam-${{ matrix.arch }}
+            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }}
           cache-to: |
             type=gha,mode=max,scope=gtsam-${{ matrix.arch }}
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-gtsam-${{ matrix.arch }},mode=max
+            type=registry,ref=snelsondurrant/cougars:buildcache-gtsam-${{ matrix.arch }},mode=max
 
   manifest-gtsam:
     needs: build-gtsam
@@ -98,12 +100,12 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_ORG }}
+          username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam \
-            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-amd64 \
-            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:gtsam-arm64
+          docker buildx imagetools create -t snelsondurrant/cougars:gtsam \
+            snelsondurrant/cougars:gtsam-amd64 \
+            snelsondurrant/cougars:gtsam-arm64
 
   build-base:
     needs: [build-gtsam, manifest-gtsam]
@@ -130,12 +132,12 @@ jobs:
           sudo apt update && sudo apt install -y python3-pip
           pip3 install --user vcstool
           echo "$HOME/.local/bin" >> $GITHUB_PATH
-          vcs import ros2_ws/src < ros2_ws/src/packages.repos
+          vcs import packages < cougars.repos
           vcs custom --git --args submodule update --init --recursive
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_ORG }}
+          username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
@@ -144,14 +146,14 @@ jobs:
           platforms: linux/${{ matrix.arch }}
           pull: true
           push: true
-          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base-${{ matrix.arch }}
+          tags: snelsondurrant/cougars:base-${{ matrix.arch }}
           provenance: false
           cache-from: |
             type=gha,scope=base-${{ matrix.arch }}
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-base-${{ matrix.arch }}
+            type=registry,ref=snelsondurrant/cougars:buildcache-base-${{ matrix.arch }}
           cache-to: |
             type=gha,mode=max,scope=base-${{ matrix.arch }}
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-base-${{ matrix.arch }},mode=max
+            type=registry,ref=snelsondurrant/cougars:buildcache-base-${{ matrix.arch }},mode=max
 
   manifest-base:
     needs: [check-changes, build-base]
@@ -165,12 +167,12 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_ORG }}
+          username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - run: |
-          docker buildx imagetools create -t ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base \
-            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base-amd64 \
-            ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:base-arm64
+          docker buildx imagetools create -t snelsondurrant/cougars:base \
+            snelsondurrant/cougars:base-amd64 \
+            snelsondurrant/cougars:base-arm64
 
   build-dev:
     needs: [check-changes, manifest-base]
@@ -185,7 +187,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_ORG }}
+          username: snelsondurrant
           password: ${{ secrets.DOCKER_TOKEN }}
       - uses: docker/build-push-action@v6
         with:
@@ -194,11 +196,11 @@ jobs:
           platforms: linux/amd64
           pull: true
           push: true
-          tags: ${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:dev
+          tags: snelsondurrant/cougars:dev
           provenance: false
           cache-from: |
             type=gha,scope=dev-amd64
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-amd64
+            type=registry,ref=snelsondurrant/cougars:buildcache-dev-amd64
           cache-to: |
             type=gha,mode=max,scope=dev-amd64
-            type=registry,ref=${{ vars.DOCKER_ORG }}/${{ vars.DOCKER_REPO }}:buildcache-dev-amd64,mode=max
+            type=registry,ref=snelsondurrant/cougars:buildcache-dev-amd64,mode=max

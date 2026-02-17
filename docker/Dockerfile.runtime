@@ -19,7 +19,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
 WORKDIR /ros2_ws
-COPY ros2_ws/src ./src
+COPY packages ./src
 
 # Build the ROS workspace
 RUN --mount=type=cache,target=/ros2_ws/build \

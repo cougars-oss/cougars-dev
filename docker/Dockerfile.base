@@ -16,7 +16,7 @@
 FROM ubuntu:22.04 AS cacher
 
 WORKDIR /tmp/packages
-COPY ros2_ws/src .
+COPY packages .
 RUN find . -type f \! -name "package.xml" -delete
 
 # --- Main Stage ---

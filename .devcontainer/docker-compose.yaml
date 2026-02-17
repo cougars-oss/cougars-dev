@@ -18,8 +18,14 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.gtsam
-    profiles:
-      - build-reqs
+    profiles: ["build-reqs"]
+
+  base:
+    image: snelsondurrant/cougars:base
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.base
+    profiles: ["build-reqs"]
 
   mapproxy:
     image: danielsnider/mapproxy
@@ -27,40 +33,34 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ~/.mapproxy:/mapproxy
-    restart: always
-    profiles:
-      - mapproxy
+      - ../.mapproxy:/mapproxy
+    restart: unless-stopped
 
-  cougars:
-    image: snelsondurrant/cougars:latest
+  dev:
+    image: snelsondurrant/cougars:dev
     build:
       context: ..
-      dockerfile: docker/Dockerfile
-      target: dev
-    container_name: cougars-ct
-    user: root
+      dockerfile: docker/Dockerfile.dev
+    container_name: cougars-dev-ct
     network_mode: host
     ipc: host
     pid: host
+    privileged: true
     environment:
       - DISPLAY=$DISPLAY
       - QT_X11_NO_MITSHM=1
     volumes:
-      - ../bags:/home/frostlab-docker/bags
-      - ../config:/home/frostlab-docker/config
-      - ../ros2_ws:/home/frostlab-docker/ros2_ws
-      - ../scripts:/home/frostlab-docker/scripts
-      - ../tmuxp:/home/frostlab-docker/.tmuxp
-      - ./.tmux.conf:/home/frostlab-docker/.tmux.conf
-      - ./entrypoint.sh:/entrypoint.sh
-      - ./completions.sh:/completions.sh
-      - ~/.ssh:/home/frostlab-docker/.ssh
+      - ros2-workspace:/home/frostlab-docker/ros2_ws
+      - ..:/home/frostlab-docker/ros2_ws/src:cached
+      - dev-shell-history:/home/frostlab-docker/.bash_history
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
-      - /etc/udev:/etc/udev
-      - /dev/shm:/dev/shm
+      - /run/udev:/run/udev:ro
       - /dev:/dev
     stdin_open: true
     tty: true
-    restart: always
+    restart: unless-stopped
+
+volumes:
+  ros2-workspace:
+  dev-shell-history:

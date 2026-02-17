@@ -1,0 +1,26 @@
+{
+  "name": "CoUGARs Dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/home/frostlab-docker/ros2_ws/src",
+  "remoteUser": "frostlab-docker",
+  "updateRemoteUserUID": true,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "twxs.cmake",
+        "eamodio.gitlens",
+        "redhat.vscode-xml",
+        "yzhang.markdown-all-in-one"
+      ]
+    }
+  },
+  "postCreateCommand": [
+    "vcs import packages < cougars.repos",
+    "vcs custom --git --args submodule update --init --recursive",
+    "find . -maxdepth 4 -name '.pre-commit-config.yaml' -execdir pre-commit install \\;"
+  ]
+}
