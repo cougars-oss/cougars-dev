@@ -19,6 +19,7 @@ repos:
     hooks:
       # --- C++ Auto-Format ---
       - id: ament_uncrustify
+        name: ament_uncrustify
         entry: ament_uncrustify
         args: ["--reformat"]
         language: system
@@ -26,23 +27,27 @@ repos:
 
       # --- C++ Linting ---
       - id: ament_cpplint
+        name: ament_cpplint
         entry: ament_cpplint
         language: system
         files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
 
       # - id: ament_cppcheck
+      #   name: ament_cppcheck
       #   entry: ament_cppcheck
       #   language: system
       #   files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
 
       # --- Python Linting ---
       - id: ament_flake8
+        name: ament_flake8
         entry: ament_flake8
         language: system
         files: \.py$
         exclude: /setup\.py$
 
       - id: ament_pep257
+        name: ament_pep257
         entry: ament_pep257
         language: system
         files: \.py$
@@ -50,17 +55,20 @@ repos:
 
       # --- CMake & XML Linting ---
       - id: ament_lint_cmake
+        name: ament_lint_cmake
         entry: ament_lint_cmake
         language: system
         files: CMakeLists\.txt$
 
       - id: ament_xmllint
+        name: ament_xmllint
         entry: ament_xmllint
         language: system
         files: \.xml$
 
       # --- Copyright Check ---
       - id: ament_copyright
+        name: ament_copyright
         entry: ament_copyright
         language: system
         files: .

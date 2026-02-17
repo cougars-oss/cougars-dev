@@ -34,7 +34,7 @@ ENV ROS_BUILD_ARCH=$TARGETARCH \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
-    openssh-client \
+    vim nano tmux openssh-client \
     && echo "Host *" >> /etc/ssh/ssh_config \
     && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 

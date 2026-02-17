@@ -32,12 +32,6 @@ RUN groupadd --gid $USER_GID "$DOCKER_USER" \
     && echo 'source /opt/ros/humble/setup.bash' >> /home/$DOCKER_USER/.bashrc \
     && echo '[ -f ~/ros2_ws/install/setup.bash ] && source ~/ros2_ws/install/setup.bash' >> /home/$DOCKER_USER/.bashrc \
     && touch /home/$DOCKER_USER/.hushlogin \
-    && echo 'export HISTCONTROL=ignoreboth' >> /home/$DOCKER_USER/.bashrc \
-    && echo 'shopt -s histappend' >> /home/$DOCKER_USER/.bashrc \
-    && echo 'export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"' >> /home/$DOCKER_USER/.bashrc \
-    && echo 'export HISTFILE=/home/$DOCKER_USER/.bash_history/bash_history' >> /home/$DOCKER_USER/.bashrc \
-    && mkdir -p /home/$DOCKER_USER/.bash_history \
-    && mkdir -p /home/$DOCKER_USER/.local/share/tmux/resurrect \
     && mkdir -p /home/$DOCKER_USER/ros2_ws/src \
     && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER
 
@@ -45,18 +39,13 @@ RUN groupadd --gid $USER_GID "$DOCKER_USER" \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
-    vim nano tmux mosh xclip python3-pip python3-venv \
+    python3-pip python3-venv \
     x11-apps x11-utils x11-xserver-utils xauth
 
 # Install Python development tools
 USER $DOCKER_USER
 RUN --mount=type=cache,target=/home/$DOCKER_USER/.cache/pip,uid=1000,gid=1000 \
     pip3 install --upgrade vcstool pre-commit asciimatics Pillow
-
-# Install tmux plugins
-RUN git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-COPY --chown=$DOCKER_USER:$DOCKER_USER docker/.tmux.conf /home/$DOCKER_USER/.tmux.conf
-RUN ~/.tmux/plugins/tpm/scripts/install_plugins.sh || true
 
 # VSCode devcontainer permissions
 USER root

@@ -16,8 +16,15 @@
       ]
     }
   },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "configureZshAsDefaultShell": false,
+      "upgradePackages": false
+    }
+  },
   "postCreateCommand": [
     "/bin/bash",
-    ".devcontainer/postCreateCommand.sh"
+    ".devcontainer/post-create-command.sh"
   ]
 }
