@@ -24,10 +24,3 @@ updates:
       interval: "monthly"
     commit-message:
       prefix: "🐙"
-
-  - package-ecosystem: "devcontainers"
-    directory: "/.devcontainer/gpu"
-    schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: "🐙"

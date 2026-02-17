@@ -106,7 +106,7 @@ jobs:
             snelsondurrant/cougars:gtsam-arm64
 
   build-base:
-    needs: [build-gtsam, manifest-gtsam]
+    needs: [check-changes, build-gtsam, manifest-gtsam]
     if: |
       always() &&
       !cancelled() &&
@@ -173,11 +173,12 @@ jobs:
             snelsondurrant/cougars:base-arm64
 
   build-dev:
-    needs: [check-changes, manifest-base]
+    needs: [check-changes, build-base, manifest-base]
     if: |
       always() &&
       !cancelled() &&
       (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true' || needs.check-changes.outputs.dev == 'true') &&
+      !contains(needs.build-base.result, 'failure') &&
       !contains(needs.manifest-base.result, 'failure')
     runs-on: ubuntu-latest
     steps:
