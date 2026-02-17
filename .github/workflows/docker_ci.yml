@@ -49,11 +49,13 @@ jobs:
               - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile.gtsam'
             base:
+              - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile.base'
               - "docker/entrypoint.sh"
               - "ros2_ws/src/packages.repos"
               - "ros2_ws/src/**/package.xml"
             dev:
+              - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile.dev'
 
   build-gtsam:
