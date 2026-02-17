@@ -29,9 +29,7 @@ services:
 
   mapproxy:
     image: danielsnider/mapproxy
-    container_name: mapproxy-ct
-    ports:
-      - "8080:8080"
+    network_mode: host
     volumes:
       - ../.mapproxy:/mapproxy
     restart: unless-stopped
@@ -41,7 +39,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.dev
-    container_name: cougars-dev-ct
     network_mode: host
     ipc: host
     pid: host

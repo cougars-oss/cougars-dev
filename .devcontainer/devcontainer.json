@@ -1,6 +1,6 @@
 {
   "name": "CoUGARs Dev",
-  "dockerComposeFile": "docker-compose.yml",
+  "dockerComposeFile": "docker-compose.yaml",
   "service": "dev",
   "workspaceFolder": "/home/frostlab-docker/ros2_ws/src",
   "remoteUser": "frostlab-docker",
@@ -19,8 +19,7 @@
     }
   },
   "postCreateCommand": [
-    "vcs import packages < cougars.repos",
-    "vcs custom --git --args submodule update --init --recursive",
-    "find . -maxdepth 4 -name '.pre-commit-config.yaml' -execdir pre-commit install \\;"
+    "/bin/bash",
+    ".devcontainer/postCreateCommand.sh"
   ]
 }

@@ -13,7 +13,7 @@
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
 #   -n <namespace>: Namespace for the AUV (e.g. auv0)
 
-source ~/scripts/utils/common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
 source ~/ros2_ws/install/setup.bash
 
 if [ -z "$1" ]; then

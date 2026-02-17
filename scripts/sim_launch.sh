@@ -12,7 +12,7 @@
 #   -m: Launch multi-agent CougUV scenario
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
 
-source ~/scripts/utils/common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
 source ~/ros2_ws/install/setup.bash
 
 coug_share=$(ros2 pkg prefix coug_description --share)

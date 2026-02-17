@@ -3,7 +3,7 @@
 #
 # Drives the BlueROV2 in HoloOcean using the keyboard
 
-source ~/scripts/utils/common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
 source ~/ros2_ws/install/setup.bash
 
 print_info "Starting BlueROV2 keyboard teleop..."
