@@ -36,23 +36,15 @@ services:
 
   dev:
     image: snelsondurrant/cougars:dev
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.dev
+    # build:
+    #   context: ..
+    #   dockerfile: docker/Dockerfile.dev
     network_mode: host
     ipc: host
     pid: host
     privileged: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [ gpu ]
     environment:
-      - DISPLAY=$DISPLAY
-      - QT_X11_NO_MITSHM=1
+      - DISPLAY=${DISPLAY:-:0}
     volumes:
       - ros2-workspace:/home/frostlab-docker/ros2_ws
       - ..:/home/frostlab-docker/ros2_ws/src:cached

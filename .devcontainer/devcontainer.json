@@ -5,9 +5,6 @@
   "workspaceFolder": "/home/frostlab-docker/ros2_ws/src",
   "remoteUser": "frostlab-docker",
   "updateRemoteUserUID": true,
-  "hostRequirements": {
-    "gpu": "optional"
-  },
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "username": "frostlab-docker",
@@ -17,8 +14,7 @@
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": true,
       "installDockerBuildx": true
-    },
-    "ghcr.io/devcontainers/features/nvidia-cuda:2.0.0": {}
+    }
   },
   "customizations": {
     "vscode": {
@@ -28,7 +24,7 @@
         "twxs.cmake",
         "ms-azuretools.vscode-docker",
         "github.vscode-github-actions",
-        "kalebpace.balena-vscode"
+        "kalebpace.balena-vscode@0.1.3"
       ]
     }
   },

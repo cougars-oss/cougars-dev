@@ -1,0 +1,42 @@
+{
+    "name": "CoUGARs Dev (GPU)",
+    "dockerComposeFile": [
+        "../docker-compose.yaml",
+        "docker-compose.yaml"
+    ],
+    "service": "dev",
+    "workspaceFolder": "/home/frostlab-docker/ros2_ws/src",
+    "remoteUser": "frostlab-docker",
+    "updateRemoteUserUID": true,
+    "hostRequirements": {
+        "gpu": true
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "username": "frostlab-docker",
+            "installZsh": false,
+            "upgradePackages": false
+        },
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+            "moby": true,
+            "installDockerBuildx": true
+        },
+        "ghcr.io/devcontainers/features/nvidia-cuda:2.0.0": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-python.python",
+                "twxs.cmake",
+                "ms-azuretools.vscode-docker",
+                "github.vscode-github-actions",
+                "kalebpace.balena-vscode@0.1.3"
+            ]
+        }
+    },
+    "postCreateCommand": [
+        "/bin/bash",
+        ".devcontainer/post-create-command.sh"
+    ]
+}
