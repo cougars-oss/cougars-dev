@@ -26,6 +26,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     build-essential cmake git ca-certificates ccache \
     libboost-all-dev libtbb-dev
 
+# Build GTSAM
 WORKDIR /tmp/gtsam-build
 RUN --mount=type=cache,target=/root/.ccache \
     ccache -z \

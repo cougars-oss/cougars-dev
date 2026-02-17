@@ -24,6 +24,7 @@ SHELL ["/bin/bash", "-c"]
 ENV DOCKER_USER=$DOCKER_USER \
     PATH="$PATH:/home/$DOCKER_USER/.local/bin"
 
+# Create the user
 RUN groupadd --gid $USER_GID "$DOCKER_USER" \
     && useradd --uid $USER_UID --gid $USER_GID -ms /bin/bash "$DOCKER_USER" \
     && usermod -aG sudo "$DOCKER_USER" \
