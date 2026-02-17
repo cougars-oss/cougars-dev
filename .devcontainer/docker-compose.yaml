@@ -18,14 +18,14 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.gtsam
-    profiles: ["build-reqs"]
+    profiles: [ "build-reqs" ]
 
   base:
     image: snelsondurrant/cougars:base
     build:
       context: ..
       dockerfile: docker/Dockerfile.base
-    profiles: ["build-reqs"]
+    profiles: [ "build-reqs" ]
 
   mapproxy:
     image: danielsnider/mapproxy
@@ -53,6 +53,7 @@ services:
       - ros2-workspace:/home/frostlab-docker/ros2_ws
       - ..:/home/frostlab-docker/ros2_ws/src:cached
       - dev-shell-history:/home/frostlab-docker/.bash_history
+      - tmux-resurrect:/home/frostlab-docker/.local/share/tmux/resurrect
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
       - /run/udev:/run/udev:ro
@@ -64,3 +65,4 @@ services:
 volumes:
   ros2-workspace:
   dev-shell-history:
+  tmux-resurrect:

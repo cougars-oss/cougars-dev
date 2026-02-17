@@ -32,13 +32,14 @@ RUN groupadd --gid $USER_GID "$DOCKER_USER" \
     && echo '[ -f ~/ros2_ws/install/setup.bash ] && source ~/ros2_ws/install/setup.bash' >> /home/$DOCKER_USER/.bashrc \
     && touch /home/$DOCKER_USER/.hushlogin \
     && mkdir -p /home/$DOCKER_USER/ros2_ws/src \
+    && mkdir -p /home/$DOCKER_USER/.local/share/tmux/resurrect \
     && chown -R $DOCKER_USER:$DOCKER_USER /home/$DOCKER_USER
 
 # Install development tools
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
-    vim nano tmux xclip python3-pip python3-venv \
+    vim nano tmux mosh xclip python3-pip python3-venv \
     x11-apps x11-utils x11-xserver-utils xauth
 
 # Install Python development tools
