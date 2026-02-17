@@ -15,13 +15,6 @@
 
 set -e
 
-# Check for valid SSH keys
-if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-    vcs import packages < cougars.repos
-    vcs custom --git --args submodule update --init --recursive
-else
-    echo "WARNING: No valid SSH keys found for GitHub. Skipping VCS import."
-    echo "To fix this, ensure your SSH agent is running and has your keys added."
-fi
-
+vcs import packages < cougars.repos
+vcs custom --git --args submodule update --init --recursive
 find . -maxdepth 4 -name '.pre-commit-config.yaml' -execdir pre-commit install \;
