@@ -1,6 +1,7 @@
 # 🌊 CoUGARs: Configurable Underwater Group of Autonomous Robots
 
 [![arXiv](https://img.shields.io/badge/arXiv-2511.08822-b31b1b.svg)](https://arxiv.org/pdf/2511.08822)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/cougars-auv/cougars-dev/main.svg)](https://results.pre-commit.ci/latest/github/cougars-auv/cougars-dev/main)
 [![ROS 2 CI](https://github.com/cougars-auv/cougars-dev/actions/workflows/ros2_ci.yml/badge.svg)](https://github.com/cougars-auv/cougars-dev/actions/workflows/ros2_ci.yml)
 [![Docker CI](https://github.com/cougars-auv/cougars-dev/actions/workflows/docker_ci.yml/badge.svg)](https://github.com/cougars-auv/cougars-dev/actions/workflows/docker_ci.yml)
 
