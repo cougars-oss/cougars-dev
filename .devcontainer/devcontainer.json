@@ -5,22 +5,31 @@
   "workspaceFolder": "/home/frostlab-docker/ros2_ws/src",
   "remoteUser": "frostlab-docker",
   "updateRemoteUserUID": true,
+  "hostRequirements": {
+    "gpu": "optional"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "frostlab-docker",
+      "installZsh": false,
+      "upgradePackages": false
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "moby": true,
+      "installDockerBuildx": true
+    },
+    "ghcr.io/devcontainers/features/nvidia-cuda:2.0.0": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-vscode.cpptools",
         "ms-python.python",
         "twxs.cmake",
-        "redhat.vscode-xml",
-        "yzhang.markdown-all-in-one"
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "kalebpace.balena-vscode"
       ]
-    }
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": false,
-      "configureZshAsDefaultShell": false,
-      "upgradePackages": false
     }
   },
   "postCreateCommand": [

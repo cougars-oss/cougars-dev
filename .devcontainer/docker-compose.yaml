@@ -43,12 +43,20 @@ services:
     ipc: host
     pid: host
     privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
     environment:
       - DISPLAY=$DISPLAY
       - QT_X11_NO_MITSHM=1
     volumes:
       - ros2-workspace:/home/frostlab-docker/ros2_ws
       - ..:/home/frostlab-docker/ros2_ws/src:cached
+      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
       - /run/udev:/run/udev:ro

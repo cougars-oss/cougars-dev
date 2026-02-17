@@ -17,3 +17,10 @@ updates:
       interval: "monthly"
     commit-message:
       prefix: "🐳"
+
+  - package-ecosystem: "devcontainers"
+    directory: "/.devcontainer"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "🐙"
