@@ -19,7 +19,7 @@ updates:
       prefix: "🐳"
 
   - package-ecosystem: "devcontainers"
-    directory: "/.devcontainer"
+    directory: "/"
     schedule:
       interval: "monthly"
     commit-message:
