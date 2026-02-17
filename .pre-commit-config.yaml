@@ -15,7 +15,6 @@ repos:
       - id: black
 
   - repo: local
-    files: ^packages/
     hooks:
       # --- C++ Auto-Format ---
       - id: ament_uncrustify
@@ -23,34 +22,39 @@ repos:
         entry: ament_uncrustify
         args: ["--reformat"]
         language: system
-        files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        types_or: [c++, c]
+        files: ^packages/
 
       # --- C++ Linting ---
       - id: ament_cpplint
         name: ament_cpplint
         entry: ament_cpplint
         language: system
-        files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+        types_or: [c++, c]
+        files: ^packages/
 
       # - id: ament_cppcheck
       #   name: ament_cppcheck
       #   entry: ament_cppcheck
       #   language: system
-      #   files: \.(h\+\+|h|hh|hxx|hpp|cuh|c|cc|cpp|cxx|cu)$
+      #   types_or: [c++, c]
+      #   files: ^packages/
 
       # --- Python Linting ---
       - id: ament_flake8
         name: ament_flake8
         entry: ament_flake8
         language: system
-        files: \.py$
+        types: [python]
+        files: ^packages/
         exclude: /setup\.py$
 
       - id: ament_pep257
         name: ament_pep257
         entry: ament_pep257
         language: system
-        files: \.py$
+        types: [python]
+        files: ^packages/
         exclude: /setup\.py$
 
       # --- CMake & XML Linting ---
@@ -58,20 +62,21 @@ repos:
         name: ament_lint_cmake
         entry: ament_lint_cmake
         language: system
-        files: CMakeLists\.txt$
+        files: ^packages/.*CMakeLists\.txt$
 
       - id: ament_xmllint
         name: ament_xmllint
         entry: ament_xmllint
         language: system
-        files: \.xml$
+        types: [xml]
+        files: ^packages/
 
       # --- Copyright Check ---
       - id: ament_copyright
         name: ament_copyright
         entry: ament_copyright
         language: system
-        files: .
+        files: ^packages/
         exclude: |
             (?x)^(
                 .*\.json|

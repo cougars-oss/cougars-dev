@@ -23,7 +23,6 @@ on:
       - "docker/Dockerfile.base"
       - "docker/Dockerfile.dev"
       - "docker/entrypoint.sh"
-      - "docker/.tmuxp.conf"
       - "cougars.repos"
       - "**/package.xml"
   repository_dispatch:
@@ -58,7 +57,6 @@ jobs:
             dev:
               - '.github/workflows/docker_ci.yml'
               - 'docker/Dockerfile.dev'
-              - 'docker/.tmuxp.conf'
 
   build-gtsam:
     needs: check-changes
