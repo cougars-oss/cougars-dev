@@ -21,7 +21,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-play_bag_path="$HOME/bags/$1"
+play_bag_path="$HOME/ros2_ws/src/bags/$1"
 shift
 
 if [ ! -d "$play_bag_path" ]; then

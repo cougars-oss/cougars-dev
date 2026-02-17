@@ -8,11 +8,9 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-iot.vscode-ros",
         "ms-vscode.cpptools",
         "ms-python.python",
         "twxs.cmake",
-        "eamodio.gitlens",
         "redhat.vscode-xml",
         "yzhang.markdown-all-in-one"
       ]

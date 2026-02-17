@@ -33,6 +33,8 @@ def generate_launch_description():
     fleet_params = PathJoinSubstitution(
         [
             EnvironmentVariable("HOME"),
+            "ros2_ws",
+            "src",
             "config",
             "fleet",
             "holoocean_bridge_params.yaml",
@@ -41,6 +43,8 @@ def generate_launch_description():
     auv_params = PathJoinSubstitution(
         [
             EnvironmentVariable("HOME"),
+            "ros2_ws",
+            "src",
             "config",
             PythonExpression(["'", auv_ns, "' + '_params.yaml'"]),
         ]
