@@ -15,6 +15,8 @@
 
 set -e
 
+source "$(dirname "$0")/utils/common.sh"
+
 # --- Selection ---
 scenario=$(gum choose --header "Choose a HoloOcean scenario:" "CougUV" "BlueROV2" "Multi-Agent")
 
