@@ -20,10 +20,10 @@ ARG ROS_DISTRO=humble
 SHELL [ "/bin/bash", "-c" ]
 
 ENV DOCKER_USER=ue4 \
-    COLCON_WS=/home/ue4/ros2_ws \
+    OVERLAY_WS=/home/ue4/ros2_ws \
     CONFIG_FOLDER=/home/ue4/config
 
-WORKDIR ${COLCON_WS}
+WORKDIR ${OVERLAY_WS}
 
 USER root
 

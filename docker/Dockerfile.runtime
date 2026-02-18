@@ -19,20 +19,20 @@ ARG DEBIAN_FRONTEND=noninteractive
 SHELL [ "/bin/bash", "-c" ]
 
 ENV DOCKER_USER=root \
-    COLCON_WS=/ros2_ws \
+    OVERLAY_WS=/ros2_ws \
     CONFIG_FOLDER=/config
 
-COPY ros2_ws/src ${COLCON_WS}/src
+COPY ros2_ws/src ${OVERLAY_WS}/src
 
 # Build the ROS workspace
-WORKDIR ${COLCON_WS}
-RUN --mount=type=cache,target=${COLCON_WS}/build \
-    --mount=type=cache,target=${COLCON_WS}/log \
+WORKDIR ${OVERLAY_WS}
+RUN --mount=type=cache,target=${OVERLAY_WS}/build \
+    --mount=type=cache,target=${OVERLAY_WS}/log \
     source /opt/ros/humble/setup.sh && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc \
-    && echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" >> /root/.bashrc
+    && echo "[ -f ${OVERLAY_WS}/install/setup.bash ] && source ${OVERLAY_WS}/install/setup.bash" >> /root/.bashrc
 
 COPY config ${CONFIG_FOLDER}
 

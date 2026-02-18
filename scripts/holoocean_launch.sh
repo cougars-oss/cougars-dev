@@ -35,12 +35,7 @@ case ${scenario} in
 esac
 
 # --- Launch ---
-err_log=$(mktemp)
-if ! gum spin --title "Launching HoloOcean (${scenario})..." --show-output -- \
-    /bin/bash -c "docker exec -it --user ue4 holoocean-ct /bin/bash -c \
-    'source /opt/ros/humble/setup.bash && source /home/ue4/ros2_ws/install/setup.bash \
-    && ros2 run holoocean_main holoocean_node --ros-args --params-file /home/ue4/config/${params}' 2>${err_log}"; then
-
-    cat ${err_log}
-fi
-rm ${err_log}
+gum spin --title "Launching HoloOcean (${scenario})..." -- sleep 1
+docker exec -it --user ue4 holoocean-ct /bin/bash -c \
+    "source /opt/ros/humble/setup.bash && source /home/ue4/ros2_ws/install/setup.bash \
+    && ros2 run holoocean_main holoocean_node --ros-args --params-file /home/ue4/config/${params}"

@@ -22,7 +22,7 @@ ARG USER_GID=1000
 SHELL [ "/bin/bash", "-c" ]
 
 ENV DOCKER_USER=${DOCKER_USER} \
-    COLCON_WS=/home/${DOCKER_USER}/cougars-dev/ros2_ws \
+    OVERLAY_WS=/home/${DOCKER_USER}/cougars-dev/ros2_ws \
     CONFIG_FOLDER=/home/${DOCKER_USER}/cougars-dev/config \
     PATH="${PATH}:/home/${DOCKER_USER}/.local/bin" \
     GUM_CHOOSE_HEADER_FOREGROUND="0" \
@@ -30,7 +30,7 @@ ENV DOCKER_USER=${DOCKER_USER} \
     GUM_CHOOSE_SELECTED_FOREGROUND="75" \
     GUM_SPIN_SPINNER_FOREGROUND="75"
 
-WORKDIR ${COLCON_WS}
+WORKDIR ${OVERLAY_WS}
 
 # Create the user
 RUN groupadd --gid ${USER_GID} "${DOCKER_USER}" \
@@ -38,7 +38,7 @@ RUN groupadd --gid ${USER_GID} "${DOCKER_USER}" \
     && usermod -aG sudo "${DOCKER_USER}" \
     && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && echo "source /opt/ros/humble/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
-    && echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
+    && echo "[ -f ${OVERLAY_WS}/install/setup.bash ] && source ${OVERLAY_WS}/install/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
     && touch /home/${DOCKER_USER}/.hushlogin \
     && chown -R ${DOCKER_USER}:${DOCKER_USER} /home/${DOCKER_USER}
 

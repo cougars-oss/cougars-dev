@@ -15,6 +15,7 @@
 
 set -e
 
+source ${OVERLAY_WS}/install/setup.bash
 source "$(dirname "$0")/utils/common.sh"
 
 # --- Selection ---
@@ -63,6 +64,7 @@ args=(
 )
 [ -n "$record_bag_path" ] && args+=("record_bag_path:=$record_bag_path")
 
+gum spin --title "Launching CoUGARs (rosbag)..." -- sleep 1
 echo "ros2 launch coug_bringup bag.launch.py ${args[*]}"
 if [ -n "$record_bag_path" ]; then
     tmp=$(mktemp -d)

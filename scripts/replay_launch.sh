@@ -15,6 +15,7 @@
 
 set -e
 
+source ${OVERLAY_WS}/install/setup.bash
 source "$(dirname "$0")/utils/common.sh"
 
 # --- Selection ---
@@ -27,5 +28,6 @@ agent_ns=$(printf "%s\n" "${!AGENTS[@]}" | sort | gum filter --placeholder "Sele
 
 # --- Launch ---
 args=("play_bag_path:=$bag_path" "auv_ns:=$agent_ns")
-echo "ros2 launch coug_bringup viz.launch.py ${args[*]}"
-ros2 launch coug_bringup viz.launch.py "${args[@]}"
+gum spin --title "Launching CoUGARs (replay)..." -- sleep 1
+echo "ros2 launch coug_bringup replay.launch.py ${args[*]}"
+ros2 launch coug_bringup replay.launch.py "${args[@]}"
