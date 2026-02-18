@@ -60,5 +60,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "ros2", "--help" ]
