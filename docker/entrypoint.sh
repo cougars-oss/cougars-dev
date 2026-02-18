@@ -16,7 +16,6 @@
 set -e
 
 source /opt/ros/humble/setup.bash
-[ -f /ros2_ws/install/setup.bash ] && source /ros2_ws/install/setup.bash
-[ -f $HOME/ros2_ws/install/setup.bash ] && source $HOME/ros2_ws/install/setup.bash
+[ -f $COLCON_WS/install/setup.bash ] && source $COLCON_WS/install/setup.bash
 
 exec "$@"

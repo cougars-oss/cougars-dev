@@ -13,23 +13,36 @@
 # limitations under the License.
 
 services:
+  dev:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+
   holoocean:
     image: frostlab/holoocean:2.0-runtime-ubuntu22.04-cuda12.4-ros-cyclone
     build:
-      context: .
-      dockerfile: Dockerfile.holoocean
+      context: ../..
+      dockerfile: docker/Dockerfile.holoocean
     container_name: holoocean-ct
-    runtime: nvidia
     network_mode: host
     ipc: host
     pid: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
     environment:
       - DISPLAY=${DISPLAY:-:0}
-      - NVIDIA_DRIVER_CAPABILITIES=all
-      - NVIDIA_VISIBLE_DEVICES=all
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
-      - $LOCAL_WORKSPACE_FOLDER/holoocean/config:/home/ue4/config
+      - ./config:/home/ue4/config
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
       - /dev/shm:/dev/shm

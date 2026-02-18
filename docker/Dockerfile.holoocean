@@ -17,7 +17,11 @@ FROM frostlab/holoocean:2.0-runtime-ubuntu22.04-cuda12.4-ros
 ARG DEBIAN_FRONTEND=noninteractive
 ARG ROS_DISTRO=humble
 
-SHELL ["/bin/bash", "-c"]
+SHELL [ "/bin/bash", "-c" ]
+
+ENV DOCKER_USER=ue4 \
+    COLCON_WS=/home/ue4/ros2_ws \
+    CONFIG_FOLDER=/home/ue4/config
 
 USER root
 
@@ -27,8 +31,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
 
-COPY entrypoint.sh /entrypoint.sh
+COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+USER ${DOCKER_USER}
 ENTRYPOINT [ "/entrypoint.sh" ]
-CMD [ "gosu", "ue4", "/bin/bash" ]
+CMD [ "/bin/bash" ]

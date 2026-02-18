@@ -16,19 +16,25 @@ FROM snelsondurrant/cougars:base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-SHELL ["/bin/bash", "-c"]
+SHELL [ "/bin/bash", "-c" ]
 
-WORKDIR /ros2_ws
-COPY packages ./src
+ENV DOCKER_USER=root \
+    COLCON_WS=/ros2_ws \
+    CONFIG_FOLDER=/config
+
+COPY packages ${COLCON_WS}/src
 
 # Build the ROS workspace
-RUN --mount=type=cache,target=/ros2_ws/build \
-    --mount=type=cache,target=/ros2_ws/log \
+WORKDIR ${COLCON_WS}
+RUN --mount=type=cache,target=${COLCON_WS}/build \
+    --mount=type=cache,target=${COLCON_WS}/log \
     source /opt/ros/humble/setup.sh && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-RUN echo 'source /opt/ros/humble/setup.bash' >> /root/.bashrc \
-    && echo '[ -f /ros2_ws/install/setup.bash ] && source /ros2_ws/install/setup.bash' >> /root/.bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> /root/.bashrc \
+    && echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" >> /root/.bashrc
 
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["ros2", "--help"]
+COPY config ${CONFIG_FOLDER}
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ "/bin/bash" ]
