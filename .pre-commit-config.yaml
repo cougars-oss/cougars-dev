@@ -70,6 +70,7 @@ repos:
         entry: ament_lint_cmake
         language: system
         types: [cmake]
+        files: ^ros2_ws/src/
 
       - id: ament_xmllint
         name: ament_xmllint
