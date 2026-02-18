@@ -32,6 +32,7 @@
                 "ms-azuretools.vscode-docker",
                 "docker.docker",
                 "github.vscode-github-actions",
+                "eamodio.gitlens",
                 "nonanonno.vscode-ros2",
                 "smilerobotics.urdf",
                 "morningfrog.urdf-visualizer",
