@@ -39,7 +39,7 @@ def launch_setup(context, *args, **kwargs):
 
     use_sim_time = LaunchConfiguration("use_sim_time")
     start_delay = LaunchConfiguration("start_delay")
-    urdf_file = LaunchConfiguration("urdf_file")
+    auv_type = LaunchConfiguration("auv_type")
     auv_ns = LaunchConfiguration("auv_ns")
     play_bag_path = LaunchConfiguration("play_bag_path")
     record_bag_path = LaunchConfiguration("record_bag_path")
@@ -48,10 +48,29 @@ def launch_setup(context, *args, **kwargs):
     auv_ns_str = context.perform_substitution(auv_ns)
     play_bag_path_str = context.perform_substitution(play_bag_path)
     record_bag_path_str = context.perform_substitution(record_bag_path)
+    auv_type_str = context.perform_substitution(auv_type)
 
     coug_bringup_dir = get_package_share_directory("coug_bringup")
     coug_bringup_launch_dir = os.path.join(coug_bringup_dir, "launch")
     sensor_bridge_dir = get_package_share_directory("sensor_bridge")
+
+    if auv_type_str == "bluerov2":
+        urdf_file = PathJoinSubstitution(
+            [
+                FindPackageShare("coug_description"),
+                "urdf",
+                "bluerov2",
+                "bluerov2.urdf.xacro",
+            ]
+        )
+    elif auv_type_str == "couguv":
+        urdf_file = PathJoinSubstitution(
+            [
+                FindPackageShare("coug_description"),
+                "urdf",
+                "couguv.urdf.xacro",
+            ]
+        )
 
     actions = []
 
@@ -176,16 +195,10 @@ def generate_launch_description():
                 ),
             ),
             DeclareLaunchArgument(
-                "urdf_file",
-                default_value=PathJoinSubstitution(
-                    [
-                        FindPackageShare("coug_description"),
-                        "urdf",
-                        "bluerov2",
-                        "bluerov2.urdf.xacro",
-                    ]
-                ),
-                description="URDF or Xacro file to load",
+                "auv_type",
+                default_value="bluerov2",
+                description="AUV type (bluerov2 or couguv)",
+                choices=["bluerov2", "couguv"],
             ),
             DeclareLaunchArgument(
                 "auv_ns",

@@ -1,60 +1,31 @@
 #!/bin/bash
-# Created by Nelson Durrant, Jan 2026
+# Copyright (c) 2026 BYU FROST Lab
 #
-# Launches the CoUGARs visualization stack for a rosbag
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# Usage:
-#   ./scripts/viz_launch.sh <bag_name> [-m] [-d <seconds>] [-n <namespace>]
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Arguments:
-#   <bag_name>: Name of the rosbag to play (required)
-#   -m: Launch multi-agent visualization if true
-#   -d <seconds>: Start offset in seconds
-#   -n <namespace>: Namespace for the AUV (e.g. auv0)
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
-source ~/ros2_ws/install/setup.bash
+set -e
 
-if [ -z "$1" ]; then
-    print_error "Usage: $0 <bag_name> [-m] [-d <seconds>] [-n <namespace>]"
-    exit 1
-fi
+source "$(dirname "$0")/utils/common.sh"
 
-play_bag_path="$HOME/bags/$1"
-shift
+# --- Selection ---
+bag_name=$(cd "$BAG_DIR" && find . -maxdepth 3 -name "metadata.yaml" -exec dirname {} \; | sed 's|^\./||' | sort -r | gum filter --placeholder "Select a bag to play..." || exit 0)
+[ -z "$bag_name" ] && exit 0
+bag_path="$BAG_DIR/$bag_name"
 
-if [ ! -d "$play_bag_path" ]; then
-    print_error "Bag not found: $play_bag_path"
-    exit 1
-fi
+agent_ns=$(printf "%s\n" "${!AGENTS[@]}" | sort | gum filter --placeholder "Select an agent to visualize..." || exit 0)
+[ -z "$agent_ns" ] && exit 0
 
-delay="0.0"
-namespace="coug0sim"
-multiagent="false"
-
-while getopts ":d:n:m" opt; do
-    case $opt in
-        d)
-            delay="$OPTARG"
-            ;;
-        n)
-            namespace="$OPTARG"
-            ;;
-        m)
-            multiagent="true"
-            ;;
-        \?)
-            print_error "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-        :)
-            print_error "Option -$OPTARG requires an argument." >&2
-            exit 1
-            ;;
-    esac
-done
-
-args=("play_bag_path:=$play_bag_path" "start_delay:=$delay" "auv_ns:=$namespace" "multiagent_viz:=$multiagent")
-
-print_info "Launching visualization stack for bag: $play_bag_path..."
+# --- Launch ---
+args=("play_bag_path:=$bag_path" "auv_ns:=$agent_ns")
+echo "ros2 launch coug_bringup viz.launch.py ${args[*]}"
 ros2 launch coug_bringup viz.launch.py "${args[@]}"

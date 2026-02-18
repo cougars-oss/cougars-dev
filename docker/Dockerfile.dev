@@ -24,7 +24,11 @@ SHELL [ "/bin/bash", "-c" ]
 ENV DOCKER_USER=${DOCKER_USER} \
     COLCON_WS=/home/${DOCKER_USER}/cougars-dev/ros2_ws \
     CONFIG_FOLDER=/home/${DOCKER_USER}/cougars-dev/config \
-    PATH="${PATH}:/home/${DOCKER_USER}/.local/bin"
+    PATH="${PATH}:/home/${DOCKER_USER}/.local/bin" \
+    GUM_CHOOSE_HEADER_FOREGROUND="0" \
+    GUM_CHOOSE_CURSOR_FOREGROUND="75" \
+    GUM_CHOOSE_SELECTED_FOREGROUND="75" \
+    GUM_SPIN_SPINNER_FOREGROUND="75"
 
 WORKDIR ${COLCON_WS}
 

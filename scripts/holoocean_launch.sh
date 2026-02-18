@@ -1,36 +1,46 @@
 #!/bin/bash
-# Created by Nelson Durrant, Jan 2026
+# Copyright (c) 2026 BYU FROST Lab
 #
-# Launches the selected scenario in HoloOcean
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# Usage:
-#   ./holoocean/launch.sh [-b] [-m]
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Arguments:
-#   -b: Launch the BlueROV2 scenario
-#   -m: Launch the multi-CougUV scenario
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 set -e
 
-source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
-
-params_file="/home/ue4/config/coug_holoocean_params.yaml"
-while getopts ":bm" opt; do
-    case $opt in
-        b)
-            params_file="/home/ue4/config/bluerov2_holoocean_params.yaml"
-            ;;
-        m)
-            params_file="/home/ue4/config/multi_coug_holoocean_params.yaml"
-            ;;
-        \?)
-            print_error "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-    esac
+scenario=""
+while getopts "mb" opt; do
+  case ${opt} in
+    m) scenario="Multi-Agent" ;;
+    b) scenario="BlueROV2" ;;
+  esac
 done
 
-print_info "Launching the configured scenario in HoloOcean..."
-docker exec -it --user ue4 holoocean-ct /bin/bash -c \
-    "source /opt/ros/humble/setup.bash && source /home/ue4/ros2_ws/install/setup.bash \
-    && ros2 run holoocean_main holoocean_node --ros-args --params-file $params_file"
+# --- Selection ---
+if [ -z "$scenario" ]; then
+    scenario=$(gum choose --header "Choose a HoloOcean scenario:" "CougUV" "BlueROV2" "Multi-Agent")
+fi
+
+case ${scenario} in
+    "CougUV") params="coug_holoocean_params.yaml";;
+    "BlueROV2") params="bluerov2_holoocean_params.yaml";;
+    "Multi-Agent") params="multi_coug_holoocean_params.yaml";;
+esac
+
+# --- Launch ---
+err_log=$(mktemp)
+if ! gum spin --title "Launching HoloOcean (${scenario})..." --show-output -- \
+    /bin/bash -c "docker exec -it --user ue4 holoocean-ct /bin/bash -c \
+    'source /opt/ros/humble/setup.bash && source /home/ue4/ros2_ws/install/setup.bash \
+    && ros2 run holoocean_main holoocean_node --ros-args --params-file /home/ue4/config/${params}' 2>${err_log}"; then
+
+    cat ${err_log}
+fi
+rm ${err_log}

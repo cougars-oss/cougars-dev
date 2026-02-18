@@ -1,14 +1,24 @@
 #!/bin/bash
-# Created by Nelson Durrant, Jan 2026
+# Copyright (c) 2026 BYU FROST Lab
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-function print_info {
-    echo -e "\033[0m\033[36m[ 🌊 ] $1\033[0m"
-}
+BAG_DIR="${HOME}/cougars-dev/bags"
 
-function print_warning {
-    echo -e "\033[0m\033[33m[ 🐡 ] $1\033[0m"
-}
-
-function print_error {
-    echo -e "\033[0m\033[31m[ 🦀 ] $1\033[0m"
-}
+declare -A AGENTS=(
+    ["bluerov2"]="bluerov2"
+    ["blue0sim"]="bluerov2"
+    ["coug0sim"]="couguv"
+    ["coug1sim"]="couguv"
+    ["coug2sim"]="couguv"
+)

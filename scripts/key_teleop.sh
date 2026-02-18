@@ -1,10 +1,26 @@
 #!/bin/bash
-# Created by Nelson Durrant, Jan 2026
+# Copyright (c) 2026 BYU FROST Lab
 #
-# Drives the BlueROV2 in HoloOcean using the keyboard
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
-source ${COLCON_WS}/install/setup.bash
+set -e
 
-print_info "Starting BlueROV2 keyboard teleop..."
-ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:=/blue0sim/cmd_vel
+source "$(dirname "$0")/utils/common.sh"
+
+# --- Selection ---
+agent_ns=$(printf "%s\n" "${!AGENTS[@]}" | sort | gum filter --placeholder "Select an agent to drive..." || exit 0)
+[ -z "$agent_ns" ] && exit 0
+
+# --- Launch ---
+gum spin --title "Driving ${agent_ns}..." --show-output -- \
+    ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args --remap cmd_vel:="/${agent_ns}/cmd_vel"

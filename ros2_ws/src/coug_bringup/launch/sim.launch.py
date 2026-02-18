@@ -31,14 +31,44 @@ from launch_ros.substitutions import FindPackageShare
 def launch_setup(context, *args, **kwargs):
 
     use_sim_time = LaunchConfiguration("use_sim_time")
-    urdf_file = LaunchConfiguration("urdf_file")
-    num_agents = LaunchConfiguration("num_agents")
-    bag_path = LaunchConfiguration("bag_path")
+    scenario = LaunchConfiguration("scenario")
+    record_bag_path = LaunchConfiguration("record_bag_path")
     compare = LaunchConfiguration("compare")
-    auv_ns = LaunchConfiguration("auv_ns")
 
-    num_agents_int = int(context.perform_substitution(num_agents))
-    bag_path_str = context.perform_substitution(bag_path)
+    scenario_str = context.perform_substitution(scenario)
+    record_bag_path_str = context.perform_substitution(record_bag_path)
+
+    if scenario_str == "bluerov2":
+        urdf_file = PathJoinSubstitution(
+            [
+                FindPackageShare("coug_description"),
+                "urdf",
+                "bluerov2_holoocean",
+                "bluerov2_holoocean.urdf.xacro",
+            ]
+        )
+        auv_ns = "blue0sim"
+        num_agents_int = 1
+    elif scenario_str == "multiagent":
+        urdf_file = PathJoinSubstitution(
+            [
+                FindPackageShare("coug_description"),
+                "urdf",
+                "couguv_holoocean.urdf.xacro",
+            ]
+        )
+        auv_ns = "coug0sim"
+        num_agents_int = 3
+    else:
+        urdf_file = PathJoinSubstitution(
+            [
+                FindPackageShare("coug_description"),
+                "urdf",
+                "couguv_holoocean.urdf.xacro",
+            ]
+        )
+        auv_ns = "coug0sim"
+        num_agents_int = 1
 
     coug_bringup_dir = get_package_share_directory("coug_bringup")
     coug_bringup_launch_dir = os.path.join(coug_bringup_dir, "launch")
@@ -47,7 +77,7 @@ def launch_setup(context, *args, **kwargs):
 
     actions = []
 
-    if bag_path_str:
+    if record_bag_path_str:
         actions.append(
             ExecuteProcess(
                 cmd=[
@@ -56,7 +86,7 @@ def launch_setup(context, *args, **kwargs):
                     "record",
                     "-a",
                     "-o",
-                    bag_path_str,
+                    record_bag_path_str,
                     "--storage",
                     "mcap",
                 ],
@@ -126,23 +156,13 @@ def generate_launch_description():
                 description="Use simulation/rosbag clock if true",
             ),
             DeclareLaunchArgument(
-                "urdf_file",
-                default_value=PathJoinSubstitution(
-                    [
-                        FindPackageShare("coug_description"),
-                        "urdf",
-                        "couguv_holoocean.urdf.xacro",
-                    ]
-                ),
-                description="URDF or Xacro file to load",
+                "scenario",
+                default_value="couguv",
+                description="HoloOcean scenario (bluerov2 or multiagent or couguv)",
+                choices=["bluerov2", "multiagent", "couguv"],
             ),
             DeclareLaunchArgument(
-                "num_agents",
-                default_value="1",
-                description="Number of AUV agents to spawn",
-            ),
-            DeclareLaunchArgument(
-                "bag_path",
+                "record_bag_path",
                 default_value="",
                 description="Path to record rosbag (if empty, no recording)",
             ),
@@ -150,11 +170,6 @@ def generate_launch_description():
                 "compare",
                 default_value="false",
                 description="Launch additional localization nodes if true",
-            ),
-            DeclareLaunchArgument(
-                "auv_ns",
-                default_value="auv0",
-                description="Namespace for the AUV (e.g. auv0)",
             ),
             OpaqueFunction(function=launch_setup),
         ]

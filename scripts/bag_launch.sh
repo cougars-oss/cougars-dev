@@ -1,93 +1,84 @@
 #!/bin/bash
-# Created by Nelson Durrant, Jan 2026
+# Copyright (c) 2026 BYU FROST Lab
 #
-# Launches the CoUGARs development stack for a rosbag
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# Usage:
-#   ./scripts/bag_launch.sh <bag_name> [-c] [-d <seconds>] [-r <bag_name>] [-n <namespace>]
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Arguments:
-#   <bag_name>: Name of the rosbag to play (required)
-#   -c: Launch alternative localization methods for comparison
-#   -d <seconds>: Start offset in seconds
-#   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
-#   -n <namespace>: Namespace for the AUV (e.g. auv0)
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
-source $COLCON_WS/install/setup.bash
+set -e
 
-if [ -z "$1" ]; then
-    print_error "Usage: $0 <bag_name> [-c] [-d <seconds>] [-r <bag_name>] [-n <namespace>]"
-    exit 1
-fi
+source "$(dirname "$0")/utils/common.sh"
 
-play_bag_path="${HOME}/cougars-dev/bags/$1"
-shift
+# --- Selection ---
+bag_name=$(cd "$BAG_DIR" && find . -maxdepth 3 -name "metadata.yaml" -exec dirname {} \; | sed 's|^\./||' | sort -r | gum filter --placeholder "Select a bag to play..." || exit 0)
+[ -z "$bag_name" ] && exit 0
+bag_path="$BAG_DIR/$bag_name"
 
-if [ ! -d "$play_bag_path" ]; then
-    print_error "Bag not found: $play_bag_path"
-    exit 1
-fi
+agent_ns=$(printf "%s\n" "${!AGENTS[@]}" | sort | gum filter --placeholder "Select an agent to launch..." || exit 0)
+[ -z "$agent_ns" ] && exit 0
+auv_type="${AGENTS[$agent_ns]}"
 
-record_bag_path=""
+# --- Options ---
+options=$(gum choose --no-limit --header "Select options:" "Record rosbag" "Set start delay" "Launch comparison methods" || true)
+
 compare="false"
-delay="0.0"
-namespace="bluerov2"
+start_delay="0.0"
+record_bag_path=""
 
-while getopts ":cd:r:n:" opt; do
-    case $opt in
-        c)
-            compare="true"
-            ;;
-        d)
-            delay="$OPTARG"
-            ;;
-        r)
-            timestamp=$(date +"_%Y-%m-%d-%H-%M-%S")
-            record_bag_path="$HOME/bags/${OPTARG}${timestamp}"
-            ;;
-        n)
-            namespace="$OPTARG"
-            ;;
-        \?)
-            print_error "Invalid option: -$OPTARG" >&2
-            exit 1
-            ;;
-        :)
-            print_error "Option -$OPTARG requires an argument." >&2
-            exit 1
-            ;;
-    esac
-done
+if [[ "$options" == *"Launch comparison methods"* ]]; then
+    compare="true"
+fi
 
-if [ -n "$record_bag_path" ] && [ -d "$record_bag_path" ]; then
-    print_warning "Bag directory already exists: $record_bag_path"
-    read -p "Do you want to overwrite it? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf "$record_bag_path"
+if [[ "$options" == *"Set start delay"* ]]; then
+    start_delay=$(gum input --placeholder "Set start delay (s)..." || echo "0.0")
+    if ! [[ "$start_delay" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        start_delay="0.0"
+    fi
+fi
+
+if [[ "$options" == *"Record rosbag"* ]]; then
+    suffix=$(gum input --placeholder "Set bag suffix..." || echo "")
+    if [ -n "$suffix" ]; then
+        record_bag_path="${BAG_DIR}/${suffix}$(date +'_%Y-%m-%d-%H-%M-%S')"
     else
-        exit 1
+        record_bag_path="${BAG_DIR}/rosbag$(date +'_%Y-%m-%d-%H-%M-%S')"
     fi
 fi
 
-args=("compare:=$compare" "play_bag_path:=$play_bag_path" "start_delay:=$delay" "auv_ns:=$namespace")
-if [ -n "$record_bag_path" ]; then
-    args+=("record_bag_path:=$record_bag_path")
-fi
+# --- Launch ---
+args=(
+    "play_bag_path:=$bag_path"
+    "auv_type:=$auv_type"
+    "auv_ns:=$agent_ns"
+    "compare:=$compare"
+    "start_delay:=$start_delay"
+)
+[ -n "$record_bag_path" ] && args+=("record_bag_path:=$record_bag_path")
 
-print_info "Launching development stack for bag: $play_bag_path..."
+echo "ros2 launch coug_bringup bag.launch.py ${args[*]}"
 if [ -n "$record_bag_path" ]; then
-    print_info "Recording to bag: $record_bag_path"
+    tmp=$(mktemp -d)
+    ROS_LOG_DIR="${tmp}" ros2 launch coug_bringup bag.launch.py "${args[@]}"
 
-    temp_log_dir=$(mktemp -d)
-    ROS_LOG_DIR="$temp_log_dir" ros2 launch coug_bringup bag.launch.py "${args[@]}"
-    if [ -d "$record_bag_path" ] && [ -d "$temp_log_dir" ]; then
-        mv "$temp_log_dir" "$record_bag_path/log"
+    if [ -d "$record_bag_path" ]; then
+        mv "${tmp}" "${record_bag_path}/log"
+
+        mkdir -p "${record_bag_path}/config"
+        src="${HOME}/config"
+        if [ -d "${src}" ] && [ -n "$(ls -A "${src}")" ]; then
+            cp -r "${src}/"* "${record_bag_path}/config/" 2>/dev/null || true
+        fi
+    else
+        rm -rf "${tmp}"
     fi
-
-    mkdir -p "$record_bag_path/config"
-    cp -r ~/config/* "$record_bag_path/config/"
 else
     ros2 launch coug_bringup bag.launch.py "${args[@]}"
 fi

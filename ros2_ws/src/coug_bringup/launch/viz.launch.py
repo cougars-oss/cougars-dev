@@ -28,10 +28,8 @@ from launch.substitutions import LaunchConfiguration
 def launch_setup(context, *args, **kwargs):
 
     use_sim_time = LaunchConfiguration("use_sim_time")
-    start_delay = LaunchConfiguration("start_delay")
     auv_ns = LaunchConfiguration("auv_ns")
     play_bag_path = LaunchConfiguration("play_bag_path")
-    multiagent_viz = LaunchConfiguration("multiagent_viz")
 
     auv_ns_str = context.perform_substitution(auv_ns)
     play_bag_path_str = context.perform_substitution(play_bag_path)
@@ -49,8 +47,6 @@ def launch_setup(context, *args, **kwargs):
                 "play",
                 play_bag_path_str,
                 "--clock",
-                "--start-offset",
-                start_delay,
                 "--remap",
                 "/tf:=/tf_discard",
                 "/tf_static:=/tf_static_discard",
@@ -68,7 +64,6 @@ def launch_setup(context, *args, **kwargs):
             ),
             launch_arguments={
                 "use_sim_time": use_sim_time,
-                "multiagent_viz": multiagent_viz,
                 "auv_ns": auv_ns,
             }.items(),
         )
@@ -84,18 +79,6 @@ def generate_launch_description():
                 "use_sim_time",
                 default_value="true",
                 description="Use simulation/rosbag clock if true",
-            ),
-            DeclareLaunchArgument(
-                "multiagent_viz",
-                default_value="false",
-                description="Use multi-agent visualization config if true",
-            ),
-            DeclareLaunchArgument(
-                "start_delay",
-                default_value="0.0",
-                description=(
-                    "Time in seconds to skip from the beginning of the bag file (start offset)"
-                ),
             ),
             DeclareLaunchArgument(
                 "auv_ns",
