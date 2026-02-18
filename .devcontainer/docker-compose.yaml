@@ -45,6 +45,7 @@ services:
     privileged: true
     environment:
       - DISPLAY=${DISPLAY:-:0}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
       - ros2-workspace:/home/frostlab-docker/ros2_ws
       - ..:/home/frostlab-docker/ros2_ws/src:cached

@@ -35,6 +35,9 @@
             ]
         }
     },
+    "remoteEnv": {
+        "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+    },
     "postCreateCommand": [
         "/bin/bash",
         ".devcontainer/post-create-command.sh"

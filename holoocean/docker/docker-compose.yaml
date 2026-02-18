@@ -14,28 +14,25 @@
 
 services:
   holoocean:
-    image: frostlab/holoocean:2.0-runtime-ubuntu22.04-cuda12.4-ros
+    image: frostlab/holoocean:2.0-runtime-ubuntu22.04-cuda12.4-ros-cyclone
+    build:
+      context: .
+      dockerfile: Dockerfile.holoocean
     container_name: holoocean-ct
-    user: root
     runtime: nvidia
     network_mode: host
     ipc: host
     pid: host
     environment:
-      - DISPLAY=$DISPLAY
-      - QT_X11_NO_MITSHM=1
+      - DISPLAY=${DISPLAY:-:0}
       - NVIDIA_DRIVER_CAPABILITIES=all
       - NVIDIA_VISIBLE_DEVICES=all
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
-      - ../config:/home/ue4/config
-      - ./entrypoint.sh:/entrypoint.sh
+      - $LOCAL_WORKSPACE_FOLDER/holoocean/config:/home/ue4/config
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
-      - /etc/udev:/etc/udev
       - /dev/shm:/dev/shm
-      - /dev:/dev
     stdin_open: true
     tty: true
-    restart: always
-    entrypoint: [ "/entrypoint.sh" ]
-    command: [ "gosu", "ue4", "/bin/bash" ]
+    restart: unless-stopped
