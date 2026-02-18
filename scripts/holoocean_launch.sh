@@ -29,13 +29,12 @@ if [ -z "$scenario" ]; then
 fi
 
 case ${scenario} in
-    "CougUV") params="coug_holoocean_params.yaml";;
+    "CougUV") params="couguv_holoocean_params.yaml";;
     "BlueROV2") params="bluerov2_holoocean_params.yaml";;
-    "Multi-Agent") params="multi_coug_holoocean_params.yaml";;
+    "Multi-Agent") params="multi_couguv_holoocean_params.yaml";;
 esac
 
 # --- Launch ---
-gum spin --title "Launching HoloOcean (${scenario})..." -- sleep 1
 docker exec -it --user ue4 holoocean-ct /bin/bash -c \
     "source /opt/ros/humble/setup.bash && source /home/ue4/ros2_ws/install/setup.bash \
-    && ros2 run holoocean_main holoocean_node --ros-args --params-file /home/ue4/config/${params}"
+    && ros2 run holoocean_main holoocean_node --ros-args --params-file /home/ue4/config/holoocean/${params}"

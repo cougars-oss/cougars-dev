@@ -1,5 +1,5 @@
 {
-    "name": "coug_openwater",
+    "name": "couguv_openwater",
     "package_name": "Ocean",
     "world": "OpenWater",
     "main_agent": "coug0sim",

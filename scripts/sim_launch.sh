@@ -53,7 +53,6 @@ fi
 args=("scenario:=$scenario" "compare:=$compare")
 [ -n "$record_bag_path" ] && args+=("record_bag_path:=$record_bag_path")
 
-gum spin --title "Launching CoUGARs (simulation)..." -- sleep 1
 echo "ros2 launch coug_bringup sim.launch.py ${args[*]}"
 if [ -n "$record_bag_path" ]; then
     tmp=$(mktemp -d)
