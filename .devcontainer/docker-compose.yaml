@@ -50,7 +50,7 @@ services:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
       - ros2-workspace:/home/frostlab-docker/ros2_ws
-      - ..:/home/frostlab-docker/ros2_ws/src:cached
+      - ..:/home/frostlab-docker/cougars-dev:cached
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
