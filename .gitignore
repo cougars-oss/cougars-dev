@@ -3,7 +3,7 @@ install
 log
 
 .mapproxy/*
-!mapproxy/.gitkeep
+!.mapproxy/.gitkeep
 
 bags/*
 !bags/.gitkeep

@@ -42,7 +42,7 @@ services:
       - DISPLAY=${DISPLAY:-:0}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
-      - ./config:/home/ue4/config
+      - ../config:/home/ue4/config
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /etc/localtime:/etc/localtime:ro
       - /dev/shm:/dev/shm
