@@ -13,7 +13,7 @@
 #   -r <bag_name>: Record a rosbag to ~/bags/<bag_name>
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
-source ~/ros2_ws/install/setup.bash
+source ${COLCON_WS}/install/setup.bash
 
 coug_share=$(ros2 pkg prefix coug_description --share)
 urdf="$coug_share/urdf/couguv_holoocean.urdf.xacro"
@@ -37,14 +37,14 @@ while getopts ":bcmr:" opt; do
             ;;
         r)
             timestamp=$(date +"_%Y-%m-%d-%H-%M-%S")
-            bag_path="$HOME/bags/${OPTARG}${timestamp}"
+            bag_path="${HOME}/bags/${OPTARG}${timestamp}"
             ;;
         \?)
             print_error "Invalid option: -$OPTARG" >&2
             exit 1
             ;;
         :)
-            print_error "Option -$OPTARG requires an argument." >&2
+            print_error "Option -${OPTARG} requires an argument." >&2
             exit 1
             ;;
     esac

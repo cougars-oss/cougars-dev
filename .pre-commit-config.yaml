@@ -30,7 +30,7 @@ repos:
         args: ["--reformat"]
         language: system
         types_or: [c++, c]
-        files: ^packages/
+        files: ^ros2_ws/src/
 
       # --- C++ Linting ---
       - id: ament_cpplint
@@ -38,14 +38,14 @@ repos:
         entry: ament_cpplint
         language: system
         types_or: [c++, c]
-        files: ^packages/
+        files: ^ros2_ws/src/
 
       # - id: ament_cppcheck
       #   name: ament_cppcheck
       #   entry: ament_cppcheck
       #   language: system
       #   types_or: [c++, c]
-      #   files: ^packages/
+      #   files: ^ros2_ws/src/
 
       # --- Python Linting ---
       - id: ament_flake8
@@ -53,7 +53,7 @@ repos:
         entry: ament_flake8
         language: system
         types: [python]
-        files: ^packages/
+        files: ^ros2_ws/src/
         exclude: /setup\.py$
 
       - id: ament_pep257
@@ -61,7 +61,7 @@ repos:
         entry: ament_pep257
         language: system
         types: [python]
-        files: ^packages/
+        files: ^ros2_ws/src/
         exclude: /setup\.py$
 
       # --- CMake & XML Linting ---
@@ -69,21 +69,21 @@ repos:
         name: ament_lint_cmake
         entry: ament_lint_cmake
         language: system
-        files: ^packages/.*CMakeLists\.txt$
+        files: ^ros2_ws/src/.*CMakeLists\.txt$
 
       - id: ament_xmllint
         name: ament_xmllint
         entry: ament_xmllint
         language: system
         types: [xml]
-        files: ^packages/
+        files: ^ros2_ws/src/
 
       # --- Copyright Check ---
       - id: ament_copyright
         name: ament_copyright
         entry: ament_copyright
         language: system
-        files: ^packages/
+        files: ^ros2_ws/src/
         exclude: |
             (?x)^(
                 .*\.json|

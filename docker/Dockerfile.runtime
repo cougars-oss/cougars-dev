@@ -22,7 +22,7 @@ ENV DOCKER_USER=root \
     COLCON_WS=/ros2_ws \
     CONFIG_FOLDER=/config
 
-COPY packages ${COLCON_WS}/src
+COPY ros2_ws/src ${COLCON_WS}/src
 
 # Build the ROS workspace
 WORKDIR ${COLCON_WS}

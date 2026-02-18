@@ -22,9 +22,11 @@ ARG USER_GID=1000
 SHELL [ "/bin/bash", "-c" ]
 
 ENV DOCKER_USER=${DOCKER_USER} \
-    COLCON_WS=/home/${DOCKER_USER}/ros2_ws \
-    CONFIG_FOLDER=/home/${DOCKER_USER}/ros2_ws/src/config \
+    COLCON_WS=/home/${DOCKER_USER}/cougars-dev/ros2_ws \
+    CONFIG_FOLDER=/home/${DOCKER_USER}/cougars-dev/config \
     PATH="${PATH}:/home/${DOCKER_USER}/.local/bin"
+
+WORKDIR ${COLCON_WS}
 
 # Create the user
 RUN groupadd --gid ${USER_GID} "${DOCKER_USER}" \
@@ -34,7 +36,6 @@ RUN groupadd --gid ${USER_GID} "${DOCKER_USER}" \
     && echo "source /opt/ros/humble/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
     && echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
     && touch /home/${DOCKER_USER}/.hushlogin \
-    && mkdir -p ${COLCON_WS}/src \
     && chown -R ${DOCKER_USER}:${DOCKER_USER} /home/${DOCKER_USER}
 
 # Install development tools

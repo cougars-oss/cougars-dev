@@ -5,7 +5,7 @@
         "docker-compose.yaml"
     ],
     "service": "dev",
-    "workspaceFolder": "/home/frostlab-docker/ros2_ws/src",
+    "workspaceFolder": "/home/frostlab-docker/cougars-dev",
     "remoteUser": "frostlab-docker",
     "updateRemoteUserUID": true,
     "hostRequirements": {
@@ -19,7 +19,7 @@
         },
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
             "moby": true,
-            "installDockerBuildx": true
+            "installDockerBuildx": false
         },
         "ghcr.io/devcontainers/features/nvidia-cuda:2.0.0": {}
     },

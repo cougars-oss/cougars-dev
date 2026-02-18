@@ -40,7 +40,7 @@ services:
     # build:
     #   context: ..
     #   dockerfile: docker/Dockerfile.dev
-    container_name: cougars-dev-ct
+    container_name: cougars-ct
     network_mode: host
     ipc: host
     pid: host

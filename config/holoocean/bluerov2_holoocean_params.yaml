@@ -5,4 +5,4 @@ holoocean_node:
     draw_arrow: false
 
     relative_path: false
-    scenario_path: "/home/ue4/config/bluerov2_openwater.json"
+    scenario_path: "/home/ue4/config/holoocean/bluerov2_openwater.json"

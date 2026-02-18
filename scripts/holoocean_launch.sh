@@ -12,20 +12,9 @@
 
 set -e
 
-script_dir="$(dirname "$(readlink -f "$0")")"
-source "$script_dir/../scripts/utils/common.sh"
-
-xhost +local:root
-
-print_info "Loading the holoocean-ct container..."
-docker compose -f "$script_dir/docker/docker-compose.yaml" up -d
-
-# Wait for './entrypoint.sh' to finish
-while [ "$(docker exec holoocean-ct test -f /tmp/ready \
-    && echo 'yes' || echo 'no')" != "yes" ]; do sleep 1; done
+source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
 
 params_file="/home/ue4/config/coug_holoocean_params.yaml"
-
 while getopts ":bm" opt; do
     case $opt in
         b)

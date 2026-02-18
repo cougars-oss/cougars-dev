@@ -14,14 +14,14 @@
 #   -n <namespace>: Namespace for the AUV (e.g. auv0)
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils/common.sh"
-source ~/ros2_ws/install/setup.bash
+source $COLCON_WS/install/setup.bash
 
 if [ -z "$1" ]; then
     print_error "Usage: $0 <bag_name> [-c] [-d <seconds>] [-r <bag_name>] [-n <namespace>]"
     exit 1
 fi
 
-play_bag_path="$HOME/ros2_ws/src/bags/$1"
+play_bag_path="${HOME}/cougars-dev/bags/$1"
 shift
 
 if [ ! -d "$play_bag_path" ]; then

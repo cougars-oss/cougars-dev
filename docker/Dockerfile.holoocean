@@ -23,6 +23,8 @@ ENV DOCKER_USER=ue4 \
     COLCON_WS=/home/ue4/ros2_ws \
     CONFIG_FOLDER=/home/ue4/config
 
+WORKDIR ${COLCON_WS}
+
 USER root
 
 # Install CycloneDDS

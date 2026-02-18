@@ -16,7 +16,7 @@
 FROM ubuntu:22.04 AS cacher
 
 WORKDIR /tmp/packages
-COPY packages .
+COPY ros2_ws/src .
 RUN find . -type f \! -name "package.xml" -delete
 
 # --- Main Stage ---
@@ -47,7 +47,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     ros-${ROS_DISTRO}-rosbag2-storage-mcap
 
 # Install ROS dependencies (rosdep)
-WORKDIR /ros2_ws/src
+WORKDIR /tmp/packages
 COPY --from=cacher /tmp/packages .
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
