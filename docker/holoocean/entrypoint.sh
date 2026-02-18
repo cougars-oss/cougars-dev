@@ -30,8 +30,4 @@ chown "${DOCKER_USER}:${DOCKER_USER}" "/home/${DOCKER_USER}"
 find "/home/${DOCKER_USER}" -maxdepth 1 -not -user "${DOCKER_USER}" \
     -exec chown -R "${DOCKER_USER}:${DOCKER_USER}" {} + 2>/dev/null || true
 
-INIT_COMMAND="source /opt/ros/humble/setup.bash; \
-              [ -f \"${OVERLAY_WS}/install/setup.bash\" ] && source \"${OVERLAY_WS}/install/setup.bash\"; \
-              exec \"\$@\""
-
-exec gosu "${DOCKER_USER}" bash -c "${INIT_COMMAND}" -- "$@"
+exec gosu "${DOCKER_USER}" "$@"
