@@ -57,7 +57,5 @@ RUN --mount=type=cache,target=/home/${DOCKER_USER}/.cache/pip,uid=1000,gid=1000 
 
 USER root
 
-COPY docker/entrypoint_dev.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "/bin/bash" ]

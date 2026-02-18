@@ -4,8 +4,7 @@
     "service": "dev",
     "workspaceFolder": "/home/frostlab-docker/cougars-dev",
     "remoteUser": "frostlab-docker",
-    "updateRemoteUserUID": false,
-    "overrideCommand": false,
+    "updateRemoteUserUID": true,
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "username": "frostlab-docker",
@@ -36,9 +35,6 @@
                 "kalebpace.balena-vscode@0.1.3"
             ]
         }
-    },
-    "remoteEnv": {
-        "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
     },
     "postCreateCommand": [
         "/bin/bash",
