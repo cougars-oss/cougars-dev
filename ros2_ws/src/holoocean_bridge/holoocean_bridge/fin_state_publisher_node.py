@@ -61,8 +61,6 @@ class FinStatePublisherNode(Node):
         joint_state.header.stamp = self.get_clock().now().to_msg()
         joint_state.name = self.joint_names
 
-        # HoloOcean uses the order: [rudder, starboard_elevator, port_elevator, thruster]
-        # We map this to the URDF joints: [top_fin_joint, left_fin_joint, right_fin_joint]
         rudder = -msg.cs[0]
         starboard_elevator = msg.cs[1]
         port_elevator = msg.cs[2]

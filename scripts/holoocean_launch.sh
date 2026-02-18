@@ -15,18 +15,8 @@
 
 set -e
 
-scenario=""
-while getopts "mb" opt; do
-  case ${opt} in
-    m) scenario="Multi-Agent" ;;
-    b) scenario="BlueROV2" ;;
-  esac
-done
-
 # --- Selection ---
-if [ -z "$scenario" ]; then
-    scenario=$(gum choose --header "Choose a HoloOcean scenario:" "CougUV" "BlueROV2" "Multi-Agent")
-fi
+scenario=$(gum choose --header "Choose a HoloOcean scenario:" "CougUV" "BlueROV2" "Multi-Agent")
 
 case ${scenario} in
     "CougUV") params="couguv_holoocean_params.yaml";;

@@ -29,6 +29,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -243,7 +244,8 @@ void CougWaypointsPlugin::Clear()
 
 void CougWaypointsPlugin::SaveWaypoints()
 {
-  QString path = QDir::homePath() + "/ros2_ws/src/coug_mapviz/waypoints";
+  const char * overlay_ws = std::getenv("OVERLAY_WS");
+  QString path = QString::fromUtf8(overlay_ws) + "/src/coug_mapviz/waypoints";
   QDir dir(path);
   if (!dir.exists()) {
     dir.mkpath(".");
@@ -278,7 +280,8 @@ void CougWaypointsPlugin::SaveWaypoints()
 
 void CougWaypointsPlugin::LoadWaypoints()
 {
-  QString path = QDir::homePath() + "/ros2_ws/src/coug_mapviz/waypoints";
+  const char * overlay_ws = std::getenv("OVERLAY_WS");
+  QString path = QString::fromUtf8(overlay_ws) + "/src/coug_mapviz/waypoints";
   QString filename = QFileDialog::getOpenFileName(
     config_widget_, "Load Mission", path, "JSON Files (*.json)");
   if (filename.isEmpty()) {return;}

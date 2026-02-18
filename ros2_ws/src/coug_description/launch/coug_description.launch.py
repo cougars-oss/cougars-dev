@@ -76,9 +76,7 @@ def generate_launch_description():
                 executable="joint_state_publisher",
                 name="joint_state_publisher",
                 parameters=[{"use_sim_time": use_sim_time}],
-                condition=UnlessCondition(
-                    use_sim_time
-                ),  # HoloOcean publishes joint states
+                condition=UnlessCondition(use_sim_time),
             ),
         ]
     )

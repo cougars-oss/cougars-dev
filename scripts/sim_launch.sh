@@ -19,10 +19,7 @@ source ${OVERLAY_WS}/install/setup.bash
 source "$(dirname "$0")/utils/common.sh"
 
 # --- Selection ---
-scenario=""
-if [ -z "$scenario" ]; then
-    scenario=$(gum choose --header "Choose a HoloOcean scenario:" "CougUV" "BlueROV2" "Multi-Agent")
-fi
+scenario=$(gum choose --header "Choose a HoloOcean scenario:" "CougUV" "BlueROV2" "Multi-Agent")
 
 case ${scenario} in
     "CougUV") scenario="couguv";;
