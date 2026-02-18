@@ -7,7 +7,8 @@
     "service": "dev",
     "workspaceFolder": "/home/frostlab-docker/cougars-dev",
     "remoteUser": "frostlab-docker",
-    "updateRemoteUserUID": true,
+    "updateRemoteUserUID": false,
+    "overrideCommand": false,
     "hostRequirements": {
         "gpu": true
     },

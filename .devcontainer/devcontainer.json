@@ -4,7 +4,8 @@
     "service": "dev",
     "workspaceFolder": "/home/frostlab-docker/cougars-dev",
     "remoteUser": "frostlab-docker",
-    "updateRemoteUserUID": true,
+    "updateRemoteUserUID": false,
+    "overrideCommand": false,
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "username": "frostlab-docker",
