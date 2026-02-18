@@ -73,7 +73,7 @@ if [ -n "$record_bag_path" ]; then
         mv "${tmp}" "${record_bag_path}/log"
 
         mkdir -p "${record_bag_path}/config"
-        src="${HOME}/config"
+        src="${HOME}/cougars-dev/config"
         if [ -d "${src}" ] && [ -n "$(ls -A "${src}")" ]; then
             cp -r "${src}/"* "${record_bag_path}/config/" 2>/dev/null || true
         fi
