@@ -23,7 +23,14 @@
                 "ms-python.python",
                 "twxs.cmake",
                 "ms-azuretools.vscode-docker",
+                "docker.docker",
                 "github.vscode-github-actions",
+                "nonanonno.vscode-ros2",
+                "smilerobotics.urdf",
+                "morningfrog.urdf-visualizer",
+                "mechatroner.rainbow-csv",
+                "redhat.vscode-xml",
+                "redhat.vscode-yaml",
                 "kalebpace.balena-vscode@0.1.3"
             ]
         }

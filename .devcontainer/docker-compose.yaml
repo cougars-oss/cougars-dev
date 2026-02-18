@@ -29,6 +29,7 @@ services:
 
   mapproxy:
     image: danielsnider/mapproxy
+    container_name: mapproxy-ct
     network_mode: host
     volumes:
       - ../.mapproxy:/mapproxy
@@ -39,6 +40,7 @@ services:
     # build:
     #   context: ..
     #   dockerfile: docker/Dockerfile.dev
+    container_name: cougars-dev-ct
     network_mode: host
     ipc: host
     pid: host
