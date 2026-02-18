@@ -43,7 +43,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     python3-pip python3-venv \
-    x11-apps x11-utils x11-xserver-utils xauth
+    x11-apps x11-utils x11-xserver-utils xauth \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list \
+    && apt-get update && apt-get install -y gum
 
 # Install Python development tools
 USER ${DOCKER_USER}
