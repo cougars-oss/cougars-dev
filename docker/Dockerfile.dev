@@ -41,13 +41,10 @@ RUN groupadd --gid ${USER_GID} "${DOCKER_USER}" \
 # Install development tools
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    python3-pip python3-venv \
-    x11-apps x11-utils x11-xserver-utils xauth \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list \
-    && apt-get update && apt-get install -y gum
+    echo 'deb [trusted=yes] https://repo.charm.sh/apt/ /' | sudo tee /etc/apt/sources.list.d/charm.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip python3-venv gum \
+    x11-apps x11-utils x11-xserver-utils xauth
 
 # Install Python development tools
 USER ${DOCKER_USER}
