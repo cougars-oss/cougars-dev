@@ -54,7 +54,11 @@ class ImuConverterNode(Node):
             self.get_parameter("gyro_noise_sigma").get_parameter_value().double_value
         )
         add_noise_param = self.get_parameter("add_noise").value
+        self.get_logger().info(
+            f"DEBUG: add_noise raw: {add_noise_param} type: {type(add_noise_param)}"
+        )
         self.add_noise = str(add_noise_param).lower() == "true"
+        self.get_logger().info(f"DEBUG: add_noise parsed: {self.add_noise}")
 
         self.subscription = self.create_subscription(
             Imu, input_topic, self.listener_callback, 10
