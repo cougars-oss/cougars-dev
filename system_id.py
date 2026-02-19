@@ -3,25 +3,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 from rosbags.highlevel import AnyReader
+from scipy.optimize import lsq_linear
 
 TOPIC_FORCE = "/coug0sim/cmd_wrench"
 TOPIC_ACCEL = "/coug0sim/imu/data_raw"
 TOPIC_VEL = "/coug0sim/dvl/data"
+TOPIC_ORIENTATION = "/coug0sim/imu/data"
 
-PRIOR_MEANS = np.array([32.0, 0.0, 0.0])
-PRIOR_SIGMAS = np.array([1e-9, 50.0, 50.0])
+PRIOR_MEANS = np.array([31.868, 1.593, 6.11])
+PRIOR_SIGMAS = np.array([1e-9, 1e-9, 1e-9])
 
 
 def get_data(bag_path):
     print(f"Reading {bag_path}...")
-    data = {"t": [], "F": [], "A": [], "V": [], "CovA": [], "CovV": []}
+    data = {"t": [], "F": [], "A": [], "V": [], "CovA": [], "CovV": [], "Pitch": []}
 
     start_t = None
     with AnyReader([Path(bag_path)]) as reader:
         connections = [
             x
             for x in reader.connections
-            if x.topic in [TOPIC_FORCE, TOPIC_ACCEL, TOPIC_VEL]
+            if x.topic in [TOPIC_FORCE, TOPIC_ACCEL, TOPIC_VEL, TOPIC_ORIENTATION]
         ]
 
         for connection, t, rawdata in reader.messages(connections=connections):
@@ -39,6 +41,16 @@ def get_data(bag_path):
             elif connection.topic == TOPIC_VEL:
                 data["V"].append([t_sec, msg.velocity.x])
                 data["CovV"].append([t_sec, msg.covariance[0]])
+            elif connection.topic == TOPIC_ORIENTATION:
+                w, x, y, z = (
+                    msg.orientation.w,
+                    msg.orientation.x,
+                    msg.orientation.y,
+                    msg.orientation.z,
+                )
+                sinp = 2.0 * (w * y - z * x)
+                pitch = np.arcsin(np.clip(sinp, -1.0, 1.0))
+                data["Pitch"].append([t_sec, pitch])
 
     return {k: np.array(v) for k, v in data.items()}
 
@@ -49,14 +61,17 @@ def solve(bag_path):
     # Interpolate to match velocity timestamps
     t = d["V"][:, 0]
     F = np.interp(t, d["F"][:, 0], d["F"][:, 1])
-    A = np.interp(t, d["A"][:, 0], d["A"][:, 1])
+    A_raw = np.interp(t, d["A"][:, 0], d["A"][:, 1])
     V = d["V"][:, 1]
-
+    Pitch = np.interp(t, d["Pitch"][:, 0], d["Pitch"][:, 1])
     CovA = np.interp(t, d["CovA"][:, 0], d["CovA"][:, 1])
     CovV = d["CovV"][:, 1]
 
+    # Subtract gravity component
+    A = A_raw + 9.8 * np.sin(Pitch)
+
     # Filter out low-velocity data
-    mask = np.abs(V) > 0.05
+    mask = np.abs(V) > -0.05
     y, a, v = F[mask], A[mask], V[mask]
 
     # Set weights based on covariance
@@ -74,7 +89,9 @@ def solve(bag_path):
 
     X_final = np.vstack([X_w, W_prior])
     y_final = np.vstack([y_w, y_prior])
-    params = np.linalg.lstsq(X_final, y_final, rcond=None)[0].flatten()
+
+    result = lsq_linear(X_final, y_final.flatten(), bounds=(0, np.inf))
+    params = result.x
 
     print(f"Mass      : {params[0]:.4f}")
     print(f"Lin Drag  : {params[1]:.4f}")
