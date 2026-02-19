@@ -34,6 +34,7 @@ def launch_setup(context, *args, **kwargs):
     scenario = LaunchConfiguration("scenario")
     record_bag_path = LaunchConfiguration("record_bag_path")
     compare = LaunchConfiguration("compare")
+    add_noise = LaunchConfiguration("add_noise")
 
     scenario_str = context.perform_substitution(scenario)
     record_bag_path_str = context.perform_substitution(record_bag_path)
@@ -133,6 +134,7 @@ def launch_setup(context, *args, **kwargs):
                 "use_sim_time": use_sim_time,
                 "auv_ns": multi_auv_ns,
                 "main_agent": "true" if i == 0 else "false",
+                "add_noise": add_noise,
             }.items(),
         )
 
@@ -170,6 +172,11 @@ def generate_launch_description():
                 "compare",
                 default_value="false",
                 description="Launch additional localization nodes if true",
+            ),
+            DeclareLaunchArgument(
+                "add_noise",
+                default_value="true",
+                description="Whether to add noise to sensor data",
             ),
             OpaqueFunction(function=launch_setup),
         ]

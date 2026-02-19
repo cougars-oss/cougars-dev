@@ -36,6 +36,7 @@ class DepthConverterNode(Node):
         self.declare_parameter("depth_frame", "depth_link")
         self.declare_parameter("map_frame", "map")
         self.declare_parameter("noise_sigma", 0.02)
+        self.declare_parameter("add_noise", True)
 
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
@@ -51,6 +52,9 @@ class DepthConverterNode(Node):
         )
         self.noise_sigma = (
             self.get_parameter("noise_sigma").get_parameter_value().double_value
+        )
+        self.add_noise = (
+            self.get_parameter("add_noise").get_parameter_value().bool_value
         )
 
         self.subscription = self.create_subscription(
@@ -74,7 +78,8 @@ class DepthConverterNode(Node):
 
         msg.pose.covariance[14] = self.noise_sigma * self.noise_sigma
 
-        msg.pose.pose.position.z += random.gauss(0, self.noise_sigma)
+        if self.add_noise:
+            msg.pose.pose.position.z += random.gauss(0, self.noise_sigma)
 
         self.publisher.publish(msg)
 

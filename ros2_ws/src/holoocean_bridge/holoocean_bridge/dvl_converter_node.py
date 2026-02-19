@@ -38,6 +38,7 @@ class DvlConverterNode(Node):
         self.declare_parameter("output_topic", "dvl/data")
         self.declare_parameter("dvl_frame", "dvl_link")
         self.declare_parameter("noise_sigma", 0.02)
+        self.declare_parameter("add_noise", True)
 
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
@@ -50,6 +51,9 @@ class DvlConverterNode(Node):
         )
         self.noise_sigma = (
             self.get_parameter("noise_sigma").get_parameter_value().double_value
+        )
+        self.add_noise = (
+            self.get_parameter("add_noise").get_parameter_value().bool_value
         )
 
         # From DVLSensor.h
@@ -83,7 +87,11 @@ class DvlConverterNode(Node):
         dvl_msg.header = msg.header
         dvl_msg.header.frame_id = self.dvl_frame
 
-        s = [random.gauss(0, self.noise_sigma) for _ in range(4)]
+        if self.add_noise:
+            s = [random.gauss(0, self.noise_sigma) for _ in range(4)]
+        else:
+            s = [0.0] * 4
+
         noise_x = self.inv_2s * (s[0] - s[2])
         noise_y = self.inv_2s * (s[1] - s[3])
         noise_z = self.inv_4c * (s[0] + s[1] + s[2] + s[3])

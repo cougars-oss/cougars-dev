@@ -38,6 +38,7 @@ class AhrsConverterNode(Node):
         self.declare_parameter("ahrs_frame", "modem_link")
         self.declare_parameter("yaw_noise_sigma", 0.01745)
         self.declare_parameter("roll_pitch_noise_sigma", 0.00349)
+        self.declare_parameter("add_noise", True)
 
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
@@ -55,6 +56,9 @@ class AhrsConverterNode(Node):
             self.get_parameter("roll_pitch_noise_sigma")
             .get_parameter_value()
             .double_value
+        )
+        self.add_noise = (
+            self.get_parameter("add_noise").get_parameter_value().bool_value
         )
 
         self.subscription = self.create_subscription(
@@ -108,9 +112,10 @@ class AhrsConverterNode(Node):
         pitch_rad = math.radians(pitch_deg)
         yaw_rad = math.radians(yaw_deg)
 
-        roll_rad += random.gauss(0, self.roll_pitch_noise_sigma)
-        pitch_rad += random.gauss(0, self.roll_pitch_noise_sigma)
-        yaw_rad += random.gauss(0, self.yaw_noise_sigma)
+        if self.add_noise:
+            roll_rad += random.gauss(0, self.roll_pitch_noise_sigma)
+            pitch_rad += random.gauss(0, self.roll_pitch_noise_sigma)
+            yaw_rad += random.gauss(0, self.yaw_noise_sigma)
 
         imu_msg.orientation = self.quaternion_from_euler(roll_rad, pitch_rad, yaw_rad)
 

@@ -29,6 +29,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     auv_ns = LaunchConfiguration("auv_ns")
     main_agent = LaunchConfiguration("main_agent")
+    add_noise = LaunchConfiguration("add_noise")
 
     fleet_params = PathJoinSubstitution(
         [
@@ -135,6 +136,11 @@ def generate_launch_description():
                 default_value="true",
                 description="Whether this agent is the main agent (publishes world transforms)",
             ),
+            DeclareLaunchArgument(
+                "add_noise",
+                default_value="true",
+                description="Whether to add noise to sensor data",
+            ),
             Node(
                 package="holoocean_bridge",
                 executable="depth_converter",
@@ -146,6 +152,7 @@ def generate_launch_description():
                         "use_sim_time": use_sim_time,
                         "depth_frame": depth_link_frame,
                         "map_frame": "map",
+                        "add_noise": add_noise,
                     },
                 ],
             ),
@@ -156,7 +163,11 @@ def generate_launch_description():
                 parameters=[
                     fleet_params,
                     auv_params,
-                    {"use_sim_time": use_sim_time, "gps_frame": com_link_frame},
+                    {
+                        "use_sim_time": use_sim_time,
+                        "gps_frame": com_link_frame,
+                        "add_noise": add_noise,
+                    },
                 ],
             ),
             Node(
@@ -176,7 +187,11 @@ def generate_launch_description():
                 parameters=[
                     fleet_params,
                     auv_params,
-                    {"use_sim_time": use_sim_time, "dvl_frame": dvl_link_frame},
+                    {
+                        "use_sim_time": use_sim_time,
+                        "dvl_frame": dvl_link_frame,
+                        "add_noise": add_noise,
+                    },
                 ],
             ),
             Node(
@@ -186,7 +201,11 @@ def generate_launch_description():
                 parameters=[
                     fleet_params,
                     auv_params,
-                    {"use_sim_time": use_sim_time, "ahrs_frame": imu_link_frame},
+                    {
+                        "use_sim_time": use_sim_time,
+                        "ahrs_frame": imu_link_frame,
+                        "add_noise": add_noise,
+                    },
                 ],
             ),
             Node(
@@ -232,7 +251,11 @@ def generate_launch_description():
                 parameters=[
                     fleet_params,
                     auv_params,
-                    {"use_sim_time": use_sim_time, "imu_frame": imu_link_frame},
+                    {
+                        "use_sim_time": use_sim_time,
+                        "imu_frame": imu_link_frame,
+                        "add_noise": add_noise,
+                    },
                 ],
             ),
             Node(
@@ -242,7 +265,11 @@ def generate_launch_description():
                 parameters=[
                     fleet_params,
                     auv_params,
-                    {"use_sim_time": use_sim_time, "mag_frame": imu_link_frame},
+                    {
+                        "use_sim_time": use_sim_time,
+                        "mag_frame": imu_link_frame,
+                        "add_noise": add_noise,
+                    },
                 ],
             ),
             Node(

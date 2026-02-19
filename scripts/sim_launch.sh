@@ -28,13 +28,18 @@ case ${scenario} in
 esac
 
 # --- Options ---
-options=$(gum choose --no-limit --header "Select options:" "Record rosbag" "Launch comparison methods" || true)
+options=$(gum choose --no-limit --header "Select options:" "Record rosbag" "Launch comparison methods" "Disable sensor noise" || true)
 
 compare="false"
 record_bag_path=""
+add_noise="true"
 
 if [[ "$options" == *"Launch comparison methods"* ]]; then
     compare="true"
+fi
+
+if [[ "$options" == *"Run without sensor noise"* ]]; then
+    add_noise="false"
 fi
 
 if [[ "$options" == *"Record rosbag"* ]]; then
@@ -47,7 +52,7 @@ if [[ "$options" == *"Record rosbag"* ]]; then
 fi
 
 # --- Launch ---
-args=("scenario:=$scenario" "compare:=$compare")
+args=("scenario:=$scenario" "compare:=$compare" "add_noise:=$add_noise")
 [ -n "$record_bag_path" ] && args+=("record_bag_path:=$record_bag_path")
 
 echo "ros2 launch coug_bringup sim.launch.py ${args[*]}"

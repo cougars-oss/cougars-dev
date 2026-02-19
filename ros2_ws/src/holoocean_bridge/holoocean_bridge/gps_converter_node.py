@@ -41,6 +41,7 @@ class GpsConverterNode(Node):
         self.declare_parameter("origin_altitude", 1412.0)
         self.declare_parameter("position_noise_sigma", 0.015)
         self.declare_parameter("altitude_noise_sigma", 0.025)
+        self.declare_parameter("add_noise", True)
 
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
@@ -92,8 +93,16 @@ class GpsConverterNode(Node):
         navsat_msg.status.status = navsat_msg.status.STATUS_FIX
         navsat_msg.status.service = navsat_msg.status.SERVICE_GPS
 
-        d_east = msg.pose.pose.position.x + random.gauss(0, self.position_noise_sigma)
-        d_north = msg.pose.pose.position.y + random.gauss(0, self.position_noise_sigma)
+        if self.add_noise:
+            d_east = msg.pose.pose.position.x + random.gauss(
+                0, self.position_noise_sigma
+            )
+            d_north = msg.pose.pose.position.y + random.gauss(
+                0, self.position_noise_sigma
+            )
+        else:
+            d_east = msg.pose.pose.position.x
+            d_north = msg.pose.pose.position.y
 
         lat, lon = self.calculate_inverse_haversine(
             self.origin_lat, self.origin_lon, d_north, d_east
@@ -101,11 +110,14 @@ class GpsConverterNode(Node):
 
         navsat_msg.latitude = lat
         navsat_msg.longitude = lon
-        navsat_msg.altitude = (
-            self.origin_alt
-            + msg.pose.pose.position.z
-            + random.gauss(0, self.altitude_noise_sigma)
-        )
+        if self.add_noise:
+            navsat_msg.altitude = (
+                self.origin_alt
+                + msg.pose.pose.position.z
+                + random.gauss(0, self.altitude_noise_sigma)
+            )
+        else:
+            navsat_msg.altitude = self.origin_alt + msg.pose.pose.position.z
 
         position_covariance = self.position_noise_sigma * self.position_noise_sigma
         altitude_covariance = self.altitude_noise_sigma * self.altitude_noise_sigma

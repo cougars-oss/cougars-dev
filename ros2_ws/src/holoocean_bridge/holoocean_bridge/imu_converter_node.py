@@ -36,6 +36,7 @@ class ImuConverterNode(Node):
         self.declare_parameter("imu_frame", "imu_link")
         self.declare_parameter("accel_noise_sigma", 0.0078)
         self.declare_parameter("gyro_noise_sigma", 0.0012)
+        self.declare_parameter("add_noise", True)
 
         input_topic = (
             self.get_parameter("input_topic").get_parameter_value().string_value
@@ -51,6 +52,9 @@ class ImuConverterNode(Node):
         )
         self.gyro_noise_sigma = (
             self.get_parameter("gyro_noise_sigma").get_parameter_value().double_value
+        )
+        self.add_noise = (
+            self.get_parameter("add_noise").get_parameter_value().bool_value
         )
 
         self.subscription = self.create_subscription(
@@ -70,13 +74,14 @@ class ImuConverterNode(Node):
         """
         msg.header.frame_id = self.imu_frame
 
-        msg.linear_acceleration.x += random.gauss(0, self.accel_noise_sigma)
-        msg.linear_acceleration.y += random.gauss(0, self.accel_noise_sigma)
-        msg.linear_acceleration.z += random.gauss(0, self.accel_noise_sigma)
+        if self.add_noise:
+            msg.linear_acceleration.x += random.gauss(0, self.accel_noise_sigma)
+            msg.linear_acceleration.y += random.gauss(0, self.accel_noise_sigma)
+            msg.linear_acceleration.z += random.gauss(0, self.accel_noise_sigma)
 
-        msg.angular_velocity.x += random.gauss(0, self.gyro_noise_sigma)
-        msg.angular_velocity.y += random.gauss(0, self.gyro_noise_sigma)
-        msg.angular_velocity.z += random.gauss(0, self.gyro_noise_sigma)
+            msg.angular_velocity.x += random.gauss(0, self.gyro_noise_sigma)
+            msg.angular_velocity.y += random.gauss(0, self.gyro_noise_sigma)
+            msg.angular_velocity.z += random.gauss(0, self.gyro_noise_sigma)
 
         accel_covariance = self.accel_noise_sigma * self.accel_noise_sigma
         gyro_covariance = self.gyro_noise_sigma * self.gyro_noise_sigma
