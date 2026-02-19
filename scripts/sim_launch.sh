@@ -55,7 +55,6 @@ fi
 args=("scenario:=$scenario" "compare:=$compare" "add_noise:=$add_noise")
 [ -n "$record_bag_path" ] && args+=("record_bag_path:=$record_bag_path")
 
-echo "DEBUG: Constructed args: ${args[*]}"
 echo "ros2 launch coug_bringup sim.launch.py ${args[*]}"
 if [ -n "$record_bag_path" ]; then
     tmp=$(mktemp -d)

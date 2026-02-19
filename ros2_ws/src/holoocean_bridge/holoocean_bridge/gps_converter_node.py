@@ -71,6 +71,9 @@ class GpsConverterNode(Node):
             .get_parameter_value()
             .double_value
         )
+        self.add_noise = (
+            self.get_parameter("add_noise").get_parameter_value().bool_value
+        )
 
         self.subscription = self.create_subscription(
             Odometry, input_topic, self.listener_callback, 10

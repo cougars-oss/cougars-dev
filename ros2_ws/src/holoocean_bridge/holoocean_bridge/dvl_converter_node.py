@@ -52,8 +52,9 @@ class DvlConverterNode(Node):
         self.noise_sigma = (
             self.get_parameter("noise_sigma").get_parameter_value().double_value
         )
-        add_noise_param = self.get_parameter("add_noise").value
-        self.add_noise = str(add_noise_param).lower() == "true"
+        self.add_noise = (
+            self.get_parameter("add_noise").get_parameter_value().bool_value
+        )
 
         # From DVLSensor.h
         elevation_rad = math.radians(22.5)
