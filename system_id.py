@@ -1,11 +1,8 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import rosbag2_py
-from rclpy.serialization import deserialize_message
-from geometry_msgs.msg import WrenchStamped
-from sensor_msgs.msg import Imu
-from dvl_msgs.msg import DVL
+from pathlib import Path
+from rosbags.highlevel import AnyReader
 
 TOPIC_FORCE = "/coug0sim/cmd_wrench"
 TOPIC_ACCEL = "/coug0sim/imu/data_raw"
@@ -19,30 +16,29 @@ def get_data(bag_path):
     print(f"Reading {bag_path}...")
     data = {"t": [], "F": [], "A": [], "V": [], "CovA": [], "CovV": []}
 
-    reader = rosbag2_py.SequentialReader()
-    reader.open(
-        rosbag2_py.StorageOptions(uri=bag_path, storage_id="mcap"),
-        rosbag2_py.ConverterOptions("", ""),
-    )
-
     start_t = None
-    while reader.has_next():
-        topic, msg_data, t = reader.read_next()
-        if start_t is None:
-            start_t = t
-        t_sec = (t - start_t) / 1e9
+    with AnyReader([Path(bag_path)]) as reader:
+        connections = [
+            x
+            for x in reader.connections
+            if x.topic in [TOPIC_FORCE, TOPIC_ACCEL, TOPIC_VEL]
+        ]
 
-        if topic == TOPIC_FORCE:
-            msg = deserialize_message(msg_data, WrenchStamped)
-            data["F"].append([t_sec, msg.wrench.force.x])
-        elif topic == TOPIC_ACCEL:
-            msg = deserialize_message(msg_data, Imu)
-            data["A"].append([t_sec, msg.linear_acceleration.x])
-            data["CovA"].append([t_sec, msg.linear_acceleration_covariance[0]])
-        elif topic == TOPIC_VEL:
-            msg = deserialize_message(msg_data, DVL)
-            data["V"].append([t_sec, msg.velocity.x])
-            data["CovV"].append([t_sec, msg.covariance[0]])
+        for connection, t, rawdata in reader.messages(connections=connections):
+            if start_t is None:
+                start_t = t
+            t_sec = (t - start_t) / 1e9
+
+            msg = reader.deserialize(rawdata, connection.msgtype)
+
+            if connection.topic == TOPIC_FORCE:
+                data["F"].append([t_sec, msg.wrench.force.x])
+            elif connection.topic == TOPIC_ACCEL:
+                data["A"].append([t_sec, msg.linear_acceleration.x])
+                data["CovA"].append([t_sec, msg.linear_acceleration_covariance[0]])
+            elif connection.topic == TOPIC_VEL:
+                data["V"].append([t_sec, msg.velocity.x])
+                data["CovV"].append([t_sec, msg.covariance[0]])
 
     return {k: np.array(v) for k, v in data.items()}
 
@@ -50,14 +46,14 @@ def get_data(bag_path):
 def solve(bag_path):
     d = get_data(bag_path)
 
-    # Interpolate to match accel timestamps
-    t = d["A"][:, 0]
+    # Interpolate to match velocity timestamps
+    t = d["V"][:, 0]
     F = np.interp(t, d["F"][:, 0], d["F"][:, 1])
-    V = np.interp(t, d["V"][:, 0], d["V"][:, 1])
-    A = d["A"][:, 1]
+    A = np.interp(t, d["A"][:, 0], d["A"][:, 1])
+    V = d["V"][:, 1]
 
-    CovV = np.interp(t, d["CovV"][:, 0], d["CovV"][:, 1])
-    CovA = d["CovA"][:, 1]
+    CovA = np.interp(t, d["CovA"][:, 0], d["CovA"][:, 1])
+    CovV = d["CovV"][:, 1]
 
     # Filter out low-velocity data
     mask = np.abs(V) > 0.05
