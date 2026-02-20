@@ -19,19 +19,12 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from rosbags.highlevel import AnyReader
 
-AUV_NS = "blue0sim"
-
 # Weighted LLS
 # Not relevant for sim data, covs are constant
 ADD_COV_WEIGHTS = True
 
-TOPIC_FORCE = "/" + AUV_NS + "/cmd_wrench"
-TOPIC_ACCEL = "/" + AUV_NS + "/imu/data_raw"
-TOPIC_VEL = "/" + AUV_NS + "/dvl/data"
-TOPIC_ORIENTATION = "/" + AUV_NS + "/imu/data"
-
-# Gaussian priors (from class)
-# These didn't end up having a big impact on the results
+# Gaussian Priors (from class)
+# The results ended up converging well w/o these
 PRIOR_MEANS = {
     "x": np.array([0.0, 0.0, 0.0]),
     "y": np.array([0.0, 0.0, 0.0]),
@@ -50,8 +43,21 @@ SENSOR_INVERSIONS = {
 }
 
 
-def get_data(bag_path):
-    print(f"Reading {bag_path} for {AUV_NS}...")
+def get_namespace(bag_path):
+    name = Path(bag_path).name.lower()
+    if "blue" in name:
+        return "blue0sim"
+    elif "coug" in name:
+        return "coug0sim"
+
+
+def get_data(bag_path, auv_ns):
+    print(f"Reading {bag_path} for {auv_ns}...")
+
+    topic_force = "/" + auv_ns + "/cmd_wrench"
+    topic_accel = "/" + auv_ns + "/imu/data_raw"
+    topic_vel = "/" + auv_ns + "/dvl/twist"
+    topic_orientation = "/" + auv_ns + "/imu/data"
 
     data = {
         "F": {"x": [], "y": [], "z": []},
@@ -67,7 +73,7 @@ def get_data(bag_path):
         connections = [
             x
             for x in reader.connections
-            if x.topic in [TOPIC_FORCE, TOPIC_ACCEL, TOPIC_VEL, TOPIC_ORIENTATION]
+            if x.topic in [topic_force, topic_accel, topic_vel, topic_orientation]
         ]
 
         for connection, t, rawdata in reader.messages(connections=connections):
@@ -76,14 +82,14 @@ def get_data(bag_path):
             t_sec = (t - start_t) / 1e9
             msg = reader.deserialize(rawdata, connection.msgtype)
 
-            if connection.topic == TOPIC_FORCE:
+            if connection.topic == topic_force:
                 data["F"]["x"].append([t_sec, msg.wrench.force.x])
                 data["F"]["y"].append([t_sec, msg.wrench.force.y])
                 data["F"]["z"].append([t_sec, msg.wrench.force.z])
 
-            elif connection.topic == TOPIC_ACCEL:
+            elif connection.topic == topic_accel:
                 # Account for IMU rotations in HoloOcean
-                flip = -1 if SENSOR_INVERSIONS[AUV_NS]["imu"] else 1
+                flip = -1 if SENSOR_INVERSIONS[auv_ns]["imu"] else 1
                 data["A"]["x"].append([t_sec, msg.linear_acceleration.x])
                 data["A"]["y"].append([t_sec, msg.linear_acceleration.y * flip])
                 data["A"]["z"].append([t_sec, msg.linear_acceleration.z * flip])
@@ -98,18 +104,18 @@ def get_data(bag_path):
                     [t_sec, msg.linear_acceleration_covariance[8]]
                 )
 
-            elif connection.topic == TOPIC_VEL:
+            elif connection.topic == topic_vel:
                 # Account for DVL rotations in HoloOcean
-                flip = -1 if SENSOR_INVERSIONS[AUV_NS]["dvl"] else 1
-                data["V"]["x"].append([t_sec, msg.velocity.x])
-                data["V"]["y"].append([t_sec, msg.velocity.y * flip])
-                data["V"]["z"].append([t_sec, msg.velocity.z * flip])
+                flip = -1 if SENSOR_INVERSIONS[auv_ns]["dvl"] else 1
+                data["V"]["x"].append([t_sec, msg.twist.twist.linear.x])
+                data["V"]["y"].append([t_sec, msg.twist.twist.linear.y * flip])
+                data["V"]["z"].append([t_sec, msg.twist.twist.linear.z * flip])
 
-                data["V_cov"]["x"].append([t_sec, msg.covariance[0]])
-                data["V_cov"]["y"].append([t_sec, msg.covariance[4]])
-                data["V_cov"]["z"].append([t_sec, msg.covariance[8]])
+                data["V_cov"]["x"].append([t_sec, msg.twist.covariance[0]])
+                data["V_cov"]["y"].append([t_sec, msg.twist.covariance[4]])
+                data["V_cov"]["z"].append([t_sec, msg.twist.covariance[8]])
 
-            elif connection.topic == TOPIC_ORIENTATION:
+            elif connection.topic == topic_orientation:
                 data["Q"].append(
                     [
                         t_sec,
@@ -131,7 +137,8 @@ def get_data(bag_path):
 
 
 def solve(bag_path):
-    d = get_data(bag_path)
+    auv_ns = get_namespace(bag_path)
+    d = get_data(bag_path, auv_ns)
 
     fig, axes = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
 
@@ -142,30 +149,37 @@ def solve(bag_path):
 
     w, x, y_q, z = Q_interp[:, 0], Q_interp[:, 1], Q_interp[:, 2], Q_interp[:, 3]
 
-    # Gravity vector (ENU/ROS frame)
-    g_x = 9.8 * 2.0 * (w * y_q - z * x)
-    g_y = 9.8 * 2.0 * (w * x + y_q * z)
-    g_z = 9.8 * (w**2 - x**2 - y_q**2 + z**2)
-
-    # Fix for BlueROV IMU/DVL frame diff
-    if SENSOR_INVERSIONS[AUV_NS]["imu"]:
-        g_y *= -1
-        g_z *= -1
-
-    gravity_comp = {"x": g_x, "y": g_y, "z": g_z}
+    # Find gravity vector (IMU frame)
+    g_x_imu = 9.8 * 2.0 * (x * z - w * y_q)
+    g_y_imu = 9.8 * 2.0 * (w * x + y_q * z)
+    g_z_imu = 9.8 * (w**2 - x**2 - y_q**2 + z**2)
+    flip = -1 if SENSOR_INVERSIONS[auv_ns]["imu"] else 1
+    gravity_comp = {"x": g_x_imu, "y": g_y_imu * flip, "z": g_z_imu * flip}
 
     for idx, axis in enumerate(["x", "y", "z"]):
         print(f"\n--- Solving for {axis.upper()} Axis ---")
 
         # Interpolate to velocity timestamps (lowest freq ~ 20 Hz)
-        F = np.interp(t, d["F"][axis][:, 0], d["F"][axis][:, 1])
+        if auv_ns == "blue0sim":
+            # IMPORTANT! Fix for BlueROV2 ZOH forces (only publish on change)
+            t_force = d["F"][axis][:, 0]
+            f_force = d["F"][axis][:, 1]
+
+            force_idx = np.searchsorted(t_force, t, side="right") - 1
+            force_idx = np.clip(force_idx, 0, len(t_force) - 1)
+            F = f_force[force_idx]
+            F[t < t_force[0]] = 0.0
+
+        else:
+            F = np.interp(t, d["F"][axis][:, 0], d["F"][axis][:, 1])
+
         A_gravity = np.interp(t, d["A"][axis][:, 0], d["A"][axis][:, 1])
         V = d["V"][axis][:, 1]
         A_cov = np.interp(t, d["A_cov"][axis][:, 0], d["A_cov"][axis][:, 1])
         V_cov = d["V_cov"][axis][:, 1]
 
         # Subtract gravity
-        A = A_gravity + gravity_comp[axis]
+        A = A_gravity - gravity_comp[axis]
 
         # Filter out low-velocity data (needed?)
         mask = np.abs(V) > 0.001
