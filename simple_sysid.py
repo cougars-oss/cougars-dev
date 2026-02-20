@@ -14,9 +14,12 @@
 # limitations under the License.
 
 import sys
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
+from functools import lru_cache
+from scipy.interpolate import RegularGridInterpolator
 from rosbags.highlevel import AnyReader
 
 # Weighted LLS
@@ -36,11 +39,72 @@ PRIOR_SIGMAS = {
     "z": np.array([1e3, 1e3, 1e3]),
 }
 
-# Simplified HoloOcean URDFs
+# Simplified HoloOcean URDFs (and guessed BlueROV2 TFs -- check this)
 SENSOR_INVERSIONS = {
     "coug0sim": {"imu": True, "dvl": True},
     "blue0sim": {"imu": True, "dvl": False},
+    "bluerov2": {"imu": False, "dvl": False},
 }
+
+# --- Braden's T200 Thruster Code ---
+
+THRUST_DIRECTIONS = np.array(
+    [
+        [1 / np.sqrt(2), 1 / np.sqrt(2), 0],  # 0 Front Right (reversed)
+        [1 / np.sqrt(2), -1 / np.sqrt(2), 0],  # 1 Front Left (reversed)
+        [1 / np.sqrt(2), -1 / np.sqrt(2), 0],  # 2 Back Right
+        [1 / np.sqrt(2), 1 / np.sqrt(2), 0],  # 3 Back Left
+        [0, 0, 1],  # 4 Front Right Vertical (reversed)
+        [0, 0, -1],  # 5 Front Left Vertical
+        [0, 0, -1],  # 6 Back Right Vertical
+        [0, 0, 1],  # 7 Back Left Vertical (reversed)
+    ]
+)
+
+
+@lru_cache(None)
+def _load_t200_table(voltage):
+    pwm_vals, force_vals = [], []
+    with open(f"data/T200-{voltage}V.csv", "r") as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            pwm_vals.append(float(row[0]))
+            force_vals.append(float(row[5]))
+
+    idx = np.argsort(pwm_vals)
+    return np.array(pwm_vals)[idx], np.array(force_vals)[idx]
+
+
+def build_t200_surface(voltages):
+    voltages = np.array(sorted(voltages))
+    force_rows, pwm_reference = [], None
+
+    for V in voltages:
+        pwm_vals, force_vals = _load_t200_table(V)
+        if pwm_reference is None:
+            pwm_reference = pwm_vals
+        force_rows.append(force_vals * 9.81)  # Kg f -> Newtons
+
+    return voltages, pwm_reference, np.vstack(force_rows)
+
+
+try:
+    _v, _p, _f_table = build_t200_surface([10, 12, 14, 16, 18, 20])
+    force_interpolator = RegularGridInterpolator(
+        (_v, _p), _f_table, bounds_error=False, fill_value=0.0
+    )
+except FileNotFoundError:
+    print("WARNING: data/T200 CSV files not found. Real-world parsing will fail.")
+    force_interpolator = None
+
+
+def interpolate_force(pwm, voltage):
+    pwm = np.clip(pwm, 1100, 1900)
+    return force_interpolator((voltage, pwm))
+
+
+# --- End of Braden's T200 Thruster Code ---
 
 
 def get_namespace(bag_path):
@@ -49,15 +113,23 @@ def get_namespace(bag_path):
         return "blue0sim"
     elif "coug" in name:
         return "coug0sim"
+    else:
+        return "bluerov2"
 
 
 def get_data(bag_path, auv_ns):
     print(f"Reading {bag_path} for {auv_ns}...")
+    is_real = auv_ns == "bluerov2"
 
-    topic_force = "/" + auv_ns + "/cmd_wrench"
-    topic_accel = "/" + auv_ns + "/imu/data_raw"
-    topic_vel = "/" + auv_ns + "/dvl/twist"
-    topic_orientation = "/" + auv_ns + "/imu/data"
+    # Topics are slightly diff in sim and real world
+    t_accel = "/bluerov2/imu/data" if is_real else f"/{auv_ns}/imu/data_raw"
+    t_orient = f"/{auv_ns}/imu/data"
+    t_vel = f"/{auv_ns}/dvl/twist"
+    t_force = None if is_real else f"/{auv_ns}/cmd_wrench"
+    t_rcout = "/mavros/rc/out" if is_real else None
+    t_battery = "/bluerov2/battery/status" if is_real else None
+
+    target_topics = {t_accel, t_orient, t_vel, t_force, t_rcout, t_battery} - {None}
 
     data = {
         "F": {"x": [], "y": [], "z": []},
@@ -66,56 +138,68 @@ def get_data(bag_path, auv_ns):
         "A_cov": {"x": [], "y": [], "z": []},
         "V_cov": {"x": [], "y": [], "z": []},
         "Q": [],
+        "PWM": [],
+        "VOLT": [],
     }
 
     start_t = None
     with AnyReader([Path(bag_path)]) as reader:
-        connections = [
-            x
-            for x in reader.connections
-            if x.topic in [topic_force, topic_accel, topic_vel, topic_orientation]
-        ]
+        connections = [x for x in reader.connections if x.topic in target_topics]
 
         for connection, t, rawdata in reader.messages(connections=connections):
             if start_t is None:
                 start_t = t
             t_sec = (t - start_t) / 1e9
             msg = reader.deserialize(rawdata, connection.msgtype)
+            topic = connection.topic
 
-            if connection.topic == topic_force:
-                data["F"]["x"].append([t_sec, msg.wrench.force.x])
-                data["F"]["y"].append([t_sec, msg.wrench.force.y])
-                data["F"]["z"].append([t_sec, msg.wrench.force.z])
+            # Calculated sim wrench
+            if topic == t_force:
+                for ax in ["x", "y", "z"]:
+                    data["F"][ax].append([t_sec, getattr(msg.wrench.force, ax)])
 
-            elif connection.topic == topic_accel:
-                # Account for IMU rotations in HoloOcean
+            # Real-world PWM
+            elif topic == t_rcout:
+                data["PWM"].append([t_sec] + list(msg.channels[:8]))
+            elif topic == t_battery:
+                data["VOLT"].append([t_sec, msg.voltage])
+
+            # IMU acceleration
+            if topic == t_accel:
                 flip = -1 if SENSOR_INVERSIONS[auv_ns]["imu"] else 1
                 data["A"]["x"].append([t_sec, msg.linear_acceleration.x])
                 data["A"]["y"].append([t_sec, msg.linear_acceleration.y * flip])
                 data["A"]["z"].append([t_sec, msg.linear_acceleration.z * flip])
 
-                data["A_cov"]["x"].append(
-                    [t_sec, msg.linear_acceleration_covariance[0]]
-                )
-                data["A_cov"]["y"].append(
-                    [t_sec, msg.linear_acceleration_covariance[4]]
-                )
-                data["A_cov"]["z"].append(
-                    [t_sec, msg.linear_acceleration_covariance[8]]
-                )
+                cov = msg.linear_acceleration_covariance
+                data["A_cov"]["x"].append([t_sec, cov[0]])
+                data["A_cov"]["y"].append([t_sec, cov[4]])
+                data["A_cov"]["z"].append([t_sec, cov[8]])
 
-            elif connection.topic == topic_vel:
-                # Account for DVL rotations in HoloOcean
+            # DVL velocity
+            if topic == t_vel:
                 flip = -1 if SENSOR_INVERSIONS[auv_ns]["dvl"] else 1
-                data["V"]["x"].append([t_sec, msg.twist.twist.linear.x])
-                data["V"]["y"].append([t_sec, msg.twist.twist.linear.y * flip])
-                data["V"]["z"].append([t_sec, msg.twist.twist.linear.z * flip])
+                v_lin = (
+                    msg.twist.linear
+                    if hasattr(msg.twist, "linear")
+                    else msg.twist.twist.linear
+                )
+                cov = (
+                    msg.twist.covariance
+                    if hasattr(msg.twist, "covariance")
+                    else [1.0] * 9
+                )
 
-                data["V_cov"]["x"].append([t_sec, msg.twist.covariance[0]])
-                data["V_cov"]["y"].append([t_sec, msg.twist.covariance[4]])
-                data["V_cov"]["z"].append([t_sec, msg.twist.covariance[8]])
+                data["V"]["x"].append([t_sec, v_lin.x])
+                data["V"]["y"].append([t_sec, v_lin.y * flip])
+                data["V"]["z"].append([t_sec, v_lin.z * flip])
 
-            elif connection.topic == topic_orientation:
+                data["V_cov"]["x"].append([t_sec, cov[0]])
+                data["V_cov"]["y"].append([t_sec, cov[4]])
+                data["V_cov"]["z"].append([t_sec, cov[8]])
+
+            # Orientation (gravity)
+            if topic == t_orient:
                 data["Q"].append(
                     [
                         t_sec,
@@ -125,6 +209,32 @@ def get_data(bag_path, auv_ns):
                         msg.orientation.z,
                     ]
                 )
+
+    # --- Braden's T200 Thruster Code ---
+
+    if is_real and data["PWM"]:
+        pwm_arr = np.array(data["PWM"])
+        volt_arr = np.array(data["VOLT"])
+
+        t_pwm = pwm_arr[:, 0]
+        pwms = pwm_arr[:, 1:]
+        volts = (
+            np.interp(t_pwm, volt_arr[:, 0], volt_arr[:, 1])
+            if len(volt_arr) > 0
+            else np.full(len(t_pwm), 16.0)
+        )
+
+        for t, pwm_row, volt in zip(t_pwm, pwms, volts):
+            force_body = np.zeros(3)
+            for j in range(min(len(pwm_row), len(THRUST_DIRECTIONS))):
+                f_newton = interpolate_force(pwm_row[j], volt)
+                force_body += f_newton * THRUST_DIRECTIONS[j]
+
+            data["F"]["x"].append([t, force_body[0]])
+            data["F"]["y"].append([t, force_body[1]])
+            data["F"]["z"].append([t, force_body[2]])
+
+    # --- End of Braden's T200 Thruster Code ---
 
     for key in data:
         if isinstance(data[key], dict):
@@ -143,33 +253,37 @@ def solve(bag_path):
     fig, axes = plt.subplots(3, 1, figsize=(10, 10), sharex=True)
 
     t = d["V"]["x"][:, 0]
-    Q_interp = np.zeros((len(t), 4))
-    for i in range(4):
-        Q_interp[:, i] = np.interp(t, d["Q"][:, 0], d["Q"][:, i + 1])
 
+    # Interpolate orientation to velocity timestamps
+    Q_interp = np.column_stack(
+        [np.interp(t, d["Q"][:, 0], d["Q"][:, i]) for i in range(1, 5)]
+    )
     w, x, y_q, z = Q_interp[:, 0], Q_interp[:, 1], Q_interp[:, 2], Q_interp[:, 3]
 
     # Find gravity vector (IMU frame)
     g_x_imu = 9.8 * 2.0 * (x * z - w * y_q)
     g_y_imu = 9.8 * 2.0 * (w * x + y_q * z)
     g_z_imu = 9.8 * (w**2 - x**2 - y_q**2 + z**2)
+
     flip = -1 if SENSOR_INVERSIONS[auv_ns]["imu"] else 1
     gravity_comp = {"x": g_x_imu, "y": g_y_imu * flip, "z": g_z_imu * flip}
 
     for idx, axis in enumerate(["x", "y", "z"]):
         print(f"\n--- Solving for {axis.upper()} Axis ---")
 
-        # Interpolate to velocity timestamps (lowest freq ~ 20 Hz)
-        if auv_ns == "blue0sim":
-            # IMPORTANT! Fix for BlueROV2 ZOH forces (only publish on change)
-            t_force = d["F"][axis][:, 0]
-            f_force = d["F"][axis][:, 1]
+        if len(d["F"][axis]) == 0:
+            print(f"Skipping {axis} (No force data)")
+            continue
 
-            force_idx = np.searchsorted(t_force, t, side="right") - 1
-            force_idx = np.clip(force_idx, 0, len(t_force) - 1)
+        # Interpolate to velocity timestamps
+        if auv_ns in ["blue0sim", "bluerov2"]:
+            # IMPORTANT! Fix for HoloOcean BlueROV2 ZOH forces (only publish on change)
+            t_force, f_force = d["F"][axis][:, 0], d["F"][axis][:, 1]
+            force_idx = np.clip(
+                np.searchsorted(t_force, t, side="right") - 1, 0, len(t_force) - 1
+            )
             F = f_force[force_idx]
             F[t < t_force[0]] = 0.0
-
         else:
             F = np.interp(t, d["F"][axis][:, 0], d["F"][axis][:, 1])
 
@@ -187,9 +301,10 @@ def solve(bag_path):
 
         # Set up Weighted Linear Least Squares
         if ADD_COV_WEIGHTS:
-            # Combine accel and vel covariances (could be better)
-            weights = 1.0 / (A_cov[mask] + V_cov[mask] + 1e-6)
-            W_sqrt = np.sqrt(weights)[:, np.newaxis]
+            # Fix for invalid covariances
+            A_cov_clean = np.maximum(A_cov[mask], 0.0)
+            V_cov_clean = np.maximum(V_cov[mask], 0.0)
+            W_sqrt = np.sqrt(1.0 / (A_cov_clean + V_cov_clean + 1e-6))[:, np.newaxis]
         else:
             W_sqrt = np.ones((len(y_meas), 1))
 
@@ -199,7 +314,6 @@ def solve(bag_path):
         X_w = X_data * W_sqrt
         y_w = y_meas[:, np.newaxis] * W_sqrt
 
-        # Add Bayesian Priors
         W_prior = np.diag(1.0 / PRIOR_SIGMAS[axis])
         y_prior = (PRIOR_MEANS[axis] / PRIOR_SIGMAS[axis]).reshape(-1, 1)
 
