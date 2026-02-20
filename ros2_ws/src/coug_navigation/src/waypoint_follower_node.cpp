@@ -152,7 +152,7 @@ void WaypointFollowerNode::processWaypointLogic(double current_x, double current
   double speed_cmd = params_.desired_speed_rpm;
   if (params_.enable_rw_speed) {
     current_speed_rpm_ += speed_dist_(rng_);
-    current_speed_rpm_ = std::clamp(current_speed_rpm_, 800.0, 1500.0);
+    current_speed_rpm_ = std::clamp(current_speed_rpm_, 0.0, 1500.0);
     speed_cmd = current_speed_rpm_;
   }
 

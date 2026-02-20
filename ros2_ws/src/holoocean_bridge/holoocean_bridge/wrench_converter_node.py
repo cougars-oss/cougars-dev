@@ -14,7 +14,9 @@
 
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import WrenchStamped
+from geometry_msgs.msg import WrenchStamped, TwistWithCovarianceStamped, Vector3Stamped
+from tf2_ros import Buffer, TransformListener
+import tf2_geometry_msgs
 from holoocean_interfaces.msg import AgentCommand, ControlCommand
 
 
@@ -31,8 +33,14 @@ class WrenchConverterNode(Node):
 
         self.declare_parameter("agent_topic", "/command/agent")
         self.declare_parameter("control_topic", "ControlCommand")
-        self.declare_parameter("output_topic", "cmd_wrench")
-        self.declare_parameter("wrench_frame", "base_link")
+        self.declare_parameter("velocity_topic", "VelocitySensor")
+        self.declare_parameter("wrench_raw_topic", "cmd_wrench_raw")
+        self.declare_parameter("wrench_topic", "cmd_wrench")
+        self.declare_parameter("wrench_frame", "com_link")
+        self.declare_parameter("map_frame", "map")
+
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
 
         agent_topic = (
             self.get_parameter("agent_topic").get_parameter_value().string_value
@@ -40,11 +48,20 @@ class WrenchConverterNode(Node):
         control_topic = (
             self.get_parameter("control_topic").get_parameter_value().string_value
         )
-        output_topic = (
-            self.get_parameter("output_topic").get_parameter_value().string_value
+        velocity_topic = (
+            self.get_parameter("velocity_topic").get_parameter_value().string_value
+        )
+        wrench_raw_topic = (
+            self.get_parameter("wrench_raw_topic").get_parameter_value().string_value
+        )
+        wrench_topic = (
+            self.get_parameter("wrench_topic").get_parameter_value().string_value
         )
         self.wrench_frame = (
             self.get_parameter("wrench_frame").get_parameter_value().string_value
+        )
+        self.map_frame = (
+            self.get_parameter("map_frame").get_parameter_value().string_value
         )
 
         self.agent_sub = self.create_subscription(
@@ -53,21 +70,39 @@ class WrenchConverterNode(Node):
         self.control_sub = self.create_subscription(
             ControlCommand, control_topic, self.control_callback, 10
         )
-        self.publisher = self.create_publisher(WrenchStamped, output_topic, 10)
+        self.velocity_sub = self.create_subscription(
+            TwistWithCovarianceStamped, velocity_topic, self.velocity_callback, 10
+        )
+        self.wrench_raw_pub = self.create_publisher(WrenchStamped, wrench_raw_topic, 10)
+        self.wrench_pub = self.create_publisher(WrenchStamped, wrench_topic, 10)
 
         # From BlueROV2.h
         self.geo_factor = 0.70710678
 
         # From actuator.py
-        rho = 1026.0
-        d_prop = 0.14
-        t_prop = 0.1
-        kt_0 = 0.4566
-        self.prop_const = (1.0 - t_prop) * rho * pow(d_prop, 4) * kt_0
+        self.rho = 1026.0
+        self.d_prop = 0.14
+        self.t_prop = 0.1
+        self.kt_0 = 0.4566
+        self.kt_max = 0.1798
+        self.ja_max = 0.6632
+        self.w = 0.056
+
+        self.c1 = (1.0 - self.t_prop) * self.rho * pow(self.d_prop, 4) * self.kt_0
+        self.c2 = (
+            (1.0 - self.t_prop)
+            * self.rho
+            * pow(self.d_prop, 4)
+            * (self.kt_max - self.kt_0)
+            / self.ja_max
+            * ((1 - self.w) / self.d_prop)
+        )
+
+        self.velocity = 0.0
 
         self.get_logger().info(
             f"Wrench converter started. Listening on {agent_topic} and {control_topic}, "
-            f"publishing on {output_topic}."
+            f"publishing on {wrench_raw_topic} and {wrench_topic}."
         )
 
     def agent_callback(self, msg: AgentCommand):
@@ -83,13 +118,13 @@ class WrenchConverterNode(Node):
         vert = cmd[0] + cmd[1] + cmd[2] + cmd[3]
 
         wrench_msg = WrenchStamped()
-        wrench_msg.header.stamp = self.get_clock().now().to_msg()
+        wrench_msg.header.stamp = msg.header.stamp
         wrench_msg.header.frame_id = self.wrench_frame
 
         wrench_msg.wrench.force.x = fwd
         wrench_msg.wrench.force.y = lat
         wrench_msg.wrench.force.z = vert
-        self.publisher.publish(wrench_msg)
+        self.wrench_pub.publish(wrench_msg)
 
     def control_callback(self, msg: ControlCommand):
         """
@@ -100,16 +135,45 @@ class WrenchConverterNode(Node):
         thruster_rpm = msg.cs[3]
 
         n_rps = thruster_rpm / 60.0
-        abs_n_rps = abs(n_rps)
 
-        # IMPORTANT! Assuming advance velocity is 0 and no spool up/down delays
-        force_x = self.prop_const * abs_n_rps * n_rps
+        # IMPORTANT! Assuming no spool up/down delays
+        force_x_raw = self.c1 * abs(n_rps) * n_rps
+        force_x = force_x_raw + self.c2 * n_rps * self.velocity
+
+        raw_wrench_msg = WrenchStamped()
+        raw_wrench_msg.header.stamp = msg.header.stamp
+        raw_wrench_msg.header.frame_id = self.wrench_frame
+        raw_wrench_msg.wrench.force.x = force_x_raw
+        self.wrench_raw_pub.publish(raw_wrench_msg)
 
         wrench_msg = WrenchStamped()
-        wrench_msg.header.stamp = self.get_clock().now().to_msg()
+        wrench_msg.header.stamp = msg.header.stamp
         wrench_msg.header.frame_id = self.wrench_frame
         wrench_msg.wrench.force.x = force_x
-        self.publisher.publish(wrench_msg)
+        self.wrench_pub.publish(wrench_msg)
+
+    def velocity_callback(self, msg: TwistWithCovarianceStamped):
+        """
+        Transform velocity into the body frame and store for control command processing.
+
+        :param msg: Twist message containing current velocity in the world frame.
+        """
+        try:
+            t_wrench_map = self.tf_buffer.lookup_transform(
+                self.wrench_frame, self.map_frame, rclpy.time.Time()
+            )
+
+            # Transform velocity into the body frame
+            vel_world = Vector3Stamped()
+            vel_world.header = msg.header
+            vel_world.vector = msg.twist.twist.linear
+            vel_wrench = tf2_geometry_msgs.do_transform_vector3(vel_world, t_wrench_map)
+            self.velocity = vel_wrench.vector.x
+
+        except Exception:
+            self.get_logger().error(
+                "Could not transform DVL velocity.", throttle_duration_sec=1.0
+            )
 
 
 def main(args=None):

@@ -38,7 +38,7 @@ if [[ "$options" == *"Launch comparison methods"* ]]; then
     compare="true"
 fi
 
-if [[ "$options" == *"Run without sensor noise"* ]]; then
+if [[ "$options" == *"Disable sensor noise"* ]]; then
     add_noise="false"
 fi
 

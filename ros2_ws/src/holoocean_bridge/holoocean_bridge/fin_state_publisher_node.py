@@ -58,7 +58,7 @@ class FinStatePublisherNode(Node):
         :param msg: ControlCommand message containing fin states.
         """
         joint_state = JointState()
-        joint_state.header.stamp = self.get_clock().now().to_msg()
+        joint_state.header.stamp = msg.header.stamp
         joint_state.name = self.joint_names
 
         rudder = -msg.cs[0]
