@@ -1,6 +1,6 @@
 ci:
   autofix_commit_msg: "🐡 [pre-commit.ci] autofix"
-  autoupdate_commit_msg: "🐠 [pre-commit.ci] autoupdate"
+  autoupdate_commit_msg: "🪼 [pre-commit.ci] autoupdate"
   autoupdate_schedule: monthly
   submodules: false
   skip: [ament_uncrustify, ament_cpplint, ament_flake8, ament_pep257, ament_lint_cmake, ament_xmllint, ament_copyright]

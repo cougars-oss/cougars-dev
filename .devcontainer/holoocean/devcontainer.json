@@ -14,7 +14,7 @@
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {},
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-        "ghcr.io/devcontainers/features/nvidia-cuda:2.0.0": {}
+        "ghcr.io/devcontainers/features/nvidia-cuda:3.0.0": {}
     },
     "customizations": {
         "vscode": {

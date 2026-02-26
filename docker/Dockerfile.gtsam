@@ -24,13 +24,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake git ca-certificates ccache \
-    libboost-all-dev libtbb-dev
+    libtbb-dev
 
 # Build GTSAM
 WORKDIR /tmp/gtsam-build
 RUN --mount=type=cache,target=/root/.ccache \
     ccache -z \
-    && git clone --depth 1 --branch 4.2.0 https://github.com/borglab/gtsam.git . \
+    && git clone --depth 1 --branch 4.3a1 https://github.com/borglab/gtsam.git . \
     && cmake -B build -S . \
     -DCMAKE_BUILD_TYPE=Release \
     -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF \
@@ -51,13 +51,6 @@ FROM ros:humble-ros-base
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
-    libboost-serialization1.74.0 \
-    libboost-filesystem1.74.0 \
-    libboost-thread1.74.0 \
-    libboost-program-options1.74.0 \
-    libboost-timer1.74.0 \
-    libboost-chrono1.74.0 \
-    libboost-regex1.74.0 \
     libtbb-dev libtbb12
 
 COPY --from=builder /usr/local /usr/local
