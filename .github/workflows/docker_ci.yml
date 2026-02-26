@@ -127,7 +127,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
       - run: |
-          sudo apt update && sudo apt install -y python3-pip
+          sudo apt-get update && sudo apt-get install -y python3-pip
           pip3 install --user vcstool
           echo "${HOME}/.local/bin" >> ${GITHUB_PATH}
           vcs import ros2_ws/src < cougars.repos
