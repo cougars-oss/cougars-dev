@@ -38,6 +38,8 @@ RUN --mount=type=cache,target=/root/.ccache \
     -DGTSAM_BUILD_TESTS=OFF \
     -DGTSAM_BUILD_EXAMPLES_ALWAYS=OFF \
     -DGTSAM_WITH_TBB=ON \
+    -DGTSAM_USE_BOOST_FEATURES=OFF \
+    -DGTSAM_ENABLE_BOOST_SERIALIZATION=OFF \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     && make -C build -j$(nproc) \
