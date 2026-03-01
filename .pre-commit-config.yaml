@@ -3,18 +3,29 @@ ci:
   autoupdate_commit_msg: "🪼 [pre-commit.ci] autoupdate"
   autoupdate_schedule: monthly
   submodules: false
-  skip: [ament_uncrustify, ament_cpplint, ament_flake8, ament_pep257, ament_lint_cmake, ament_xmllint, ament_copyright]
+  skip:
+    [
+      ament_uncrustify,
+      ament_cpplint,
+      # ament_cppcheck,
+      ament_flake8,
+      ament_pep257,
+      ament_lint_cmake,
+      ament_xmllint,
+      ament_copyright,
+    ]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: \.md$
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
-        args: ['--maxkb=10000']
+        args: ["--maxkb=10000"]
 
   - repo: https://github.com/psf/black
     rev: 26.1.0
@@ -86,12 +97,12 @@ repos:
         language: system
         files: ^ros2_ws/src/
         exclude: |
-            (?x)^(
-                .*\.json|
-                .*\.yaml|
-                .*\.yml|
-                .*\.xml|
-                .*\.repos|
-                .*\.txt|
-                .*/setup\.py
-            )$
+          (?x)^(
+              .*\.json|
+              .*\.yaml|
+              .*\.yml|
+              .*\.xml|
+              .*\.repos|
+              .*\.txt|
+              .*/setup\.py
+          )$

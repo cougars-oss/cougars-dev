@@ -8,203 +8,203 @@
   @date Jan 2026
   -->
 
- <class>coug_waypoints_config</class>
- <widget class="QWidget" name="coug_waypoints_config">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>404</width>
-    <height>200</height>
-   </rect>
-  </property>
+  <class>coug_waypoints_config</class>
+  <widget class="QWidget" name="coug_waypoints_config">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>404</width>
+        <height>200</height>
+      </rect>
+    </property>
 
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>2</number>
-   </property>
-   <property name="topMargin">
-    <number>2</number>
-   </property>
-   <property name="rightMargin">
-    <number>2</number>
-   </property>
-   <property name="bottomMargin">
-    <number>2</number>
-   </property>
-   <property name="verticalSpacing">
-    <number>6</number>
-   </property>
-
-   <!-- Row 0: Waypoints Topic Selection -->
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_topic">
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Waypoints Topic:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QComboBox" name="topic_selector">
-     <property name="editable">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-
-   <!-- Row 1: Selected Depth -->
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_selected">
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Selected Depth (z):</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QDoubleSpinBox" name="depth_editor">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="decimals">
-      <number>2</number>
-     </property>
-     <property name="minimum">
-      <double>-9999.990000000000009</double>
-     </property>
-     <property name="maximum">
-      <double>9999.990000000000009</double>
-     </property>
-     <property name="buttonSymbols">
-      <enum>QAbstractSpinBox::PlusMinus</enum>
-     </property>
-    </widget>
-   </item>
-
-   <!-- Row 2: Publish / Stop -->
-   <item row="2" column="1" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout_pub_stop">
-     <item>
-      <widget class="QPushButton" name="publish">
-       <property name="text">
-        <string>Publish</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="stop">
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-
-   <!-- Row 3: Save / Load -->
-   <item row="3" column="1" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout_file">
-     <item>
-      <widget class="QPushButton" name="save">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="load">
-       <property name="text">
-        <string>Load</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-
-   <!-- Row 4: Clear -->
-   <item row="4" column="1" colspan="3">
-    <widget class="QPushButton" name="clear">
-     <property name="text">
-      <string>Clear</string>
-     </property>
-    </widget>
-   </item>
-
-   <!-- Row 5: Checkbox -->
-   <item row="5" column="1" colspan="3">
-    <widget class="QCheckBox" name="apply_all">
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Apply to all topics</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-
-   <!-- Row 6: Status -->
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Status:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1" colspan="3">
-    <widget class="QLabel" name="status">
-     <property name="font">
-      <font>
-       <family>Sans Serif</family>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
+    <property name="windowTitle">
+      <string>Form</string>
+    </property>
+    <property name="styleSheet">
       <string notr="true"/>
-     </property>
-     <property name="text">
-      <string>Click to add waypoints</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+        <number>2</number>
+      </property>
+      <property name="topMargin">
+        <number>2</number>
+      </property>
+      <property name="rightMargin">
+        <number>2</number>
+      </property>
+      <property name="bottomMargin">
+        <number>2</number>
+      </property>
+      <property name="verticalSpacing">
+        <number>6</number>
+      </property>
 
-  </layout>
- </widget>
+      <!-- Row 0: Waypoints Topic Selection -->
+      <item row="0" column="0">
+        <widget class="QLabel" name="label_topic">
+          <property name="font">
+            <font>
+              <family>Sans Serif</family>
+              <pointsize>8</pointsize>
+            </font>
+          </property>
+          <property name="text">
+            <string>Waypoints Topic:</string>
+          </property>
+        </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+        <widget class="QComboBox" name="topic_selector">
+          <property name="editable">
+            <bool>false</bool>
+          </property>
+        </widget>
+      </item>
 
- <resources/>
- <connections/>
+      <!-- Row 1: Selected Depth -->
+      <item row="1" column="0">
+        <widget class="QLabel" name="label_selected">
+          <property name="font">
+            <font>
+              <family>Sans Serif</family>
+              <pointsize>8</pointsize>
+            </font>
+          </property>
+          <property name="text">
+            <string>Selected Depth (z):</string>
+          </property>
+        </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+        <widget class="QDoubleSpinBox" name="depth_editor">
+          <property name="enabled">
+            <bool>false</bool>
+          </property>
+          <property name="decimals">
+            <number>2</number>
+          </property>
+          <property name="minimum">
+            <double>-9999.990000000000009</double>
+          </property>
+          <property name="maximum">
+            <double>0.0</double>
+          </property>
+          <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::PlusMinus</enum>
+          </property>
+        </widget>
+      </item>
+
+      <!-- Row 2: Publish / Stop -->
+      <item row="2" column="1" colspan="3">
+        <layout class="QHBoxLayout" name="horizontalLayout_pub_stop">
+          <item>
+            <widget class="QPushButton" name="publish">
+              <property name="text">
+                <string>Publish</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="stop">
+              <property name="text">
+                <string>Stop</string>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+
+      <!-- Row 3: Save / Load -->
+      <item row="3" column="1" colspan="3">
+        <layout class="QHBoxLayout" name="horizontalLayout_file">
+          <item>
+            <widget class="QPushButton" name="save">
+              <property name="text">
+                <string>Save</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="load">
+              <property name="text">
+                <string>Load</string>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+
+      <!-- Row 4: Clear -->
+      <item row="4" column="1" colspan="3">
+        <widget class="QPushButton" name="clear">
+          <property name="text">
+            <string>Clear</string>
+          </property>
+        </widget>
+      </item>
+
+      <!-- Row 5: Checkbox -->
+      <item row="5" column="1" colspan="3">
+        <widget class="QCheckBox" name="apply_all">
+          <property name="font">
+            <font>
+              <family>Sans Serif</family>
+              <pointsize>8</pointsize>
+            </font>
+          </property>
+          <property name="text">
+            <string>Apply to all topics</string>
+          </property>
+          <property name="checked">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+
+      <!-- Row 6: Status -->
+      <item row="6" column="0">
+        <widget class="QLabel" name="label_2">
+          <property name="font">
+            <font>
+              <family>Sans Serif</family>
+              <pointsize>8</pointsize>
+            </font>
+          </property>
+          <property name="text">
+            <string>Status:</string>
+          </property>
+        </widget>
+      </item>
+      <item row="6" column="1" colspan="3">
+        <widget class="QLabel" name="status">
+          <property name="font">
+            <font>
+              <family>Sans Serif</family>
+              <pointsize>8</pointsize>
+            </font>
+          </property>
+          <property name="styleSheet">
+            <string notr="true"/>
+          </property>
+          <property name="text">
+            <string>Click to add waypoints</string>
+          </property>
+          <property name="wordWrap">
+            <bool>true</bool>
+          </property>
+          <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+        </widget>
+      </item>
+
+    </layout>
+  </widget>
+
+  <resources/>
+  <connections/>
 </ui>

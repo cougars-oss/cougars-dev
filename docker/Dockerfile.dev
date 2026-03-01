@@ -22,41 +22,41 @@ ARG USER_GID=1000
 SHELL [ "/bin/bash", "-c" ]
 
 ENV DOCKER_USER=${DOCKER_USER} \
-    OVERLAY_WS=/home/${DOCKER_USER}/cougars-dev/ros2_ws \
-    CONFIG_FOLDER=/home/${DOCKER_USER}/cougars-dev/config \
-    PATH="${PATH}:/home/${DOCKER_USER}/.local/bin" \
-    GUM_CHOOSE_HEADER_FOREGROUND="0" \
-    GUM_CHOOSE_CURSOR_FOREGROUND="75" \
-    GUM_CHOOSE_SELECTED_FOREGROUND="75" \
-    GUM_SPIN_SPINNER_FOREGROUND="75" \
-    GUM_FILTER_INDICATOR_FOREGROUND="75"\
-    GUM_FILTER_MATCH_FOREGROUND="75" \
-    GUM_INPUT_CURSOR_FOREGROUND="75"
+  OVERLAY_WS=/home/${DOCKER_USER}/cougars-dev/ros2_ws \
+  CONFIG_FOLDER=/home/${DOCKER_USER}/cougars-dev/config \
+  PATH="${PATH}:/home/${DOCKER_USER}/.local/bin" \
+  GUM_CHOOSE_HEADER_FOREGROUND="0" \
+  GUM_CHOOSE_CURSOR_FOREGROUND="75" \
+  GUM_CHOOSE_SELECTED_FOREGROUND="75" \
+  GUM_SPIN_SPINNER_FOREGROUND="75" \
+  GUM_FILTER_INDICATOR_FOREGROUND="75"\
+  GUM_FILTER_MATCH_FOREGROUND="75" \
+  GUM_INPUT_CURSOR_FOREGROUND="75"
 
 WORKDIR ${OVERLAY_WS}
 
 # Create the user
 RUN groupadd --gid ${USER_GID} "${DOCKER_USER}" \
-    && useradd --uid ${USER_UID} --gid ${USER_GID} -ms /bin/bash "${DOCKER_USER}" \
-    && usermod -aG sudo "${DOCKER_USER}" \
-    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
-    && echo "source /opt/ros/humble/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
-    && echo "[ -f ${OVERLAY_WS}/install/setup.bash ] && source ${OVERLAY_WS}/install/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
-    && touch /home/${DOCKER_USER}/.hushlogin \
-    && chown -R ${DOCKER_USER}:${DOCKER_USER} /home/${DOCKER_USER}
+  && useradd --uid ${USER_UID} --gid ${USER_GID} -ms /bin/bash "${DOCKER_USER}" \
+  && usermod -aG sudo "${DOCKER_USER}" \
+  && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+  && echo "source /opt/ros/humble/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
+  && echo "[ -f ${OVERLAY_WS}/install/setup.bash ] && source ${OVERLAY_WS}/install/setup.bash" >> /home/${DOCKER_USER}/.bashrc \
+  && touch /home/${DOCKER_USER}/.hushlogin \
+  && chown -R ${DOCKER_USER}:${DOCKER_USER} /home/${DOCKER_USER}
 
 # Install development tools
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    echo 'deb [trusted=yes] https://repo.charm.sh/apt/ /' | sudo tee /etc/apt/sources.list.d/charm.list \
-    && apt-get update && apt-get install -y --no-install-recommends \
-    python3-pip python3-venv gum \
-    x11-apps x11-utils x11-xserver-utils xauth
+  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+  echo 'deb [trusted=yes] https://repo.charm.sh/apt/ /' | sudo tee /etc/apt/sources.list.d/charm.list \
+  && apt-get update && apt-get install -y --no-install-recommends \
+  python3-pip python3-venv gum \
+  x11-apps x11-utils x11-xserver-utils xauth
 
 # Install Python development tools
 USER ${DOCKER_USER}
 RUN --mount=type=cache,target=/home/${DOCKER_USER}/.cache/pip,uid=1000,gid=1000 \
-    pip3 install --upgrade vcstool pre-commit
+  pip3 install --upgrade vcstool pre-commit
 
 USER root
 

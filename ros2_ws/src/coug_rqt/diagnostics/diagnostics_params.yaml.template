@@ -1,36 +1,43 @@
 diagnostic_aggregator:
   ros__parameters:
-    analyzers: ['AUV_NS']
+    analyzers: ["AUV_NS"]
 
     AUV_NS:
       type: diagnostic_aggregator/AnalyzerGroup
       path: AUV_NS
-      analyzers: ['factor_graph_node', 'origin_manager_node', 'waypoint_follower_node', 'dvl_a50_twist_node']
+      analyzers:
+        [
+          "factor_graph_node",
+          "origin_manager_node",
+          "waypoint_follower_node",
+          "dvl_a50_twist_node",
+        ]
 
       factor_graph_node:
         type: diagnostic_aggregator/GenericAnalyzer
-        path: 'factor_graph_node'
-        regex: ['.*factor_graph_node.*AUV_NS.*']
-        find_and_remove_prefix: ['factor_graph_node: [/AUV_NS]', 'factor_graph_node_tm: [/AUV_NS] ']
+        path: "factor_graph_node"
+        regex: [".*factor_graph_node.*AUV_NS.*"]
+        find_and_remove_prefix:
+          ["factor_graph_node: [/AUV_NS]", "factor_graph_node_tm: [/AUV_NS] "]
         timeout: 5.0
 
       origin_manager_node:
         type: diagnostic_aggregator/GenericAnalyzer
-        path: 'origin_manager_node'
-        regex: ['.*origin_manager_node.*AUV_NS.*']
-        find_and_remove_prefix: ['origin_manager_node: [/AUV_NS] ']
+        path: "origin_manager_node"
+        regex: [".*origin_manager_node.*AUV_NS.*"]
+        find_and_remove_prefix: ["origin_manager_node: [/AUV_NS] "]
         timeout: 5.0
 
       waypoint_follower_node:
         type: diagnostic_aggregator/GenericAnalyzer
-        path: 'waypoint_follower_node'
-        regex: ['.*waypoint_follower_node.*AUV_NS.*']
-        find_and_remove_prefix: ['waypoint_follower_node: [/AUV_NS] ']
+        path: "waypoint_follower_node"
+        regex: [".*waypoint_follower_node.*AUV_NS.*"]
+        find_and_remove_prefix: ["waypoint_follower_node: [/AUV_NS] "]
         timeout: 5.0
 
       dvl_a50_twist_node:
         type: diagnostic_aggregator/GenericAnalyzer
-        path: 'dvl_a50_twist_node'
-        regex: ['.*dvl_a50_twist_node.*AUV_NS.*']
-        find_and_remove_prefix: ['dvl_a50_twist_node: [/AUV_NS] ']
+        path: "dvl_a50_twist_node"
+        regex: [".*dvl_a50_twist_node.*AUV_NS.*"]
+        find_and_remove_prefix: ["dvl_a50_twist_node: [/AUV_NS] "]
         timeout: 5.0

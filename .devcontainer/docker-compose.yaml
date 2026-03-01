@@ -18,14 +18,14 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.gtsam
-    profiles: [ "build-reqs" ]
+    profiles: ["build-reqs"]
 
   base:
     image: snelsondurrant/cougars:base
     build:
       context: ..
       dockerfile: docker/Dockerfile.base
-    profiles: [ "build-reqs" ]
+    profiles: ["build-reqs"]
 
   mapproxy:
     image: danielsnider/mapproxy

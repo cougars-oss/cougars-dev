@@ -1,96 +1,83 @@
 {
-    "name": "bluerov2_openwater",
-    "package_name": "Ocean",
-    "world": "OpenWater",
-    "main_agent": "blue0sim",
-    "ticks_per_sec": 200,
-    "frames_per_sec": false,
-    "agents": [
+  "name": "bluerov2_openwater",
+  "package_name": "Ocean",
+  "world": "OpenWater",
+  "main_agent": "blue0sim",
+  "ticks_per_sec": 200,
+  "frames_per_sec": false,
+  "agents": [
+    {
+      "agent_name": "blue0sim",
+      "agent_type": "BlueROV2",
+      "sensors": [
         {
-            "agent_name": "blue0sim",
-            "agent_type": "BlueROV2",
-            "sensors": [
-                {
-                    "sensor_type": "IMUSensor",
-                    "socket": "IMUSocket",
-                    "Hz": 200,
-                    "configuration": {
-                        "AccelBiasSigma": 1.05e-05,
-                        "AngVelBiasSigma": 3.91e-06,
-                        "ReturnBias": true
-                    },
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "GPSSensor",
-                    "socket": "COM",
-                    "Hz": 1,
-                    "configuration": {
-                        "Depth": 0.5
-                    },
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "DepthSensor",
-                    "socket": "DepthSocket",
-                    "Hz": 10,
-                    "configuration": {
-                    },
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "MagnetometerSensor",
-                    "socket": "IMUSocket",
-                    "Hz": 100,
-                    "configuration": {
-                        "MagneticVector": [
-                            0.07857,
-                            0.41316,
-                            -0.90726
-                        ]
-                    },
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "RotationSensor",
-                    "socket": "IMUSocket",
-                    "Hz": 10,
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "DVLSensor",
-                    "socket": "DVLSocket",
-                    "Hz": 15,
-                    "configuration": {
-                        "DebugLines": false
-                    },
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "DynamicsSensor",
-                    "configuration": {
-                        "UseCOM": true,
-                        "UseRPY": false
-                    },
-                    "ros_publish": true
-                },
-                {
-                    "sensor_type": "VelocitySensor",
-                    "socket": "DVLSocket",
-                    "ros_publish": true
-                }
-            ],
-            "control_scheme": 0,
-            "location": [
-                0,
-                0,
-                0
-            ],
-            "rotation": [
-                0,
-                0,
-                0
-            ]
+          "sensor_type": "IMUSensor",
+          "socket": "IMUSocket",
+          "Hz": 200,
+          "configuration": {
+            "AccelBiasSigma": 1.05e-5,
+            "AngVelBiasSigma": 3.91e-6,
+            "ReturnBias": true
+          },
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "GPSSensor",
+          "socket": "COM",
+          "Hz": 1,
+          "configuration": {
+            "Depth": 0.5
+          },
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "DepthSensor",
+          "socket": "DepthSocket",
+          "Hz": 10,
+          "configuration": {},
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "MagnetometerSensor",
+          "socket": "IMUSocket",
+          "Hz": 100,
+          "configuration": {
+            "MagneticVector": [0.07857, 0.41316, -0.90726]
+          },
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "RotationSensor",
+          "socket": "IMUSocket",
+          "Hz": 10,
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "DVLSensor",
+          "socket": "DVLSocket",
+          "Hz": 15,
+          "configuration": {
+            "DebugLines": false
+          },
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "DynamicsSensor",
+          "configuration": {
+            "UseCOM": true,
+            "UseRPY": false
+          },
+          "ros_publish": true
+        },
+        {
+          "sensor_type": "VelocitySensor",
+          "socket": "DVLSocket",
+          "ros_publish": true
         }
-    ]
+      ],
+      "control_scheme": 0,
+      "location": [0, 0, 0],
+      "rotation": [0, 0, 0]
+    }
+  ]
 }

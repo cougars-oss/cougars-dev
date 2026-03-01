@@ -20,7 +20,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [ gpu ]
+              capabilities: [gpu]
 
   holoocean:
     image: frostlab/holoocean:2.0-runtime-ubuntu22.04-cuda12.4-ros-cyclone
@@ -37,7 +37,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [ gpu ]
+              capabilities: [gpu]
     environment:
       - DISPLAY=${DISPLAY:-:0}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp

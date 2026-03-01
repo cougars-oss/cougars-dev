@@ -20,8 +20,8 @@ ARG ROS_DISTRO=humble
 SHELL [ "/bin/bash", "-c" ]
 
 ENV DOCKER_USER=ue4 \
-    OVERLAY_WS=/home/ue4/ros2_ws \
-    CONFIG_FOLDER=/home/ue4/config
+  OVERLAY_WS=/home/ue4/ros2_ws \
+  CONFIG_FOLDER=/home/ue4/config
 
 WORKDIR ${OVERLAY_WS}
 
@@ -29,9 +29,9 @@ USER root
 
 # Install CycloneDDS
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
+  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends \
+  ros-${ROS_DISTRO}-rmw-cyclonedds-cpp
 
 COPY docker/holoocean/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

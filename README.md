@@ -41,7 +41,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
   **Simulation (HoloOcean):**
 
-  - Detatch from the tmux window using `Ctrl+b d` and build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
+  - Detach from the tmux window using `Ctrl+b d` and build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
 
   - When finished, launch the default HoloOcean scenario in the resulting `holoocean-ct` container using `./holoocean/launch.sh`.
 

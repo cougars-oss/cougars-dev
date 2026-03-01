@@ -1,42 +1,40 @@
 {
-    "name": "CoUGARs Dev (HoloOcean)",
-    "dockerComposeFile": [
-        "../docker-compose.yaml",
-        "docker-compose.yaml"
-    ],
-    "service": "dev",
-    "workspaceFolder": "/home/frostlab-docker/cougars-dev",
-    "remoteUser": "frostlab-docker",
-    "updateRemoteUserUID": true,
-    "hostRequirements": {
-        "gpu": true
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/common-utils:2": {},
-        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-        "ghcr.io/devcontainers/features/nvidia-cuda:3.0.0": {}
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-vscode.cpptools",
-                "ms-python.python",
-                "twxs.cmake",
-                "ms-azuretools.vscode-docker",
-                "docker.docker",
-                "github.vscode-github-actions",
-                "eamodio.gitlens",
-                "nonanonno.vscode-ros2",
-                "smilerobotics.urdf",
-                "morningfrog.urdf-visualizer",
-                "mechatroner.rainbow-csv",
-                "redhat.vscode-xml",
-                "redhat.vscode-yaml"
-            ]
-        }
-    },
-    "postCreateCommand": [
-        "/bin/bash",
-        ".devcontainer/post-create-command.sh"
-    ]
+  "name": "CoUGARs Dev (HoloOcean)",
+  "dockerComposeFile": [
+    "../docker-compose.yaml",
+    "docker-compose.yaml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/home/frostlab-docker/cougars-dev",
+  "remoteUser": "frostlab-docker",
+  "updateRemoteUserUID": true,
+  "hostRequirements": {
+    "gpu": true
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/nvidia-cuda:3.0.0": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "docker.docker",
+        "eamodio.gitlens",
+        "nonanonno.vscode-ros2",
+        "althack.ament-task-provider",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "EditorConfig.EditorConfig"
+      ]
+    }
+  },
+  "postCreateCommand": [
+    "/bin/bash",
+    ".devcontainer/post-create-command.sh"
+  ]
 }

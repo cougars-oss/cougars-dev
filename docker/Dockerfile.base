@@ -28,35 +28,35 @@ ARG TARGETARCH
 SHELL [ "/bin/bash", "-c" ]
 
 ENV ROS_BUILD_ARCH=${TARGETARCH} \
-    RCUTILS_COLORIZED_OUTPUT=1
+  RCUTILS_COLORIZED_OUTPUT=1
 
 # Install and configure SSH client
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    vim nano tmux openssh-client \
-    && echo "Host *" >> /etc/ssh/ssh_config \
-    && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends \
+  vim nano tmux openssh-client \
+  && echo "Host *" >> /etc/ssh/ssh_config \
+  && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
 # Install ROS packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp ros-${ROS_DISTRO}-rmw-zenoh-cpp \
-    ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy \
-    ros-${ROS_DISTRO}-teleop-twist-keyboard ros-${ROS_DISTRO}-teleop-tools \
-    ros-${ROS_DISTRO}-rosbag2-storage-mcap
+  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends \
+  ros-${ROS_DISTRO}-rmw-cyclonedds-cpp ros-${ROS_DISTRO}-rmw-zenoh-cpp \
+  ros-${ROS_DISTRO}-joy ros-${ROS_DISTRO}-teleop-twist-joy \
+  ros-${ROS_DISTRO}-teleop-twist-keyboard ros-${ROS_DISTRO}-teleop-tools \
+  ros-${ROS_DISTRO}-rosbag2-storage-mcap
 
 # Install ROS dependencies (rosdep)
 WORKDIR /tmp/packages
 COPY --from=cacher /tmp/packages .
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
-    --mount=type=cache,target=/root/.ros/rosdep \
-    apt-get update \
-    && rosdep update \
-    && rosdep install --from-paths . --ignore-src -y \
-    && rm -rf ./*
+  --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+  --mount=type=cache,target=/root/.ros/rosdep \
+  apt-get update \
+  && rosdep update \
+  && rosdep install --from-paths . --ignore-src -y \
+  && rm -rf ./*
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

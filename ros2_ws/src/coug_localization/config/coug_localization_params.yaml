@@ -23,7 +23,7 @@
 
       imu0: imu/data
       imu0_config: [false, false, false, # X, Y, Z
-                    true, true, false, # Roll, Pitch, Yaw
+                    true,  true,  false, # Roll, Pitch, Yaw
                     false, false, false, # Vx, Vy, Vz
                     true,  true,  true,  # Vroll, Vpitch, Vyaw
                     true,  true,  true]  # Ax, Ay, Az
