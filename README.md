@@ -43,7 +43,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
     cd ~/cougars-dev/scripts && ./holoocean_launch.sh
     ```
 
-  - Open a new terminal, build the `ros2_ws` workspace, and launch the simulation stack using `./sim_launch.sh`.
+  - Open a new terminal, build the `ros2_ws` workspace, and launch the development stack using `./sim_launch.sh`.
 
     ```bash
     cd ~/cougars-dev/ros2_ws && colcon build
