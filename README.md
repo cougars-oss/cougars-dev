@@ -25,52 +25,42 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
 - Generate and add a [GitHub SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux).
 
-- Open a new terminal and clone the `cougars-dev` repository.
+- Clone the `cougars-dev` repository.
 
   ```bash
   git clone git@github.com:cougars-auv/cougars-dev.git
-  ```
-
-- Enter the repository and run `./deploy.sh dev` to pull the latest image from Docker Hub and launch the `coug_dev` tmux window inside the `cougars-ct` container.
-
-  ```bash
-  cd cougars-dev && ./deploy.sh dev
   ```
 
 - Choose a development workflow:
 
   **Simulation (HoloOcean):**
 
-  - Detach from the tmux window using `Ctrl+b d` and build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
+  - Build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
 
-  - When finished, launch the default HoloOcean scenario in the resulting `holoocean-ct` container using `./holoocean/launch.sh`.
+  - Open the `cougars-dev` repository in VSCode. Check for a notification in the bottom right. When it pops up, select "Reopen in Container". If you don't see a notification, open the Command Palette (`Ctrl + Shift + P`), search for "Dev Containers: Reopen in Container", and select it. When prompted to select a devcontainer.json file, choose `CoUGARs Dev (HoloOcean)`.
+
+  - Open a new terminal window using `` Ctrl + Alt + Shift + ` `` and launch a HoloOcean scenario in the `holoocean-ct` container using `./holoocean_launch.sh`.
 
     ```bash
-    cd cougars-dev && ./holoocean/launch.sh
+    cd ~/cougars-dev/scripts && ./holoocean_launch.sh
     ```
 
-  - Open a new terminal, attach to the `coug_dev` tmux window using `./deploy.sh dev`, build the `ros2_ws` workspace, and launch the simulation stack using `./sim_launch.sh`.
+  - Open a new terminal, build the `ros2_ws` workspace, and launch the simulation stack using `./sim_launch.sh`.
 
     ```bash
-    cd ~/ros2_ws && colcon build
-    cd ~/scripts && ./sim_launch.sh
+    cd ~/cougars-dev/ros2_ws && colcon build
+    cd ~/cougars-dev/scripts && ./sim_launch.sh
     ```
 
   **Recorded Data (`rosbag2`):**
 
-  - On your host machine, copy your `rosbag2` bag into the `bags` folder at the root of the repository.
+  - Copy your `rosbag2` bag into the `bags` folder at the root of the repository.
 
-  - Inside of the `coug_dev` tmux window, build the `ros2_ws` workspace and launch the development stack using `./bag_launch.sh <bag_name>`. Provide the name of your bag as the script argument.
-
-    ```bash
-    cd ~/ros2_ws && colcon build
-    cd ~/scripts && ./bag_launch.sh <bag_name>
-    ```
-
-  - To simply visualize the playback without launching any new nodes, use `./viz_launch.sh <bag_name>`.
+  - Open a new terminal window using `` Ctrl + Alt + Shift + ` ``, build the `ros2_ws` workspace, and launch the development stack using `./bag_launch.sh`.
 
     ```bash
-    cd ~/scripts && ./viz_launch.sh <bag_name>
+    cd ~/cougars-dev/ros2_ws && colcon build
+    cd ~/cougars-dev/scripts && ./bag_launch.sh
     ```
 
 ## 🤝 Contributing
@@ -79,9 +69,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
 - **Make Changes:** Develop and debug your new feature. Add good documentation.
 
-  > All code must pass linting checks before it can be merged. We recommend using `pre-commit` for code style and formatting during development. Set it up on your host machine using `pip install pre-commit && pre-commit install`.
-  >
-  > If you need to add dependencies, update the `package.xml`, `Dockerfile`, `cougars.repos`, or `dependencies.repos` in your branch and test building the image locally using `docker compose -f docker/docker-compose.yaml up -d --build`. The CI will automatically build and push the new image to Docker Hub upon merge.
+  > If you need to add dependencies, update the `package.xml`, `Dockerfile`, `cougars.repos`, or `dependencies.repos` in your branch and test building the image locally. The CI will automatically build and push the new image to Docker Hub upon merge.
 
 - **Sync Frequently:** Regularly rebase your branch against `main` (or merge `main` into your branch) to prevent conflicts.
 
