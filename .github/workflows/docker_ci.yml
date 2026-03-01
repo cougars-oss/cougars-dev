@@ -79,7 +79,7 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/Dockerfile.gtsam
+          file: .docker/Dockerfile.gtsam
           platforms: linux/${{ matrix.arch }}
           push: true
           tags: snelsondurrant/cougars:gtsam-${{ matrix.arch }}
@@ -140,7 +140,7 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/Dockerfile.base
+          file: .docker/Dockerfile.base
           platforms: linux/${{ matrix.arch }}
           pull: true
           push: true
@@ -191,7 +191,7 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: .
-          file: docker/Dockerfile.dev
+          file: .docker/Dockerfile.dev
           platforms: linux/amd64
           pull: true
           push: true

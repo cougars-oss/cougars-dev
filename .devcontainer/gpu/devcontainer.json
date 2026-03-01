@@ -19,8 +19,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.cpptools",
-        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools-extension-pack",
         "ms-python.python",
         "ms-azuretools.vscode-docker",
         "docker.docker",

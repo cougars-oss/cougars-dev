@@ -17,14 +17,14 @@ services:
     image: snelsondurrant/cougars:gtsam
     build:
       context: ..
-      dockerfile: docker/Dockerfile.gtsam
+      dockerfile: .docker/Dockerfile.gtsam
     profiles: ["build-reqs"]
 
   base:
     image: snelsondurrant/cougars:base
     build:
       context: ..
-      dockerfile: docker/Dockerfile.base
+      dockerfile: .docker/Dockerfile.base
     profiles: ["build-reqs"]
 
   mapproxy:
@@ -39,7 +39,7 @@ services:
     image: snelsondurrant/cougars:dev
     # build:
     #   context: ..
-    #   dockerfile: docker/Dockerfile.dev
+    #   dockerfile: .docker/Dockerfile.dev
     container_name: cougars-ct
     network_mode: host
     ipc: host

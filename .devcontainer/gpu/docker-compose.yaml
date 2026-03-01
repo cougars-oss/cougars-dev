@@ -26,7 +26,7 @@ services:
     image: frostlab/holoocean:2.0-runtime-ubuntu22.04-cuda12.4-ros-cyclone
     build:
       context: ..
-      dockerfile: docker/holoocean/Dockerfile.holoocean
+      dockerfile: .docker/holoocean/Dockerfile.holoocean
     container_name: holoocean-ct
     network_mode: host
     ipc: host
