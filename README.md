@@ -23,9 +23,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
   - Install [Docker Desktop](https://docs.docker.com/desktop/) and enable the [WSL2 backend](https://docs.docker.com/desktop/windows/wsl/).
 
-- Generate and add a [GitHub SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux).
-
-- Clone the `cougars-dev` repository.
+- Add a [GitHub SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux) and clone the `cougars-dev` repository.
 
   ```bash
   git clone git@github.com:cougars-auv/cougars-dev.git
@@ -37,9 +35,9 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
   - Build a runtime image for [HoloOcean-ROS](https://github.com/byu-holoocean/holoocean-ros/tree/main/docker). When prompted to run `./build_container.sh`, specify the branch `nelson/fgo-dev` using `./build_container.sh -b nelson/fgo-dev`.
 
-  - Open the `cougars-dev` repository in VSCode. Check for a notification in the bottom right. When it pops up, select "Reopen in Container". If you don't see a notification, open the Command Palette (`Ctrl + Shift + P`), search for "Dev Containers: Reopen in Container", and select it. When prompted to select a devcontainer.json file, choose `CoUGARs Dev (HoloOcean)`.
+  - Open the `cougars-dev` repository in VSCode and use the Command Palette (`Ctrl + Shift + P`) to select "Dev Containers: Reopen in Container." When prompted to choose a `devcontainer.json` file, click `CoUGARs Dev (HoloOcean)`.
 
-  - Open a new terminal window using `` Ctrl + Alt + Shift + ` `` and launch a HoloOcean scenario in the `holoocean-ct` container using `./holoocean_launch.sh`.
+  - Once the containers load, open a new terminal window using `` Ctrl + Alt + Shift + ` `` and launch a HoloOcean scenario in the `holoocean-ct` container using `./holoocean_launch.sh`.
 
     ```bash
     cd ~/cougars-dev/scripts && ./holoocean_launch.sh
@@ -54,7 +52,9 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
   **Recorded Data (`rosbag2`):**
 
-  - Copy your `rosbag2` bag into the `bags` folder at the root of the repository.
+    - Open the `cougars-dev` repository in VSCode and use the Command Palette (`Ctrl + Shift + P`) to select "Dev Containers: Reopen in Container." When prompted to choose a `devcontainer.json` file, click `CoUGARs Dev`.
+
+  - Once the containers load, copy your `rosbag2` bag into the `bags` folder at the root of the repository.
 
   - Open a new terminal window using `` Ctrl + Alt + Shift + ` ``, build the `ros2_ws` workspace, and launch the development stack using `./bag_launch.sh`.
 
