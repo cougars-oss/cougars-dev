@@ -30,6 +30,7 @@ repos:
       - id: check-symlinks
       - id: check-added-large-files
         args: ["--maxkb=10000"]
+      - id: forbid-submodules
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.37.0
