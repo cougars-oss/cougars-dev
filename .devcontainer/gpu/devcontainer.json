@@ -8,13 +8,15 @@
   "workspaceFolder": "/home/frostlab-docker/cougars-dev",
   "remoteUser": "frostlab-docker",
   "updateRemoteUserUID": true,
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}"
+  },
   "hostRequirements": {
     "gpu": true
   },
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers/features/desktop-lite:1": {},
     "ghcr.io/devcontainers/features/nvidia-cuda:3.0.0": {}
   },
   "customizations": {
