@@ -8,9 +8,6 @@
   "workspaceFolder": "/home/frostlab-docker/cougars-dev",
   "remoteUser": "frostlab-docker",
   "updateRemoteUserUID": true,
-  "containerEnv": {
-    "DISPLAY": "${localEnv:DISPLAY}"
-  },
   "hostRequirements": {
     "gpu": true
   },

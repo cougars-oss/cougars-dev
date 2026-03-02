@@ -5,9 +5,6 @@
   "workspaceFolder": "/home/frostlab-docker/cougars-dev",
   "remoteUser": "frostlab-docker",
   "updateRemoteUserUID": true,
-  "containerEnv": {
-    "DISPLAY": "${localEnv:DISPLAY}"
-  },
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
