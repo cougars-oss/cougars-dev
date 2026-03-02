@@ -46,7 +46,7 @@ services:
     pid: host
     privileged: true
     environment:
-      - DISPLAY=${DISPLAY:-:0}
+      - DISPLAY=${DISPLAY}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
       - ..:/home/frostlab-docker/cougars-dev:cached

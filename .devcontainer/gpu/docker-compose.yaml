@@ -39,7 +39,7 @@ services:
               count: all
               capabilities: [gpu]
     environment:
-      - DISPLAY=${DISPLAY:-:0}
+      - DISPLAY=${DISPLAY}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
       - ../config:/home/ue4/config
