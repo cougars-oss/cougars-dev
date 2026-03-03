@@ -169,7 +169,7 @@
     timeout_threshold: 2.0 # [s]
 
     simulate_dropout: false
-    dropout_frequency: 0.0333 # [Hz] Frequency of the dropout cycle (1/30).
+    dropout_frequency: 0.033 # [Hz] Frequency of the dropout cycle (1/30).
     dropout_duration: 5.0 # [s] Duration of the dropout.
 
     # --- ROS Topics and Frames ---
@@ -256,7 +256,7 @@
 
 /**/ekf_filter_node_map:
   ros__parameters:
-    frequency: 20.0
+    frequency: 30.0
     two_d_mode: false
     publish_tf: false # Published by FGO instead
     print_diagnostics: true
@@ -303,7 +303,7 @@
 
 /**/ukf_filter_node_map:
   ros__parameters:
-    frequency: 20.0
+    frequency: 30.0
     two_d_mode: false
     publish_tf: false # Published by FGO instead
     print_diagnostics: true

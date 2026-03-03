@@ -32,7 +32,7 @@ waypoint_follower_node:
     default_value: 2.0
   invert_z:
     type: bool
-    default_value: true
+    default_value: false
 
   enable_rw_speed:
     type: bool
