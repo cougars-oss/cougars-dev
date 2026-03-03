@@ -123,7 +123,7 @@ class GpsConverterNode(Node):
                 zone=self.origin_utm.zone,
                 band=self.origin_utm.band,
                 easting=self.origin_utm.easting + d_east,
-                northing=self.origin_utm.northing + d_north
+                northing=self.origin_utm.northing + d_north,
             )
             current_pt = current_utm.toMsg()
             lat = current_pt.latitude
