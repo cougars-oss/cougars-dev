@@ -5,9 +5,9 @@ repositories:
     version: main
   holoocean_interfaces:
     type: zip
-    url: https://github.com/byu-holoocean/holoocean-ros/archive/refs/heads/main.zip
-    version: holoocean-ros-main/holoocean_interfaces
+    url: https://github.com/byu-holoocean/holoocean-ros/archive/05a7a4814ac99efb768def844366860b81224e56.zip
+    version: holoocean-ros-05a7a4814ac99efb768def844366860b81224e56/holoocean_interfaces
   dvl_msgs:
-    type: git
-    url: https://github.com/paagutie/dvl_msgs.git
-    version: master
+    type: zip
+    url: https://github.com/paagutie/dvl_msgs/archive/555525ebc027f4ca21fdd654a6f30cecd259772f.zip
+    version: dvl_msgs-555525ebc027f4ca21fdd654a6f30cecd259772f
