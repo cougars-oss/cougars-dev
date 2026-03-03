@@ -17,7 +17,8 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import NavSatFix
-import math
+from geographic_msgs.msg import GeoPoint
+import geodesy.utm
 
 
 class GpsConverterNode(Node):
@@ -80,6 +81,16 @@ class GpsConverterNode(Node):
         )
         self.publisher = self.create_publisher(NavSatFix, output_topic, 10)
 
+        try:
+            pt = GeoPoint(
+                latitude=self.origin_lat,
+                longitude=self.origin_lon,
+                altitude=self.origin_alt,
+            )
+            self.origin_utm = geodesy.utm.fromMsg(pt)
+        except Exception as e:
+            self.get_logger().error(f"Failed to initialize origin UTM: {e}")
+
         self.get_logger().info(
             f"GPS converter started. Listening on {input_topic} and publishing on {output_topic}."
         )
@@ -107,9 +118,19 @@ class GpsConverterNode(Node):
             d_east = msg.pose.pose.position.x
             d_north = msg.pose.pose.position.y
 
-        lat, lon = self.calculate_inverse_haversine(
-            self.origin_lat, self.origin_lon, d_north, d_east
-        )
+        try:
+            current_utm = geodesy.utm.UTMPoint(
+                zone=self.origin_utm.zone,
+                band=self.origin_utm.band,
+                easting=self.origin_utm.easting + d_east,
+                northing=self.origin_utm.northing + d_north
+            )
+            current_pt = current_utm.toMsg()
+            lat = current_pt.latitude
+            lon = current_pt.longitude
+        except Exception as e:
+            self.get_logger().error(f"Failed UTM distance conversion: {e}")
+            return
 
         navsat_msg.latitude = lat
         navsat_msg.longitude = lon
@@ -131,36 +152,6 @@ class GpsConverterNode(Node):
         navsat_msg.position_covariance_type = navsat_msg.COVARIANCE_TYPE_DIAGONAL_KNOWN
 
         self.publisher.publish(navsat_msg)
-
-    def calculate_inverse_haversine(self, ref_lat, ref_lon, d_north, d_east):
-        """
-        Calculate the latitude and longitude given a reference point and displacement.
-
-        :param ref_lat: Reference latitude in degrees.
-        :param ref_lon: Reference longitude in degrees.
-        :param d_north: Displacement north in meters.
-        :param d_east: Displacement east in meters.
-        :return: Tuple of (latitude, longitude) in degrees.
-        """
-        earth_radius = 6378137.0
-        ref_lat_rad = math.radians(ref_lat)
-        ref_lon_rad = math.radians(ref_lon)
-
-        d = math.sqrt(d_north**2 + d_east**2)
-        theta = math.atan2(d_east, d_north)
-
-        lat_rad = math.asin(
-            math.sin(ref_lat_rad) * math.cos(d / earth_radius)
-            + math.cos(ref_lat_rad) * math.sin(d / earth_radius) * math.cos(theta)
-        )
-        lon_rad = ref_lon_rad + math.atan2(
-            math.sin(theta) * math.sin(d / earth_radius) * math.cos(ref_lat_rad),
-            math.cos(d / earth_radius) - math.sin(ref_lat_rad) * math.sin(lat_rad),
-        )
-        lat = math.degrees(lat_rad)
-        lon = math.degrees(lon_rad)
-
-        return lat, lon
 
 
 def main(args=None):

@@ -18,6 +18,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Quaternion, Vector3Stamped
+from tf_transformations import quaternion_from_euler
 
 
 class AhrsConverterNode(Node):
@@ -71,29 +72,6 @@ class AhrsConverterNode(Node):
             f"publishing on {output_topic}."
         )
 
-    def quaternion_from_euler(self, roll, pitch, yaw):
-        """
-        Convert Euler angles to a Quaternion message.
-
-        :param roll: Roll angle in radians.
-        :param pitch: Pitch angle in radians.
-        :param yaw: Yaw angle in radians.
-        :return: Populated geometry_msgs/Quaternion message.
-        """
-        cy = math.cos(yaw * 0.5)
-        sy = math.sin(yaw * 0.5)
-        cp = math.cos(pitch * 0.5)
-        sp = math.sin(pitch * 0.5)
-        cr = math.cos(roll * 0.5)
-        sr = math.sin(roll * 0.5)
-
-        q = Quaternion()
-        q.w = cr * cp * cy + sr * sp * sy
-        q.x = sr * cp * cy - cr * sp * sy
-        q.y = cr * sp * cy + sr * cp * sy
-        q.z = cr * cp * sy - sr * sp * cy
-        return q
-
     def listener_callback(self, msg: Vector3Stamped):
         """
         Process rotation sensor data (Vector3Stamped).
@@ -117,7 +95,11 @@ class AhrsConverterNode(Node):
             pitch_rad += random.gauss(0, self.roll_pitch_noise_sigma)
             yaw_rad += random.gauss(0, self.yaw_noise_sigma)
 
-        imu_msg.orientation = self.quaternion_from_euler(roll_rad, pitch_rad, yaw_rad)
+        q_array = quaternion_from_euler(roll_rad, pitch_rad, yaw_rad)
+        imu_msg.orientation.x = q_array[0]
+        imu_msg.orientation.y = q_array[1]
+        imu_msg.orientation.z = q_array[2]
+        imu_msg.orientation.w = q_array[3]
 
         yaw_variance = self.yaw_noise_sigma**2
         roll_pitch_variance = self.roll_pitch_noise_sigma**2

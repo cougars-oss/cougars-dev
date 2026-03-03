@@ -14,6 +14,10 @@
   <depend>sensor_msgs</depend>
   <depend>dvl_msgs</depend>
   <depend>holoocean_interfaces</depend>
+  <depend>python3-geodesy</depend>
+  <depend>tf_transformations</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
