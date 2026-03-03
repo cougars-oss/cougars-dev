@@ -245,7 +245,7 @@ void CougWaypointsPlugin::Clear()
 void CougWaypointsPlugin::SaveWaypoints()
 {
   const char * overlay_ws = std::getenv("OVERLAY_WS");
-  QString path = QString::fromUtf8(overlay_ws) + "/src/coug_mapviz/waypoints";
+  QString path = QString::fromUtf8(overlay_ws) + "/src/coug_mapviz/missions";
   QDir dir(path);
   if (!dir.exists()) {
     dir.mkpath(".");
@@ -281,7 +281,7 @@ void CougWaypointsPlugin::SaveWaypoints()
 void CougWaypointsPlugin::LoadWaypoints()
 {
   const char * overlay_ws = std::getenv("OVERLAY_WS");
-  QString path = QString::fromUtf8(overlay_ws) + "/src/coug_mapviz/waypoints";
+  QString path = QString::fromUtf8(overlay_ws) + "/src/coug_mapviz/missions";
   QString filename = QFileDialog::getOpenFileName(
     config_widget_, "Load Mission", path, "JSON Files (*.json)");
   if (filename.isEmpty()) {return;}
