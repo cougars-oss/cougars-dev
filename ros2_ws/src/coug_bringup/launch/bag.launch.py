@@ -52,7 +52,6 @@ def launch_setup(context, *args, **kwargs):
 
     coug_bringup_dir = get_package_share_directory("coug_bringup")
     coug_bringup_launch_dir = os.path.join(coug_bringup_dir, "launch")
-    sensor_bridge_dir = get_package_share_directory("sensor_bridge")
 
     if auv_type_str == "bluerov2":
         urdf_file = PathJoinSubstitution(
@@ -158,20 +157,9 @@ def launch_setup(context, *args, **kwargs):
         }.items(),
     )
 
-    sensor_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(sensor_bridge_dir, "launch", "sensor_bridge.launch.py")
-        ),
-        launch_arguments={
-            "use_sim_time": use_sim_time,
-            "auv_ns": auv_ns,
-        }.items(),
-    )
-
     agent_actions = [
         PushRosNamespace(auv_ns),
         auv_launch,
-        sensor_launch,
     ]
 
     actions.append(GroupAction(actions=agent_actions))

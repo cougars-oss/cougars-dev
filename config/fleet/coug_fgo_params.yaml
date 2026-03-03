@@ -173,8 +173,9 @@
     dropout_duration: 5.0 # [s] Duration of the dropout.
 
     # --- ROS Topics and Frames ---
-    input_topic: "gps/fix"
-    odom_output_topic: "odometry/gps"
+    navsat_topic: "gps/fix"
+    gps_odom_topic: "odometry/gps"
+    ahrs_topic: "imu/data"
     origin_topic: "/origin"
 
     use_parameter_child_frame: false
@@ -203,6 +204,19 @@
     output_topic: "dvl/twist"
 
     use_parameter_frame: true
+
+/**/dvl_a50_odom_node:
+  ros__parameters:
+    # --- Node Settings ---
+    publish_diagnostics: true # Publish diagnostic information.
+    timeout_threshold: 0.5 # [s]
+
+    # --- ROS Topics and Frames ---
+    input_topic: "dvl/position"
+    output_topic: "odometry/dvl"
+
+    use_parameter_frame: true
+    publish_local_tf: false
 
 # --- Robot Localization Pipeline ---
 /**/imu_filter_madgwick_node:

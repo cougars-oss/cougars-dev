@@ -11,6 +11,7 @@ diagnostic_aggregator:
           "origin_manager_node",
           "waypoint_follower_node",
           "dvl_a50_twist_node",
+          "dvl_a50_odom_node",
         ]
 
       factor_graph_node:
@@ -45,6 +46,13 @@ diagnostic_aggregator:
         find_and_remove_prefix: ["dvl_a50_twist_node: [/coug0sim] "]
         timeout: 5.0
 
+      dvl_a50_odom_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: "dvl_a50_odom_node"
+        regex: [".*dvl_a50_odom_node.*coug0sim.*"]
+        find_and_remove_prefix: ["dvl_a50_odom_node: [/coug0sim] "]
+        timeout: 5.0
+
     coug1sim:
       type: diagnostic_aggregator/AnalyzerGroup
       path: coug1sim
@@ -54,6 +62,7 @@ diagnostic_aggregator:
           "origin_manager_node",
           "waypoint_follower_node",
           "dvl_a50_twist_node",
+          "dvl_a50_odom_node",
         ]
 
       factor_graph_node:
@@ -88,6 +97,13 @@ diagnostic_aggregator:
         find_and_remove_prefix: ["dvl_a50_twist_node: [/coug1sim] "]
         timeout: 5.0
 
+      dvl_a50_odom_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: "dvl_a50_odom_node"
+        regex: [".*dvl_a50_odom_node.*coug1sim.*"]
+        find_and_remove_prefix: ["dvl_a50_odom_node: [/coug1sim] "]
+        timeout: 5.0
+
     coug2sim:
       type: diagnostic_aggregator/AnalyzerGroup
       path: coug2sim
@@ -97,6 +113,7 @@ diagnostic_aggregator:
           "origin_manager_node",
           "waypoint_follower_node",
           "dvl_a50_twist_node",
+          "dvl_a50_odom_node",
         ]
 
       factor_graph_node:
@@ -129,4 +146,11 @@ diagnostic_aggregator:
         path: "dvl_a50_twist_node"
         regex: [".*dvl_a50_twist_node.*coug2sim.*"]
         find_and_remove_prefix: ["dvl_a50_twist_node: [/coug2sim] "]
+        timeout: 5.0
+
+      dvl_a50_odom_node:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: "dvl_a50_odom_node"
+        regex: [".*dvl_a50_odom_node.*coug2sim.*"]
+        find_and_remove_prefix: ["dvl_a50_odom_node: [/coug2sim] "]
         timeout: 5.0
