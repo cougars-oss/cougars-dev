@@ -1,5 +1,8 @@
 /blue0sim/**:
   ros__parameters:
+    gps:
+      enable_gps: false
+
     dynamics:
       mass: [11.5, 11.5, 11.5]
       linear_drag: [11.5, 11.5, 11.5]
@@ -8,3 +11,7 @@
     prior:
       parameter_priors:
         initial_position_sigmas: [0.001, 0.001, 1.0]
+
+/blue0sim/dvl_a50_odom_node:
+  ros__parameters:
+    publish_diagnostics: false

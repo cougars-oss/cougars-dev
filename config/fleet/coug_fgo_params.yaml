@@ -61,7 +61,7 @@
       timeout_threshold: 1.0 # [s]
 
     gps:
-      enable_gps: false
+      enable_gps: true
       enable_gps_init_only: false
       use_parameter_frame: false
       use_parameter_covariance: false
@@ -175,7 +175,7 @@
     # --- ROS Topics and Frames ---
     navsat_topic: "gps/fix"
     gps_odom_topic: "odometry/gps"
-    ahrs_topic: "imu/data"
+    ahrs_topic: "imu/ahrs"
     origin_topic: "/origin"
 
     use_parameter_child_frame: false

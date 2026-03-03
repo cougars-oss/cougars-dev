@@ -2,6 +2,7 @@
   ros__parameters:
     imu_topic: "imu/data"
     ahrs_topic: "imu/data"
+    gps_odom_topic: "odometry/truth"
 
     imu:
       gravity: [0.0, 0.0, -9.81]
@@ -18,14 +19,14 @@
       enable_ahrs: false
       enable_ahrs_init_only: true
 
-    dynamics:
-      enable_dynamics: false
-
     prior:
       use_parameter_priors: false
 
 /bluerov2/origin_manager_node:
   ros__parameters:
+    ahrs_topic: "imu/data"
+    gps_odom_topic: "odometry/truth"
+
     use_parameter_child_frame: true
     use_parameter_origin: false
 

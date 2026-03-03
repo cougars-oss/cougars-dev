@@ -1,3 +1,3 @@
-/coug0sim/**:
+/coug0sim/dvl_a50_odom_node:
   ros__parameters:
-    param: false
+    publish_diagnostics: false
