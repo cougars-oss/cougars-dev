@@ -41,6 +41,7 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=24
     volumes:
       - ../config:/home/ue4/config
       - /tmp/.X11-unix:/tmp/.X11-unix

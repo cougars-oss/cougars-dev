@@ -48,6 +48,7 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=24
     volumes:
       - ..:/home/frostlab-docker/cougars-dev:cached
       - /var/run/docker.sock:/var/run/docker.sock
