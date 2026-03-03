@@ -17,7 +17,7 @@ import random
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Imu
-from geometry_msgs.msg import Quaternion, Vector3Stamped
+from geometry_msgs.msg import Vector3Stamped
 from tf_transformations import quaternion_from_euler
 
 
