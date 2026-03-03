@@ -60,7 +60,9 @@ jobs:
 
   build-gtsam:
     needs: check-changes
-    if: needs.check-changes.outputs.gtsam == 'true'
+    if: |
+      github.event_name != 'repository_dispatch' &&
+      needs.check-changes.outputs.gtsam == 'true'
     strategy:
       matrix:
         include:
@@ -110,7 +112,9 @@ jobs:
     if: |
       always() &&
       !cancelled() &&
-      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true') &&
+      (github.event_name == 'repository_dispatch' ||
+       needs.check-changes.outputs.gtsam == 'true' ||
+       needs.check-changes.outputs.base == 'true') &&
       !contains(needs.build-gtsam.result, 'failure') &&
       !contains(needs.manifest-gtsam.result, 'failure')
     strategy:
@@ -158,7 +162,9 @@ jobs:
     if: |
       always() &&
       !cancelled() &&
-      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true') &&
+      (github.event_name == 'repository_dispatch' ||
+       needs.check-changes.outputs.gtsam == 'true' ||
+       needs.check-changes.outputs.base == 'true') &&
       !contains(needs.build-base.result, 'failure')
     runs-on: ubuntu-latest
     steps:
@@ -177,7 +183,10 @@ jobs:
     if: |
       always() &&
       !cancelled() &&
-      (needs.check-changes.outputs.gtsam == 'true' || needs.check-changes.outputs.base == 'true' || needs.check-changes.outputs.dev == 'true') &&
+      (github.event_name == 'repository_dispatch' ||
+       needs.check-changes.outputs.gtsam == 'true' ||
+       needs.check-changes.outputs.base == 'true' ||
+       needs.check-changes.outputs.dev == 'true') &&
       !contains(needs.build-base.result, 'failure') &&
       !contains(needs.manifest-base.result, 'failure')
     runs-on: ubuntu-latest
