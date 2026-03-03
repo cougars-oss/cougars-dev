@@ -63,6 +63,10 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
     cd ~/cougars-dev/scripts && ./bag_launch.sh
     ```
 
+## 📖 Wiki
+
+Check out our [GitHub Wiki](https://github.com/cougars-auv/cougars-dev/wiki) for up-to-date documentation.
+
 ## 🤝 Contributing
 
 - **Create a Branch:** Create a new branch using the format `name/feature` (e.g., `nelson/repo-docs`).
