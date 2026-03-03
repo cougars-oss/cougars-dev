@@ -65,7 +65,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
 ## 📖 Wiki
 
-Check out our [GitHub Wiki](https://github.com/cougars-auv/cougars-dev/wiki) for up-to-date documentation.
+Check out the [GitHub Wiki](https://github.com/cougars-auv/cougars-dev/wiki) for up-to-date documentation.
 
 ## 🤝 Contributing
 
