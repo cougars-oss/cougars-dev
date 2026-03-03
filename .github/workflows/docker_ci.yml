@@ -19,10 +19,10 @@ on:
     branches: ["main"]
     paths:
       - ".github/workflows/docker_ci.yml"
-      - "docker/Dockerfile.gtsam"
-      - "docker/Dockerfile.base"
-      - "docker/Dockerfile.dev"
-      - "docker/entrypoint.sh"
+      - ".docker/Dockerfile.gtsam"
+      - ".docker/Dockerfile.base"
+      - ".docker/Dockerfile.dev"
+      - ".docker/entrypoint.sh"
       - "cougars.repos"
       - "**/package.xml"
   repository_dispatch:
@@ -46,17 +46,17 @@ jobs:
         with:
           filters: |
             gtsam:
-              - '.github/workflows/docker_ci.yml'
-              - 'docker/Dockerfile.gtsam'
+              - ".github/workflows/docker_ci.yml"
+              - ".docker/Dockerfile.gtsam"
             base:
-              - '.github/workflows/docker_ci.yml'
-              - 'docker/Dockerfile.base'
-              - "docker/entrypoint.sh"
+              - ".github/workflows/docker_ci.yml"
+              - ".docker/Dockerfile.base"
+              - ".docker/entrypoint.sh"
               - "cougars.repos"
               - "**/package.xml"
             dev:
-              - '.github/workflows/docker_ci.yml'
-              - 'docker/Dockerfile.dev'
+              - ".github/workflows/docker_ci.yml"
+              - ".docker/Dockerfile.dev"
 
   build-gtsam:
     needs: check-changes

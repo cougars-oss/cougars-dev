@@ -12,7 +12,7 @@ updates:
           - "*"
 
   - package-ecosystem: "docker"
-    directory: "/docker"
+    directory: "/.docker"
     schedule:
       interval: "monthly"
     commit-message:
