@@ -31,8 +31,6 @@ def generate_launch_description():
 
     coug_des_dir = get_package_share_directory("coug_description")
     coug_des_launch_dir = os.path.join(coug_des_dir, "launch")
-    coug_loc_dir = get_package_share_directory("coug_localization")
-    coug_loc_launch_dir = os.path.join(coug_loc_dir, "launch")
     coug_fgo_dir = get_package_share_directory("coug_fgo")
     coug_fgo_launch_dir = os.path.join(coug_fgo_dir, "launch")
     coug_nav_dir = get_package_share_directory("coug_navigation")
@@ -46,17 +44,6 @@ def generate_launch_description():
             "use_sim_time": use_sim_time,
             "urdf_file": urdf_file,
             "auv_ns": auv_ns,
-        }.items(),
-    )
-
-    coug_loc_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(coug_loc_launch_dir, "coug_localization.launch.py")
-        ),
-        launch_arguments={
-            "use_sim_time": use_sim_time,
-            "auv_ns": auv_ns,
-            "compare": compare,
         }.items(),
     )
 
@@ -126,7 +113,6 @@ def generate_launch_description():
     )
 
     ld.add_action(coug_des_cmd)
-    ld.add_action(coug_loc_cmd)
     ld.add_action(coug_fgo_cmd)
     ld.add_action(coug_nav_cmd)
 
