@@ -221,7 +221,7 @@
 # --- Robot Localization Pipeline ---
 /**/imu_filter_madgwick_node:
   ros__parameters:
-    use_mag: false
+    use_mag: true
     publish_tf: false
     gain: 0.05
     orientation_stddev: 0.01
@@ -291,7 +291,7 @@
     odom2_differential: false
     odom2_relative: false # Absolute GPS position in the map frame.
 
-    imu0: imu/ahrs
+    imu0: imu/data
     imu0_config: [false, false, false, # X, Y, Z
                   false, false, true,  # Roll, Pitch, Yaw
                   false, false, false, # Vx, Vy, Vz
@@ -338,7 +338,7 @@
     odom2_differential: false
     odom2_relative: false # Absolute GPS position in the map frame.
 
-    imu0: imu/ahrs
+    imu0: imu/data
     imu0_config: [false, false, false, # X, Y, Z
                   false, false, true,  # Roll, Pitch, Yaw
                   false, false, false, # Vx, Vy, Vz
