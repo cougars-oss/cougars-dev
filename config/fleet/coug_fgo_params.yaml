@@ -226,6 +226,10 @@
     gain: 0.05
     orientation_stddev: 0.01
 
+    mag_bias_x: 0.07857
+    mag_bias_y: 0.41316
+    mag_bias_z: -0.90726
+
 /**/ekf_filter_node_odom:
   ros__parameters:
     frequency: 30.0
