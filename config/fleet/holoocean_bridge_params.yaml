@@ -12,8 +12,8 @@
       input_topic: "GPSSensor"
       output_topic: "gps/fix"
 
-      origin_latitude: 40.33940 # 40.23890
-      origin_longitude: -111.90721 # -111.74212
+      origin_latitude: 40.33940
+      origin_longitude: -111.90721
       origin_altitude: 1412.0
 
       position_noise_sigma: 0.015 # [m] GPS position uncertainty sigmas.
@@ -52,7 +52,9 @@
     ros__parameters:
       agent_topic: "/command/agent"
       control_topic: "ControlCommand"
-      output_topic: "cmd_wrench"
+      velocity_topic: "VelocitySensor"
+      wrench_raw_topic: "cmd_wrench_raw"
+      wrench_topic: "cmd_wrench"
 
   truth_converter_node:
     ros__parameters:

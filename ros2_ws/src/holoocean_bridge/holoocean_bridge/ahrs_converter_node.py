@@ -36,7 +36,7 @@ class AhrsConverterNode(Node):
 
         self.declare_parameter("input_topic", "RotationSensor")
         self.declare_parameter("output_topic", "imu/ahrs")
-        self.declare_parameter("ahrs_frame", "modem_link")
+        self.declare_parameter("ahrs_frame", "imu_link")
         self.declare_parameter("yaw_noise_sigma", 0.01745)
         self.declare_parameter("roll_pitch_noise_sigma", 0.00349)
         self.declare_parameter("add_noise", True)

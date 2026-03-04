@@ -81,7 +81,7 @@
       robust_k: 1.345
 
     mag:
-      enable_mag: false
+      enable_mag: true
       enable_mag_init_only: false
       use_parameter_frame: false
       use_parameter_covariance: false
@@ -97,7 +97,7 @@
       robust_k: 1.345
 
     ahrs:
-      enable_ahrs: true
+      enable_ahrs: false
       enable_ahrs_init_only: false
       use_parameter_frame: false
       use_parameter_covariance: false
@@ -216,7 +216,7 @@
     output_topic: "odometry/dvl"
 
     use_parameter_frame: true
-    publish_local_tf: false
+    publish_local_tf: false # Whether to publish the dvl_odom->base_link transform
 
 # --- Robot Localization Pipeline ---
 /**/imu_filter_madgwick_node:
