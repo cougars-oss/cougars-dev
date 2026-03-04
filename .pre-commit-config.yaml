@@ -120,5 +120,6 @@ repos:
               .*\.xml|
               .*\.repos|
               .*\.txt|
+              .*LICENSE|
               .*/setup\.py
           )$
