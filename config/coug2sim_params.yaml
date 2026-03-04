@@ -2,7 +2,7 @@
   ros__parameters:
     prior:
       parameter_priors:
-        initial_position: [0.0, 40.0, 0.0] # [m]
+        initial_position: [0.0, 40.0, 0.0]
 
 /coug2sim/dvl_a50_odom_node:
   ros__parameters:
