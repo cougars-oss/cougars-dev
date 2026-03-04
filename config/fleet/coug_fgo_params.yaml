@@ -3,7 +3,7 @@
     # --- Node Settings ---
     publish_global_tf: true # Publish the map -> odom transform.
     publish_smoothed_path: true # Publish the full smoothed path for visualization.
-    publish_velocity: true # Publish the estimated velocity (at the DVL frame in the map frame).
+    publish_velocity: true # Publish the estimated velocity (at the target frame in the map frame).
     publish_imu_bias: true # Publish the estimated IMU biases (accel + gyro).
     publish_diagnostics: true # Publish diagnostic information.
     publish_graph_metrics: true # Publish high-frequency timing and graph metadata.
@@ -35,7 +35,7 @@
     wrench_topic: "cmd_wrench"
     global_odom_topic: "odometry/global"
     smoothed_path_topic: "smoothed_path"
-    velocity_topic: "~/velocity" # At the DVL frame in the map frame.
+    velocity_topic: "~/velocity" # At the target frame in the map frame.
     # Topic for the IMU bias. Published as a TwistWithCovarianceStamped,
     # where 'linear' holds accelerometer bias and 'angular' holds gyroscope bias.
     imu_bias_topic: "~/imu_bias"
@@ -144,7 +144,7 @@
       parameter_priors:
         initial_position: [0.0, 0.0, 0.0] # [m]
         initial_orientation: [0.0, 0.0, 0.0] # [rad]
-        initial_velocity: [0.0, 0.0, 0.0] # [m/s] (at DVL frame)
+        initial_velocity: [0.0, 0.0, 0.0] # [m/s] (at target frame)
         initial_accel_bias: [0.0, 0.0, 0.0] # [m/s^2]
         initial_gyro_bias: [0.0, 0.0, 0.0] # [rad/s]
         initial_position_sigmas: [0.001, 0.001, 0.001] # [m] Initial position uncertainty.
