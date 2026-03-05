@@ -29,6 +29,7 @@ on:
       - "cougars.repos"
   repository_dispatch:
     types: [ros2_dispatch]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
