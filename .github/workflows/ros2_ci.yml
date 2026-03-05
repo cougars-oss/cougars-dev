@@ -60,22 +60,22 @@ jobs:
           UPSTREAM_WORKSPACE: cougars.repos
           TARGET_WORKSPACE: ros2_ws/src
           CCACHE_DIR: ${{ github.workspace }}/.ccache
+          BASEDIR: ${{ github.workspace }}/.work
           TARGET_CMAKE_ARGS: >
             -DCMAKE_BUILD_TYPE=${{ matrix.runner == 'ubuntu-latest' && 'Debug' || 'Release' }}
             -DCMAKE_CXX_FLAGS="${{ matrix.runner == 'ubuntu-latest' && '--coverage' || '' }}"
             -DCMAKE_C_FLAGS="${{ matrix.runner == 'ubuntu-latest' && '--coverage' || '' }}"
-          COLCON_TEST_ARGS: ${{ matrix.runner == 'ubuntu-latest' && '--pytest-args --cov --cov-report=xml' || '' }}
           AFTER_SETUP_UPSTREAM_WORKSPACE: |
             git config --global --add safe.directory "*"
             vcs custom --git --args submodule update --init --recursive
           AFTER_SCRIPT: |
             if [ "${{ matrix.runner }}" = "ubuntu-latest" ]; then
               lcov --capture --directory /root/target_ws/build --output-file /tmp/coverage.info
-              lcov --remove /tmp/coverage.info '/usr/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file $TARGET_REPO_PATH/coverage.info
-              find /root/target_ws -name "coverage.xml" -exec cp --parents {} $TARGET_REPO_PATH/ \;
+              lcov --remove /tmp/coverage.info '/usr/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file /root/target_ws/coverage.info
             fi
       - if: matrix.runner == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
+          files: ${{ github.workspace }}/.work/target_ws/coverage.info
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
