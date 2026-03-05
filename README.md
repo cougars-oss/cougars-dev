@@ -4,6 +4,7 @@
 [![ROS 2 CI](https://github.com/cougars-auv/cougars-dev/actions/workflows/ros2_ci.yml/badge.svg)](https://github.com/cougars-auv/cougars-dev/actions/workflows/ros2_ci.yml)
 [![Docker CI](https://github.com/cougars-auv/cougars-dev/actions/workflows/docker_ci.yml/badge.svg)](https://github.com/cougars-auv/cougars-dev/actions/workflows/docker_ci.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/cougars-auv/cougars-dev/main.svg)](https://results.pre-commit.ci/latest/github/cougars-auv/cougars-dev/main)
+[![codecov](https://codecov.io/gh/cougars-auv/cougars-dev/graph/badge.svg?token=5OBYXUBZR8)](https://codecov.io/gh/cougars-auv/cougars-dev)
 
 CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autonomy research by the [Field Robotic Systems Lab (FROST Lab)](https://frostlab.byu.edu) at [Brigham Young University](https://byu.edu).
 
