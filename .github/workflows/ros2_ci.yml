@@ -75,8 +75,7 @@ jobs:
               cp coverage.info $BASEDIR/
               find . -name "coverage.xml" -exec cp --parents {} $BASEDIR/ \;
             fi
-      - name: Upload to Codecov
-        if: matrix.runner == 'ubuntu-latest'
+      - if: matrix.runner == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

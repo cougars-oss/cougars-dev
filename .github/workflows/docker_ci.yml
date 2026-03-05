@@ -27,6 +27,7 @@ on:
       - "**/package.xml"
   repository_dispatch:
     types: [docker_dispatch]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
