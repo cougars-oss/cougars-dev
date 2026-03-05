@@ -62,21 +62,21 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
           BASEDIR: ${{ github.workspace }}/.work
           TARGET_CMAKE_ARGS: >
-            -DCMAKE_BUILD_TYPE=${{ matrix.runner == 'ubuntu-latest' && github.event_name == 'push' && 'Debug' || 'Release' }}
-            -DCMAKE_CXX_FLAGS="${{ matrix.runner == 'ubuntu-latest' && github.event_name == 'push' && '--coverage' || '' }}"
-            -DCMAKE_C_FLAGS="${{ matrix.runner == 'ubuntu-latest' && github.event_name == 'push' && '--coverage' || '' }}"
-            -DCMAKE_EXE_LINKER_FLAGS="${{ matrix.runner == 'ubuntu-latest' && github.event_name == 'push' && '--coverage' || '' }}"
-            -DCMAKE_SHARED_LINKER_FLAGS="${{ matrix.runner == 'ubuntu-latest' && github.event_name == 'push' && '--coverage' || '' }}"
+            -DCMAKE_BUILD_TYPE=${{ matrix.runner == 'ubuntu-latest' && 'Debug' || 'Release' }}
+            -DCMAKE_CXX_FLAGS="${{ matrix.runner == 'ubuntu-latest' && '--coverage' || '' }}"
+            -DCMAKE_C_FLAGS="${{ matrix.runner == 'ubuntu-latest' && '--coverage' || '' }}"
+            -DCMAKE_EXE_LINKER_FLAGS="${{ matrix.runner == 'ubuntu-latest' && '--coverage' || '' }}"
+            -DCMAKE_SHARED_LINKER_FLAGS="${{ matrix.runner == 'ubuntu-latest' && '--coverage' || '' }}"
           AFTER_SETUP_UPSTREAM_WORKSPACE: |
             git config --global --add safe.directory "*"
             vcs custom --git --args submodule update --init --recursive
-      - if: matrix.runner == 'ubuntu-latest' && github.event_name == 'push'
+      - if: matrix.runner == 'ubuntu-latest'
         run: |
           sudo apt-get update && sudo apt-get install -y lcov gcc-11
           lcov --gcov-tool gcov-11 --capture --directory ${{ github.workspace }}/.work/target_ws/build --output-file coverage.info --ignore-errors mismatch,gcov,source
           lcov --remove coverage.info '/usr/*' '/opt/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file coverage.info --ignore-errors mismatch,gcov,unused
           sed -i "s|${{ github.workspace }}/.work/target_ws/src|${{ github.workspace }}/ros2_ws/src|g" coverage.info
-      - if: matrix.runner == 'ubuntu-latest' && github.event_name == 'push'
+      - if: matrix.runner == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
           files: coverage.info
