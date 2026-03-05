@@ -70,9 +70,9 @@ jobs:
             vcs custom --git --args submodule update --init --recursive
       - if: matrix.runner == 'ubuntu-latest'
         run: |
-          sudo apt-get update && sudo apt-get install -y lcov
-          lcov --capture --directory ${{ github.workspace }}/.work/target_ws/build --output-file coverage.info --ignore-errors version,mismatch
-          lcov --remove coverage.info '/usr/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file coverage.info --ignore-errors version,mismatch
+          sudo apt-get update && sudo apt-get install -y lcov gcc-11
+          lcov --gcov-tool gcov-11 --capture --directory ${{ github.workspace }}/.work/target_ws/build --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file coverage.info
       - if: matrix.runner == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
