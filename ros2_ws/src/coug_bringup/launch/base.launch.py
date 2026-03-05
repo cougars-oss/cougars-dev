@@ -78,31 +78,28 @@ def generate_launch_description():
         }.items(),
     )
 
-    ld = LaunchDescription()
-    ld.add_action(
-        DeclareLaunchArgument(
-            "use_sim_time",
-            default_value="false",
-            description="Use simulation/rosbag clock if true",
-        )
+    ld = LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                "use_sim_time",
+                default_value="false",
+                description="Use simulation/rosbag clock if true",
+            ),
+            DeclareLaunchArgument(
+                "multiagent_viz",
+                default_value="false",
+                description="Use multi-agent visualization config if true",
+            ),
+            DeclareLaunchArgument(
+                "auv_ns",
+                default_value="auv0",
+                description="Namespace for the AUV (e.g. auv0)",
+            ),
+            coug_mapviz_cmd,
+            coug_rviz_cmd,
+            coug_rqt_cmd,
+            coug_plotjuggler_cmd,
+        ]
     )
-    ld.add_action(
-        DeclareLaunchArgument(
-            "multiagent_viz",
-            default_value="false",
-            description="Use multi-agent visualization config if true",
-        )
-    )
-    ld.add_action(
-        DeclareLaunchArgument(
-            "auv_ns",
-            default_value="auv0",
-            description="Namespace for the AUV (e.g. auv0)",
-        ),
-    )
-    ld.add_action(coug_mapviz_cmd)
-    ld.add_action(coug_rviz_cmd)
-    ld.add_action(coug_rqt_cmd)
-    ld.add_action(coug_plotjuggler_cmd)
 
     return ld

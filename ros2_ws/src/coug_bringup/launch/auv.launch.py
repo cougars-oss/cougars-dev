@@ -69,51 +69,41 @@ def generate_launch_description():
         }.items(),
     )
 
-    ld = LaunchDescription()
-    ld.add_action(
-        DeclareLaunchArgument(
-            "use_sim_time",
-            default_value="false",
-            description="Use simulation/rosbag clock if true",
-        )
-    )
-    ld.add_action(
-        DeclareLaunchArgument(
-            "urdf_file",
-            default_value=PathJoinSubstitution(
-                [
-                    FindPackageShare("coug_description"),
-                    "urdf",
-                    "couguv_holoocean.urdf.xacro",
-                ]
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                "use_sim_time",
+                default_value="false",
+                description="Use simulation/rosbag clock if true",
             ),
-            description="URDF or Xacro file to load",
-        )
+            DeclareLaunchArgument(
+                "urdf_file",
+                default_value=PathJoinSubstitution(
+                    [
+                        FindPackageShare("coug_description"),
+                        "urdf",
+                        "couguv_holoocean.urdf.xacro",
+                    ]
+                ),
+                description="URDF or Xacro file to load",
+            ),
+            DeclareLaunchArgument(
+                "auv_ns",
+                default_value="auv0",
+                description="Namespace for the AUV (e.g. auv0)",
+            ),
+            DeclareLaunchArgument(
+                "set_origin",
+                default_value="true",
+                description="Whether to set the origin (true) or subscribe to it (false)",
+            ),
+            DeclareLaunchArgument(
+                "compare",
+                default_value="false",
+                description="Launch additional localization nodes if true",
+            ),
+            coug_des_cmd,
+            coug_fgo_cmd,
+            coug_nav_cmd,
+        ]
     )
-    ld.add_action(
-        DeclareLaunchArgument(
-            "auv_ns",
-            default_value="auv0",
-            description="Namespace for the AUV (e.g. auv0)",
-        )
-    )
-    ld.add_action(
-        DeclareLaunchArgument(
-            "set_origin",
-            default_value="true",
-            description="Whether to set the origin (true) or subscribe to it (false)",
-        )
-    )
-    ld.add_action(
-        DeclareLaunchArgument(
-            "compare",
-            default_value="false",
-            description="Launch additional localization nodes if true",
-        )
-    )
-
-    ld.add_action(coug_des_cmd)
-    ld.add_action(coug_fgo_cmd)
-    ld.add_action(coug_nav_cmd)
-
-    return ld

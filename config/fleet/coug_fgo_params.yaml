@@ -141,6 +141,7 @@
       initialization_duration: 10.0 # [s] Time duration to collect and average data before initializing.
 
       # If true, forces the initial state to be set by the values below.
+      # The parameter priors should be set at the base frame with respect to the map frame.
       use_parameter_priors: true
       parameter_priors:
         initial_position: [0.0, 0.0, 0.0] # [m]
