@@ -68,14 +68,14 @@ jobs:
           AFTER_SETUP_UPSTREAM_WORKSPACE: |
             git config --global --add safe.directory "*"
             vcs custom --git --args submodule update --init --recursive
-          AFTER_SCRIPT: |
-            if [ "${{ matrix.runner }}" = "ubuntu-latest" ]; then
-              lcov --capture --directory $target_ws/build --output-file /tmp/coverage.info
-              lcov --remove /tmp/coverage.info '/usr/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file $target_ws/coverage.info
-            fi
+      - if: matrix.runner == 'ubuntu-latest'
+        run: |
+          sudo apt-get update && sudo apt-get install -y lcov
+          lcov --capture --directory ${{ github.workspace }}/.work/target_ws/build --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file coverage.info
       - if: matrix.runner == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
-          files: ${{ github.workspace }}/.work/target_ws/coverage.info
+          files: coverage.info
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
