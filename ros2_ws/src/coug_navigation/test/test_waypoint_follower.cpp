@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @file test_waypoint_follower_node.cpp
- * @brief Unit tests for waypoint_follower_node.hpp.
+ * @file test_waypoint_follower.cpp
+ * @brief Unit tests for waypoint_follower.hpp.
  * @author Nelson Durrant
  * @date Jan 2026
  */
@@ -24,7 +24,7 @@
 #include <geometry_msgs/msg/pose_array.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 
-#include "coug_navigation/waypoint_follower_node.hpp"
+#include "coug_navigation/waypoint_follower.hpp"
 
 using coug_navigation::WaypointFollowerNode;
 
@@ -73,15 +73,18 @@ protected:
 };
 
 /**
- * @brief Verify distance calculation.
+ * @brief Verify Euclidean distance calculation between two 2D points.
  */
 TEST_F(WaypointFollowerNodeTest, CalculateDistance) {
+  // Classic 3-4-5 right triangle from origin
   EXPECT_NEAR(node->calculateDistance(0.0, 0.0, 3.0, 4.0), 5.0, 1e-6);
+
+  // Same triangle shifted to a negative quadrant
   EXPECT_NEAR(node->calculateDistance(-1.0, -1.0, 2.0, 3.0), 5.0, 1e-6);
 }
 
 /**
- * @brief Verify waypoint logic and arrival.
+ * @brief Verify waypoint arrival detection via capture and slip radii.
  */
 TEST_F(WaypointFollowerNodeTest, ProcessWaypointLogic) {
   geometry_msgs::msg::Pose p1;
@@ -91,24 +94,28 @@ TEST_F(WaypointFollowerNodeTest, ProcessWaypointLogic) {
   node->params_.capture_radius = 1.5;
   node->params_.slip_radius = 5.0;
   node->waypoints_.push_back(p1);
-  node->current_waypoint_index_ = 0;
+  node->current_waypoint_index_.store(0);
 
+  // Far from waypoint — should not advance
   node->processWaypointLogic(0.0, 0.0);
-  EXPECT_EQ(node->current_waypoint_index_, 0u);
+  EXPECT_EQ(node->current_waypoint_index_.load(), 0u);
 
+  // Within slip radius and closer than previous — triggers slip arrival
   node->processWaypointLogic(9.0, 9.0);
-  EXPECT_EQ(node->current_waypoint_index_, 1u);
+  EXPECT_EQ(node->current_waypoint_index_.load(), 1u);
 }
 
 /**
- * @brief Verify mission stop logic.
+ * @brief Verify stopMission resets state, clears waypoints, and halts the vehicle.
  */
 TEST_F(WaypointFollowerNodeTest, StopMission) {
-  node->state_ = WaypointFollowerNode::MissionState::ACTIVE;
+  // Start with an active mission containing one waypoint
+  node->state_.store(WaypointFollowerNode::MissionState::ACTIVE);
   node->waypoints_.push_back(geometry_msgs::msg::Pose());
 
   node->stopMission();
 
-  EXPECT_EQ(node->state_, WaypointFollowerNode::MissionState::IDLE);
+  // Mission state returns to IDLE and waypoint list is cleared
+  EXPECT_EQ(node->state_.load(), WaypointFollowerNode::MissionState::IDLE);
   EXPECT_TRUE(node->waypoints_.empty());
 }

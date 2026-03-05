@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @file waypoint_follower_node.hpp
+ * @file waypoint_follower.hpp
  * @brief ROS 2 node for waypoint navigation and HSD command generation.
  * @author Nelson Durrant
  * @date Jan 2026
@@ -34,7 +34,7 @@
 #include <std_msgs/msg/float64.hpp>
 #include <diagnostic_updater/diagnostic_updater.hpp>
 
-#include <coug_navigation/waypoint_follower_parameters.hpp>
+#include "coug_navigation/waypoint_follower_parameters.hpp"
 
 namespace coug_navigation
 {

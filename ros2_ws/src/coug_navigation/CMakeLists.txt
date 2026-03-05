@@ -22,7 +22,7 @@ generate_parameter_library(
 )
 
 # --- Component Library ---
-ament_auto_add_library(waypoint_follower_component SHARED src/waypoint_follower_node.cpp)
+ament_auto_add_library(waypoint_follower_component SHARED src/waypoint_follower.cpp)
 target_include_directories(waypoint_follower_component PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -36,7 +36,7 @@ rclcpp_components_register_nodes(waypoint_follower_component
 )
 
 # --- Executables ---
-ament_auto_add_executable(waypoint_follower src/waypoint_follower_main.cpp)
+ament_auto_add_executable(waypoint_follower src/waypoint_follower_node.cpp)
 target_link_libraries(waypoint_follower
   waypoint_follower_component
 )
@@ -47,14 +47,14 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(test_waypoint_follower_node test/test_waypoint_follower_node.cpp)
-  target_include_directories(test_waypoint_follower_node PUBLIC
+  ament_add_gtest(test_waypoint_follower test/test_waypoint_follower.cpp)
+  target_include_directories(test_waypoint_follower PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   )
-  target_link_libraries(test_waypoint_follower_node
+  target_link_libraries(test_waypoint_follower
     waypoint_follower_component
   )
-  ament_target_dependencies(test_waypoint_follower_node
+  ament_target_dependencies(test_waypoint_follower
     rclcpp
     nav_msgs
     geometry_msgs
