@@ -30,11 +30,11 @@ SHELL [ "/bin/bash", "-c" ]
 ENV ROS_BUILD_ARCH=${TARGETARCH} \
   RCUTILS_COLORIZED_OUTPUT=1
 
-# Install and configure SSH client
+# Install system dependencies and configure SSH client
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
   apt-get update && apt-get install -y --no-install-recommends \
-  vim nano tmux openssh-client \
+  vim nano tmux openssh-client lcov python3-pytest-cov \
   && echo "Host *" >> /etc/ssh/ssh_config \
   && echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
