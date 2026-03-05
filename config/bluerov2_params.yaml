@@ -16,7 +16,7 @@
       use_parameter_covariance: true
 
     ahrs:
-      enable_ahrs: false
+      enable_ahrs: true
       enable_ahrs_init_only: true
 
     prior:
@@ -33,9 +33,9 @@
 /bluerov2/ekf_filter_node_map:
   ros__parameters:
     odom2: odometry/gps_null
-    imu0: imu/data_null
+    imu0: imu/data
 
 /bluerov2/ukf_filter_node_map:
   ros__parameters:
     odom2: odometry/gps_null
-    imu0: imu/data_null
+    imu0: imu/data

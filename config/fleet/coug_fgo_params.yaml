@@ -20,7 +20,8 @@
     # - "ISAM2": Full history smoothing.
 
     solver_type: "IncrementalFixedLagSmoother"
-    max_keyframe_rate: -1.0 # Maximum keyframe rate (in Hz). -1.0 for no limit.
+    max_update_rate: -1.0 # Maximum keyframe rate (in Hz). -1.0 for no limit.
+    max_opt_rate: -1.0 # Maximum optimization rate (in Hz). -1.0 for no limit.
     smoother_lag: 20.0 # The time window (in seconds) of past states to smooth over.
     relinearize_threshold: 0.1 # Lower values are more accurate but slower.
     relinearize_skip: 1 # Number of updates to skip between relinearizations.
