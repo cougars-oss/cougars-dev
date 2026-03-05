@@ -74,7 +74,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y lcov gcc-11
           lcov --gcov-tool gcov-11 --capture --directory ${{ github.workspace }}/.work/target_ws/build --output-file coverage.info --ignore-errors mismatch,gcov,source
-          lcov --remove coverage.info '/usr/*' '/opt/*' '*/test/*' '*/install/*' '*/build/*' --output-file coverage.info --ignore-errors mismatch,gcov,source
+          lcov --remove coverage.info '/usr/*' '/opt/*' '*/test/*' '*/tests/*' '*/install/*' '*/build/*' --output-file coverage.info --ignore-errors mismatch,gcov,unused
       - if: matrix.runner == 'ubuntu-latest' && github.event_name == 'push'
         uses: codecov/codecov-action@v5
         with:
