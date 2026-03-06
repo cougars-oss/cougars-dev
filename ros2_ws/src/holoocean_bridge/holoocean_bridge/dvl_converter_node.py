@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 import random
 import rclpy
 from rclpy.node import Node
@@ -37,7 +36,7 @@ class DvlConverterNode(Node):
         self.declare_parameter("input_topic", "DVLSensorVelocity")
         self.declare_parameter("output_topic", "dvl/data")
         self.declare_parameter("dvl_frame", "dvl_link")
-        self.declare_parameter("noise_sigma", 0.02)
+        self.declare_parameter("noise_sigmas", [0.02, 0.02, 0.02])
         self.declare_parameter("add_noise", True)
 
         input_topic = (
@@ -49,22 +48,12 @@ class DvlConverterNode(Node):
         self.dvl_frame = (
             self.get_parameter("dvl_frame").get_parameter_value().string_value
         )
-        self.noise_sigma = (
-            self.get_parameter("noise_sigma").get_parameter_value().double_value
+        self.noise_sigmas = (
+            self.get_parameter("noise_sigmas").get_parameter_value().double_array_value
         )
         self.add_noise = (
             self.get_parameter("add_noise").get_parameter_value().bool_value
         )
-
-        # From DVLSensor.h
-        elevation_rad = math.radians(22.5)
-        self.sin_elev = math.sin(elevation_rad)
-        self.cos_elev = math.cos(elevation_rad)
-
-        self.inv_2s = 1.0 / (2.0 * self.sin_elev)
-        self.inv_4c = 1.0 / (4.0 * self.cos_elev)
-        self.cov_val_h = (self.noise_sigma**2) / (2.0 * self.sin_elev**2)
-        self.cov_val_v = (self.noise_sigma**2) / (4.0 * self.cos_elev**2)
 
         self.subscription = self.create_subscription(
             TwistWithCovarianceStamped, input_topic, self.listener_callback, 10
@@ -88,13 +77,13 @@ class DvlConverterNode(Node):
         dvl_msg.header.frame_id = self.dvl_frame
 
         if self.add_noise:
-            s = [random.gauss(0, self.noise_sigma) for _ in range(4)]
+            noise_x = random.gauss(0, self.noise_sigmas[0])
+            noise_y = random.gauss(0, self.noise_sigmas[1])
+            noise_z = random.gauss(0, self.noise_sigmas[2])
         else:
-            s = [0.0] * 4
-
-        noise_x = self.inv_2s * (s[0] - s[2])
-        noise_y = self.inv_2s * (s[1] - s[3])
-        noise_z = self.inv_4c * (s[0] + s[1] + s[2] + s[3])
+            noise_x = 0.0
+            noise_y = 0.0
+            noise_z = 0.0
 
         dvl_msg.velocity.x = msg.twist.twist.linear.x + noise_x
         dvl_msg.velocity.y = msg.twist.twist.linear.y + noise_y
@@ -108,9 +97,9 @@ class DvlConverterNode(Node):
         )
 
         dvl_msg.covariance = [0.0] * 9
-        dvl_msg.covariance[0] = self.cov_val_h
-        dvl_msg.covariance[4] = self.cov_val_h
-        dvl_msg.covariance[8] = self.cov_val_v
+        dvl_msg.covariance[0] = self.noise_sigmas[0] ** 2
+        dvl_msg.covariance[4] = self.noise_sigmas[1] ** 2
+        dvl_msg.covariance[8] = self.noise_sigmas[2] ** 2
 
         self.publisher.publish(dvl_msg)
 

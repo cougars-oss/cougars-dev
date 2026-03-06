@@ -37,8 +37,7 @@ class AhrsConverterNode(Node):
         self.declare_parameter("input_topic", "RotationSensor")
         self.declare_parameter("output_topic", "imu/ahrs")
         self.declare_parameter("ahrs_frame", "imu_link")
-        self.declare_parameter("yaw_noise_sigma", 0.01745)
-        self.declare_parameter("roll_pitch_noise_sigma", 0.00349)
+        self.declare_parameter("noise_sigmas", [0.00349, 0.00349, 0.01745])
         self.declare_parameter("add_noise", True)
 
         input_topic = (
@@ -50,13 +49,8 @@ class AhrsConverterNode(Node):
         self.ahrs_frame = (
             self.get_parameter("ahrs_frame").get_parameter_value().string_value
         )
-        self.yaw_noise_sigma = (
-            self.get_parameter("yaw_noise_sigma").get_parameter_value().double_value
-        )
-        self.roll_pitch_noise_sigma = (
-            self.get_parameter("roll_pitch_noise_sigma")
-            .get_parameter_value()
-            .double_value
+        self.noise_sigmas = (
+            self.get_parameter("noise_sigmas").get_parameter_value().double_array_value
         )
         self.add_noise = (
             self.get_parameter("add_noise").get_parameter_value().bool_value
@@ -91,9 +85,9 @@ class AhrsConverterNode(Node):
         yaw_rad = math.radians(yaw_deg)
 
         if self.add_noise:
-            roll_rad += random.gauss(0, self.roll_pitch_noise_sigma)
-            pitch_rad += random.gauss(0, self.roll_pitch_noise_sigma)
-            yaw_rad += random.gauss(0, self.yaw_noise_sigma)
+            roll_rad += random.gauss(0, self.noise_sigmas[0])
+            pitch_rad += random.gauss(0, self.noise_sigmas[1])
+            yaw_rad += random.gauss(0, self.noise_sigmas[2])
 
         q_array = quaternion_from_euler(roll_rad, pitch_rad, yaw_rad)
         imu_msg.orientation.x = q_array[0]
@@ -101,12 +95,9 @@ class AhrsConverterNode(Node):
         imu_msg.orientation.z = q_array[2]
         imu_msg.orientation.w = q_array[3]
 
-        yaw_variance = self.yaw_noise_sigma**2
-        roll_pitch_variance = self.roll_pitch_noise_sigma**2
-
-        imu_msg.orientation_covariance[0] = roll_pitch_variance
-        imu_msg.orientation_covariance[4] = roll_pitch_variance
-        imu_msg.orientation_covariance[8] = yaw_variance
+        imu_msg.orientation_covariance[0] = self.noise_sigmas[0] ** 2
+        imu_msg.orientation_covariance[4] = self.noise_sigmas[1] ** 2
+        imu_msg.orientation_covariance[8] = self.noise_sigmas[2] ** 2
 
         self.publisher.publish(imu_msg)
 

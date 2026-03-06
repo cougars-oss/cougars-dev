@@ -40,8 +40,7 @@ class GpsConverterNode(Node):
         self.declare_parameter("origin_latitude", 40.33940)
         self.declare_parameter("origin_longitude", -111.90721)
         self.declare_parameter("origin_altitude", 1412.0)
-        self.declare_parameter("position_noise_sigma", 0.015)
-        self.declare_parameter("altitude_noise_sigma", 0.025)
+        self.declare_parameter("noise_sigmas", [0.015, 0.015, 0.025])
         self.declare_parameter("add_noise", True)
 
         input_topic = (
@@ -62,15 +61,8 @@ class GpsConverterNode(Node):
         self.origin_alt = (
             self.get_parameter("origin_altitude").get_parameter_value().double_value
         )
-        self.position_noise_sigma = (
-            self.get_parameter("position_noise_sigma")
-            .get_parameter_value()
-            .double_value
-        )
-        self.altitude_noise_sigma = (
-            self.get_parameter("altitude_noise_sigma")
-            .get_parameter_value()
-            .double_value
+        self.noise_sigmas = (
+            self.get_parameter("noise_sigmas").get_parameter_value().double_array_value
         )
         self.add_noise = (
             self.get_parameter("add_noise").get_parameter_value().bool_value
@@ -108,12 +100,8 @@ class GpsConverterNode(Node):
         navsat_msg.status.service = navsat_msg.status.SERVICE_GPS
 
         if self.add_noise:
-            d_east = msg.pose.pose.position.x + random.gauss(
-                0, self.position_noise_sigma
-            )
-            d_north = msg.pose.pose.position.y + random.gauss(
-                0, self.position_noise_sigma
-            )
+            d_east = msg.pose.pose.position.x + random.gauss(0, self.noise_sigmas[0])
+            d_north = msg.pose.pose.position.y + random.gauss(0, self.noise_sigmas[1])
         else:
             d_east = msg.pose.pose.position.x
             d_north = msg.pose.pose.position.y
@@ -138,17 +126,14 @@ class GpsConverterNode(Node):
             navsat_msg.altitude = (
                 self.origin_alt
                 + msg.pose.pose.position.z
-                + random.gauss(0, self.altitude_noise_sigma)
+                + random.gauss(0, self.noise_sigmas[2])
             )
         else:
             navsat_msg.altitude = self.origin_alt + msg.pose.pose.position.z
 
-        position_covariance = self.position_noise_sigma * self.position_noise_sigma
-        altitude_covariance = self.altitude_noise_sigma * self.altitude_noise_sigma
-
-        navsat_msg.position_covariance[0] = position_covariance  # East
-        navsat_msg.position_covariance[4] = position_covariance  # North
-        navsat_msg.position_covariance[8] = altitude_covariance  # Up
+        navsat_msg.position_covariance[0] = self.noise_sigmas[0] ** 2  # East
+        navsat_msg.position_covariance[4] = self.noise_sigmas[1] ** 2  # North
+        navsat_msg.position_covariance[8] = self.noise_sigmas[2] ** 2  # Up
         navsat_msg.position_covariance_type = navsat_msg.COVARIANCE_TYPE_DIAGONAL_KNOWN
 
         self.publisher.publish(navsat_msg)

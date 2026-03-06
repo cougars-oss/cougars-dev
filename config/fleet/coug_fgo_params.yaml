@@ -55,8 +55,8 @@
       parameter_covariance:
         accel_noise_sigmas: [0.0078, 0.0078, 0.0078] # [m/s^2] Accelerometer measurement noise sigmas.
         gyro_noise_sigmas: [0.0012, 0.0012, 0.0012] # [rad/s] Gyroscope measurement noise sigmas.
-      accel_bias_rw_sigmas: [0.000105, 0.000105, 0.000105] # [m/s^3] Sigmas for accelerometer bias random walk.
-      gyro_bias_rw_sigmas: [0.0000391, 0.0000391, 0.0000391] # [rad/s^2] Sigmas for gyroscope bias random walk.
+      accel_bias_rw_sigmas: [0.000105, 0.000105, 0.000105] # [m/s^2/√s] Continuous-time spectral density sigmas for accelerometer bias random walk.
+      gyro_bias_rw_sigmas: [0.0000391, 0.0000391, 0.0000391] # [rad/s/√s] Continuous-time spectral density sigmas for gyroscope bias random walk.
       integration_covariance: 0.00001 # A small covariance for the integration process itself.
       gravity: [0.0, 0.0, -9.8] # [m/s^2]
       timeout_threshold: 1.0 # [s]

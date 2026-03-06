@@ -34,7 +34,7 @@ class MagConverterNode(Node):
         self.declare_parameter("input_topic", "MagnetometerSensor")
         self.declare_parameter("output_topic", "imu/mag")
         self.declare_parameter("mag_frame", "imu_link")
-        self.declare_parameter("noise_sigma", 0.003)
+        self.declare_parameter("noise_sigmas", [0.003, 0.003, 0.003])
         self.declare_parameter("add_noise", True)
 
         input_topic = (
@@ -46,8 +46,8 @@ class MagConverterNode(Node):
         self.mag_frame = (
             self.get_parameter("mag_frame").get_parameter_value().string_value
         )
-        self.noise_sigma = (
-            self.get_parameter("noise_sigma").get_parameter_value().double_value
+        self.noise_sigmas = (
+            self.get_parameter("noise_sigmas").get_parameter_value().double_array_value
         )
         self.add_noise = (
             self.get_parameter("add_noise").get_parameter_value().bool_value
@@ -71,15 +71,13 @@ class MagConverterNode(Node):
         msg.header.frame_id = self.mag_frame
 
         if self.add_noise:
-            msg.magnetic_field.x += random.gauss(0, self.noise_sigma)
-            msg.magnetic_field.y += random.gauss(0, self.noise_sigma)
-            msg.magnetic_field.z += random.gauss(0, self.noise_sigma)
+            msg.magnetic_field.x += random.gauss(0, self.noise_sigmas[0])
+            msg.magnetic_field.y += random.gauss(0, self.noise_sigmas[1])
+            msg.magnetic_field.z += random.gauss(0, self.noise_sigmas[2])
 
-        variance = self.noise_sigma * self.noise_sigma
-
-        msg.magnetic_field_covariance[0] = variance
-        msg.magnetic_field_covariance[4] = variance
-        msg.magnetic_field_covariance[8] = variance
+        msg.magnetic_field_covariance[0] = self.noise_sigmas[0] ** 2
+        msg.magnetic_field_covariance[4] = self.noise_sigmas[1] ** 2
+        msg.magnetic_field_covariance[8] = self.noise_sigmas[2] ** 2
 
         self.publisher.publish(msg)
 

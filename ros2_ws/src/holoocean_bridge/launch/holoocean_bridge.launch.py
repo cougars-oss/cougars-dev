@@ -255,6 +255,7 @@ def generate_launch_description():
                         "use_sim_time": use_sim_time,
                         "imu_frame": imu_link_frame,
                         "add_noise": add_noise,
+                        "add_bias": add_noise,
                     },
                 ],
             ),

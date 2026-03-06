@@ -14,11 +14,7 @@
           "sensor_type": "IMUSensor",
           "socket": "IMUSocket",
           "Hz": 200,
-          "configuration": {
-            "AccelBiasSigma": 1.05e-5,
-            "AngVelBiasSigma": 3.91e-6,
-            "ReturnBias": true
-          },
+          "configuration": {},
           "ros_publish": true
         },
         {
@@ -93,11 +89,7 @@
           "sensor_type": "IMUSensor",
           "socket": "IMUSocket",
           "Hz": 200,
-          "configuration": {
-            "AccelBiasSigma": 1.05e-5,
-            "AngVelBiasSigma": 3.91e-6,
-            "ReturnBias": true
-          },
+          "configuration": {},
           "ros_publish": true
         },
         {
@@ -172,11 +164,7 @@
           "sensor_type": "IMUSensor",
           "socket": "IMUSocket",
           "Hz": 200,
-          "configuration": {
-            "AccelBiasSigma": 1.05e-5,
-            "AngVelBiasSigma": 3.91e-6,
-            "ReturnBias": true
-          },
+          "configuration": {},
           "ros_publish": true
         },
         {

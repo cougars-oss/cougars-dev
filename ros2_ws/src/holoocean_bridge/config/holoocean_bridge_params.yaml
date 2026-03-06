@@ -3,9 +3,12 @@
     ros__parameters:
       input_topic: "IMUSensor"
       output_topic: "imu/data_raw"
+      bias_topic: "imu_bias"
 
-      accel_noise_sigma: 0.0078 # [m/s^2] Accelerometer measurement noise sigmas.
-      gyro_noise_sigma: 0.0012 # [rad/s] Gyroscope measurement noise sigmas.
+      accel_noise_sigmas: [0.0078, 0.0078, 0.0078] # [m/s^2] Accelerometer measurement noise sigmas.
+      gyro_noise_sigmas: [0.0012, 0.0012, 0.0012] # [rad/s] Gyroscope measurement noise sigmas.
+      accel_bias_rw_sigmas: [1.05e-5, 1.05e-5, 1.05e-5] # [m/s^2/√s] Continuous-time accel bias random walk spectral density sigmas.
+      gyro_bias_rw_sigmas: [3.91e-6, 3.91e-6, 3.91e-6] # [rad/s/√s] Continuous-time gyro bias random walk spectral density sigmas.
 
   gps_converter_node:
     ros__parameters:
@@ -16,8 +19,7 @@
       origin_longitude: -111.90721
       origin_altitude: 1412.0
 
-      position_noise_sigma: 0.015 # [m] GPS position uncertainty sigmas.
-      altitude_noise_sigma: 0.025 # [m] GPS altitude uncertainty sigmas.
+      noise_sigmas: [0.015, 0.015, 0.025] # [m] GPS position uncertainty sigmas [east, north, up].
 
   depth_converter_node:
     ros__parameters:
@@ -31,22 +33,21 @@
       input_topic: "RotationSensor"
       output_topic: "imu/ahrs"
 
-      yaw_noise_sigma: 0.01745 # [rad] AHRS sensor yaw uncertainty sigma.
-      roll_pitch_noise_sigma: 0.00349 # [rad] AHRS sensor roll and pitch uncertainty sigmas.
+      noise_sigmas: [0.00349, 0.00349, 0.01745] # [rad] AHRS orientation uncertainty sigmas [roll, pitch, yaw].
 
   mag_converter_node:
     ros__parameters:
       input_topic: "MagnetometerSensor"
       output_topic: "imu/mag"
 
-      noise_sigma: 0.003 # [normalized] Magnetic field uncertainty sigmas.
+      noise_sigmas: [0.003, 0.003, 0.003] # [normalized] Magnetic field uncertainty sigmas.
 
   dvl_converter_node:
     ros__parameters:
       input_topic: "DVLSensorVelocity"
       output_topic: "dvl/data"
 
-      noise_sigma: 0.02 # [m/s] DVL body-velocity uncertainty sigmas.
+      noise_sigmas: [0.02, 0.02, 0.02] # [m/s] DVL body-velocity uncertainty sigmas.
 
   wrench_converter_node:
     ros__parameters:
