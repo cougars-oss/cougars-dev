@@ -20,7 +20,7 @@
         {
           "sensor_type": "GPSSensor",
           "socket": "COM",
-          "Hz": 1,
+          "Hz": 5,
           "configuration": {
             "Depth": 0.5
           },
@@ -29,7 +29,7 @@
         {
           "sensor_type": "DepthSensor",
           "socket": "DepthSocket",
-          "Hz": 10,
+          "Hz": 20,
           "configuration": {},
           "ros_publish": true
         },
@@ -45,13 +45,13 @@
         {
           "sensor_type": "RotationSensor",
           "socket": "IMUSocket",
-          "Hz": 10,
+          "Hz": 200,
           "ros_publish": true
         },
         {
           "sensor_type": "DVLSensor",
           "socket": "DVLSocket",
-          "Hz": 15,
+          "Hz": 10,
           "configuration": {
             "DebugLines": false
           },
@@ -95,7 +95,7 @@
         {
           "sensor_type": "GPSSensor",
           "socket": "COM",
-          "Hz": 1,
+          "Hz": 5,
           "configuration": {
             "Depth": 0.5
           },
@@ -104,7 +104,7 @@
         {
           "sensor_type": "DepthSensor",
           "socket": "DepthSocket",
-          "Hz": 10,
+          "Hz": 20,
           "configuration": {},
           "ros_publish": true
         },
@@ -120,13 +120,13 @@
         {
           "sensor_type": "RotationSensor",
           "socket": "IMUSocket",
-          "Hz": 10,
+          "Hz": 200,
           "ros_publish": true
         },
         {
           "sensor_type": "DVLSensor",
           "socket": "DVLSocket",
-          "Hz": 15,
+          "Hz": 10,
           "configuration": {
             "DebugLines": false
           },
@@ -170,7 +170,7 @@
         {
           "sensor_type": "GPSSensor",
           "socket": "COM",
-          "Hz": 1,
+          "Hz": 5,
           "configuration": {
             "Depth": 0.5
           },
@@ -179,7 +179,7 @@
         {
           "sensor_type": "DepthSensor",
           "socket": "DepthSocket",
-          "Hz": 10,
+          "Hz": 20,
           "configuration": {},
           "ros_publish": true
         },
@@ -195,13 +195,13 @@
         {
           "sensor_type": "RotationSensor",
           "socket": "IMUSocket",
-          "Hz": 10,
+          "Hz": 200,
           "ros_publish": true
         },
         {
           "sensor_type": "DVLSensor",
           "socket": "DVLSocket",
-          "Hz": 15,
+          "Hz": 10,
           "configuration": {
             "DebugLines": false
           },

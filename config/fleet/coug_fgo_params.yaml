@@ -272,7 +272,7 @@
                     false, false, false, # Vx, Vy, Vz
                     false, false, false, # Vroll, Vpitch, Vyaw
                     false, false, false] # Ax, Ay, Az
-    odom1_queue_size: 2
+    odom1_queue_size: 5
     odom1_differential: false
     odom1_relative: false # Absolute depth in the map frame.
 
@@ -282,7 +282,7 @@
                     false, false, false, # Vx, Vy, Vz
                     false, false, false, # Vroll, Vpitch, Vyaw
                     false, false, false] # Ax, Ay, Az
-    odom2_queue_size: 2
+    odom2_queue_size: 5
     odom2_differential: false
     odom2_relative: false # Absolute GPS position in the map frame.
 
@@ -292,7 +292,7 @@
                   false, false, false, # Vx, Vy, Vz
                   false, false, false, # Vroll, Vpitch, Vyaw
                   false, false, false] # Ax, Ay, Az
-    imu0_queue_size: 2
+    imu0_queue_size: 15
     imu0_differential: false
     imu0_relative: false # Absolute heading in the map frame.
 
@@ -319,7 +319,7 @@
                     false, false, false, # Vx, Vy, Vz
                     false, false, false, # Vroll, Vpitch, Vyaw
                     false, false, false] # Ax, Ay, Az
-    odom1_queue_size: 2
+    odom1_queue_size: 5
     odom1_differential: false
     odom1_relative: false # Absolute depth in the map frame.
 
@@ -329,7 +329,7 @@
                     false, false, false, # Vx, Vy, Vz
                     false, false, false, # Vroll, Vpitch, Vyaw
                     false, false, false] # Ax, Ay, Az
-    odom2_queue_size: 2
+    odom2_queue_size: 5
     odom2_differential: false
     odom2_relative: false # Absolute GPS position in the map frame.
 
@@ -339,6 +339,6 @@
                   false, false, false, # Vx, Vy, Vz
                   false, false, false, # Vroll, Vpitch, Vyaw
                   false, false, false] # Ax, Ay, Az
-    imu0_queue_size: 2
+    imu0_queue_size: 15
     imu0_differential: false
     imu0_relative: false # Absolute heading in the map frame.
