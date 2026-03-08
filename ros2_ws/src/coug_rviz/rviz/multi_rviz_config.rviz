@@ -146,7 +146,7 @@ Visualization Manager:
             Value: true
           Enabled: true
           Keep: 1
-          Name: FL-B
+          Name: FGO
           Position Tolerance: 0.10000000149011612
           Shape:
             Alpha: 1
@@ -303,7 +303,7 @@ Visualization Manager:
             Value: true
           Enabled: true
           Keep: 1
-          Name: FL-B
+          Name: FGO
           Position Tolerance: 0.10000000149011612
           Shape:
             Alpha: 1
@@ -460,7 +460,7 @@ Visualization Manager:
             Value: true
           Enabled: true
           Keep: 1
-          Name: FL-B
+          Name: FGO
           Position Tolerance: 0.10000000149011612
           Shape:
             Alpha: 1
