@@ -244,7 +244,7 @@
                   true,  true,  true]  # Ax, Ay, Az
     imu0_differential: false
     imu0_relative: true
-    imu0_queue_size: 10
+    imu0_queue_size: 15
     imu0_remove_gravitational_acceleration: true
 
     use_control: false
