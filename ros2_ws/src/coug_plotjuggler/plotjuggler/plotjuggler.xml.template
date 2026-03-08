@@ -10,10 +10,11 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/position/x"/>
               <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/position/x"/>
-              <curve color="#ffaa00" name="/AUV_NS/odometry/global_ukf/pose/pose/position/x"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/position/x"/>
               <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/position/x"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/position/x"/>
+              <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/position/x"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/position/x"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_tm/pose/pose/position/x"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -22,10 +23,11 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/position/y"/>
               <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/position/y"/>
-              <curve color="#ffaa00" name="/AUV_NS/odometry/global_ukf/pose/pose/position/y"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/position/y"/>
               <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/position/y"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/position/y"/>
+              <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/position/y"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/position/y"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_tm/pose/pose/position/y"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -34,10 +36,11 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/position/z"/>
               <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/position/z"/>
-              <curve color="#ffaa00" name="/AUV_NS/odometry/global_ukf/pose/pose/position/z"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/position/z"/>
               <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/position/z"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/position/z"/>
+              <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/position/z"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/position/z"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_tm/pose/pose/position/z"/>
             </plot>
           </DockArea>
         </DockSplitter>
@@ -52,10 +55,11 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/orientation/roll"/>
               <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/roll"/>
-              <curve color="#ffaa00" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/roll"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/roll"/>
               <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/roll"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/orientation/roll"/>
+              <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/orientation/roll"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/orientation/roll"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_tm/pose/pose/orientation/roll"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -64,10 +68,11 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/orientation/pitch"/>
               <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/pitch"/>
-              <curve color="#ffaa00" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/pitch"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/pitch"/>
               <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/pitch"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/orientation/pitch"/>
+              <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/orientation/pitch"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/orientation/pitch"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_tm/pose/pose/orientation/pitch"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -76,10 +81,11 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/orientation/yaw"/>
               <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/yaw"/>
-              <curve color="#ffaa00" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/yaw"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/yaw"/>
               <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/yaw"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/orientation/yaw"/>
+              <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/orientation/yaw"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/orientation/yaw"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_tm/pose/pose/orientation/yaw"/>
             </plot>
           </DockArea>
         </DockSplitter>
@@ -94,8 +100,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/VelocitySensor/twist/twist/linear/x"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/x"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/velocity/twist/twist/linear/x"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/velocity/twist/twist/linear/x"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/velocity/twist/twist/linear/x"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/velocity/twist/twist/linear/x"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -104,8 +111,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/VelocitySensor/twist/twist/linear/y"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/y"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/velocity/twist/twist/linear/y"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/velocity/twist/twist/linear/y"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/velocity/twist/twist/linear/y"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/velocity/twist/twist/linear/y"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -114,8 +122,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/VelocitySensor/twist/twist/linear/z"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/z"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/velocity/twist/twist/linear/z"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/velocity/twist/twist/linear/z"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/velocity/twist/twist/linear/z"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/velocity/twist/twist/linear/z"/>
             </plot>
           </DockArea>
         </DockSplitter>
@@ -130,8 +139,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/linear/x"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/x"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/linear/x"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/linear/x"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/linear/x"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/imu_bias/twist/twist/linear/x"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -140,8 +150,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/linear/y"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/y"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/linear/y"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/linear/y"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/linear/y"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/imu_bias/twist/twist/linear/y"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -150,8 +161,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/linear/z"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/z"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/linear/z"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/linear/z"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/linear/z"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/imu_bias/twist/twist/linear/z"/>
             </plot>
           </DockArea>
         </DockSplitter>
@@ -166,8 +178,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/angular/x"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/x"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/angular/x"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/angular/x"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/angular/x"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/imu_bias/twist/twist/angular/x"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -176,8 +189,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/angular/y"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/y"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/angular/y"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/angular/y"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/angular/y"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/imu_bias/twist/twist/angular/y"/>
             </plot>
           </DockArea>
           <DockArea name="...">
@@ -186,8 +200,9 @@
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/angular/z"/>
               <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/z"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/angular/z"/>
+              <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/angular/z"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/angular/z"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_tm/imu_bias/twist/twist/angular/z"/>
             </plot>
           </DockArea>
         </DockSplitter>
@@ -196,8 +211,6 @@
     <currentTabIndex index="0"/>
   </tabbed_widget>
   <use_relative_time_offset enabled="1"/>
-  <!-- - - - - - - - - - - - - - - -->
-  <!-- - - - - - - - - - - - - - - -->
   <Plugins>
   <plugin ID="DataLoad CSV">
     <parameters delimiter="0" time_axis=""/>
@@ -218,7 +231,7 @@
     <max_array_size value="100"/>
     <boolean_strings_to_number value="true"/>
     <remove_suffix_from_strings value="true"/>
-    <selected_topics value="/AUV_NS/imu_bias;/AUV_NS/VelocitySensor;/AUV_NS/odometry/global;/AUV_NS/odometry/global_ekf;/AUV_NS/odometry/global_iekf;/AUV_NS/odometry/global_tm;/AUV_NS/odometry/global_ukf;/AUV_NS/odometry/truth;/AUV_NS/factor_graph_node/velocity;/AUV_NS/factor_graph_node/imu_bias;/AUV_NS/factor_graph_node_tm/imu_bias;/AUV_NS/factor_graph_node_tm/velocity;/AUV_NS/iekf_node/velocity;/AUV_NS/iekf_node/imu_bias"/>
+    <selected_topics value="/AUV_NS/imu_bias;/AUV_NS/VelocitySensor;/AUV_NS/odometry/global;/AUV_NS/odometry/global_pi;/AUV_NS/odometry/global_isam2;/AUV_NS/odometry/global_iekf;/AUV_NS/odometry/global_ukf;/AUV_NS/odometry/global_ekf;/AUV_NS/odometry/truth;/AUV_NS/factor_graph_node/velocity;/AUV_NS/factor_graph_node/imu_bias;/AUV_NS/factor_graph_node_isam2/imu_bias;/AUV_NS/factor_graph_node_isam2/velocity;/AUV_NS/factor_graph_node_pi/velocity;/AUV_NS/factor_graph_node_pi/imu_bias;/AUV_NS/iekf_node/velocity;/AUV_NS/iekf_node/imu_bias"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>
@@ -232,11 +245,8 @@
   <plugin ID="CSV Exporter"/>
   <plugin ID="ROS2 Topic Re-Publisher"/>
   </Plugins>
-  <!-- - - - - - - - - - - - - - - -->
   <previouslyLoaded_Datafiles/>
   <previouslyLoaded_Streamer name="ROS2 Topic Subscriber"/>
-  <!-- - - - - - - - - - - - - - - -->
   <customMathEquations/>
   <snippets/>
-  <!-- - - - - - - - - - - - - - - -->
 </root>

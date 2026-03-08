@@ -92,7 +92,7 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: coug0sim, FGO
+    name: coug0sim, FL-B
     config:
       visible: true
       collapsed: true
@@ -169,7 +169,7 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: coug1sim, FGO
+    name: coug1sim, FL-B
     config:
       visible: true
       collapsed: true
@@ -246,7 +246,7 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: coug2sim, FGO
+    name: coug2sim, FL-B
     config:
       visible: true
       collapsed: true

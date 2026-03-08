@@ -19,7 +19,11 @@ diagnostic_aggregator:
         path: "factor_graph_node"
         regex: [".*factor_graph_node.*AUV_NS.*"]
         find_and_remove_prefix:
-          ["factor_graph_node: [/AUV_NS]", "factor_graph_node_tm: [/AUV_NS] "]
+          [
+            "factor_graph_node: [/AUV_NS] ",
+            "factor_graph_node_isam2: [/AUV_NS] ",
+            "factor_graph_node_pi: [/AUV_NS] "
+          ]
         timeout: 5.0
 
       origin_manager_node:

@@ -20,8 +20,9 @@ diagnostic_aggregator:
         regex: [".*factor_graph_node.*coug0sim.*"]
         find_and_remove_prefix:
           [
-            "factor_graph_node: [/coug0sim]",
-            "factor_graph_node_tm: [/coug0sim] ",
+            "factor_graph_node: [/coug0sim] ",
+            "factor_graph_node_isam2: [/coug0sim] ",
+            "factor_graph_node_pi: [/coug0sim] ",
           ]
         timeout: 5.0
 
@@ -71,8 +72,9 @@ diagnostic_aggregator:
         regex: [".*factor_graph_node.*coug1sim.*"]
         find_and_remove_prefix:
           [
-            "factor_graph_node: [/coug1sim]",
-            "factor_graph_node_tm: [/coug1sim] ",
+            "factor_graph_node: [/coug1sim] ",
+            "factor_graph_node_isam2: [/coug1sim] ",
+            "factor_graph_node_pi: [/coug1sim] ",
           ]
         timeout: 5.0
 
@@ -122,8 +124,9 @@ diagnostic_aggregator:
         regex: [".*factor_graph_node.*coug2sim.*"]
         find_and_remove_prefix:
           [
-            "factor_graph_node: [/coug2sim]",
-            "factor_graph_node_tm: [/coug2sim] ",
+            "factor_graph_node: [/coug0sim] ",
+            "factor_graph_node_isam2: [/coug0sim] ",
+            "factor_graph_node_pi: [/coug0sim] ",
           ]
         timeout: 5.0
 

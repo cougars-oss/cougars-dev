@@ -1,6 +1,5 @@
 /bluerov2/**:
   ros__parameters:
-    imu_topic: "imu/data"
     ahrs_topic: "imu/data"
     gps_odom_topic: "odometry/truth"
 

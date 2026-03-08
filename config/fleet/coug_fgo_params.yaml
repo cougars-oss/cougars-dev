@@ -27,7 +27,7 @@
     relinearize_skip: 1 # Number of updates to skip between relinearizations.
 
     # --- ROS Topics and Frames ---
-    imu_topic: "imu/data_raw"
+    imu_topic: "imu/data"
     gps_odom_topic: "odometry/gps"
     depth_odom_topic: "odometry/depth"
     mag_topic: "imu/mag"
@@ -221,13 +221,6 @@
     publish_local_tf: false # Whether to publish the dvl_odom->base_link transform
 
 # --- Robot Localization Pipeline ---
-/**/imu_filter_madgwick_node:
-  ros__parameters:
-    use_mag: false
-    publish_tf: false
-    gain: 0.05
-    orientation_stddev: 0.01
-
 /**/ekf_filter_node_odom:
   ros__parameters:
     frequency: 30.0

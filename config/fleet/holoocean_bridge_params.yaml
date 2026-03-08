@@ -2,7 +2,7 @@
   imu_converter_node:
     ros__parameters:
       input_topic: "IMUSensor"
-      output_topic: "imu/data_raw"
+      output_topic: "imu/data"
       bias_topic: "imu_bias"
 
       accel_noise_sigmas: [0.0078, 0.0078, 0.0078] # [m/s^2] Accelerometer measurement noise sigmas.

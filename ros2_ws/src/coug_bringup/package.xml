@@ -15,6 +15,8 @@
   <exec_depend>coug_rqt</exec_depend>
   <exec_depend>coug_rviz</exec_depend>
   <exec_depend>holoocean_bridge</exec_depend>
+  <exec_depend>sbg_driver</exec_depend>
+  <exec_depend>ntrip_client</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

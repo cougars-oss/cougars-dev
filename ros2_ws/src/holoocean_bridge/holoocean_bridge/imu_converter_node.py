@@ -35,7 +35,7 @@ class ImuConverterNode(Node):
         super().__init__("imu_converter_node")
 
         self.declare_parameter("input_topic", "IMUSensor")
-        self.declare_parameter("output_topic", "imu/data_raw")
+        self.declare_parameter("output_topic", "imu/data")
         self.declare_parameter("bias_topic", "imu_bias")
         self.declare_parameter("imu_frame", "imu_link")
         self.declare_parameter("accel_noise_sigmas", [0.0078, 0.0078, 0.0078])
