@@ -51,12 +51,14 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   echo 'deb [trusted=yes] https://repo.charm.sh/apt/ /' | sudo tee /etc/apt/sources.list.d/charm.list \
   && apt-get update && apt-get install -y --no-install-recommends \
   python3-pip python3-venv gum \
+  cm-super dvipng texlive-latex-base texlive-latex-extra texlive-publishers texlive-science \
   x11-apps x11-utils x11-xserver-utils xauth
 
 # Install Python development tools
 USER ${DOCKER_USER}
 RUN --mount=type=cache,target=/home/${DOCKER_USER}/.cache/pip,uid=1000,gid=1000 \
-  pip3 install --upgrade vcstool pre-commit
+  pip3 install --upgrade vcstool pre-commit \
+  daft-pgm evo matplotlib pandas seaborn scienceplots
 
 USER root
 

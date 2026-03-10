@@ -19,16 +19,18 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.cpptools-extension-pack",
-        "ms-python.python",
-        "ms-azuretools.vscode-docker",
         "docker.docker",
         "eamodio.gitlens",
+        "editorconfig.editorconfig",
+        "mechatroner.rainbow-csv",
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-vscode.cpptools",
         "nonanonno.vscode-ros2",
-        "althack.ament-task-provider",
         "redhat.vscode-xml",
         "redhat.vscode-yaml",
-        "EditorConfig.EditorConfig"
+        "twxs.cmake"
       ]
     }
   },
