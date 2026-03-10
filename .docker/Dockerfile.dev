@@ -58,7 +58,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 USER ${DOCKER_USER}
 RUN --mount=type=cache,target=/home/${DOCKER_USER}/.cache/pip,uid=1000,gid=1000 \
   pip3 install --upgrade vcstool pre-commit \
-  daft-pgm evo matplotlib pandas seaborn scienceplots
+  daft-pgm evo matplotlib pandas seaborn scienceplots rosbags
 
 USER root
 
