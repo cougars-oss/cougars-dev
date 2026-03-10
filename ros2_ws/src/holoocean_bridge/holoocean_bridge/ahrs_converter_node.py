@@ -18,7 +18,23 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3Stamped
-from tf_transformations import quaternion_from_euler
+
+
+def get_quaternion_from_euler(roll, pitch, yaw):
+    """Convert an Euler angle to a quaternion."""
+    cy = math.cos(yaw * 0.5)
+    sy = math.sin(yaw * 0.5)
+    cp = math.cos(pitch * 0.5)
+    sp = math.sin(pitch * 0.5)
+    cr = math.cos(roll * 0.5)
+    sr = math.sin(roll * 0.5)
+
+    q_x = sr * cp * cy - cr * sp * sy
+    q_y = cr * sp * cy + sr * cp * sy
+    q_z = cr * cp * sy - sr * sp * cy
+    q_w = cr * cp * cy + sr * sp * sy
+
+    return [q_x, q_y, q_z, q_w]
 
 
 class AhrsConverterNode(Node):
@@ -89,7 +105,7 @@ class AhrsConverterNode(Node):
             pitch_rad += random.gauss(0, self.noise_sigmas[1])
             yaw_rad += random.gauss(0, self.noise_sigmas[2])
 
-        q_array = quaternion_from_euler(roll_rad, pitch_rad, yaw_rad)
+        q_array = get_quaternion_from_euler(roll_rad, pitch_rad, yaw_rad)
         imu_msg.orientation.x = q_array[0]
         imu_msg.orientation.y = q_array[1]
         imu_msg.orientation.z = q_array[2]

@@ -15,7 +15,6 @@
   <depend>dvl_msgs</depend>
   <depend>holoocean_interfaces</depend>
   <depend>geodesy</depend>
-  <depend>tf_transformations</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
 
