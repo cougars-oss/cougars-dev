@@ -9,10 +9,11 @@
               <range bottom="-0.194934" left="25.938627" top="0.004754" right="30.957195"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/position/x"/>
-              <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/position/x"/>
-              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/position/x"/>
-              <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/position/x"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/position/x"/>
+              <curve color="#ff55ff" name="/AUV_NS/odometry/global_ekf/pose/pose/position/x"/>
+              <curve color="#ffff00" name="/AUV_NS/odometry/global_ukf/pose/pose/position/x"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_iekf/pose/pose/position/x"/>
+              <curve color="#ff0000" name="/AUV_NS/odometry/global_tpi/pose/pose/position/x"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_lpi/pose/pose/position/x"/>
               <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/position/x"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/position/x"/>
             </plot>
@@ -22,10 +23,11 @@
               <range bottom="-0.124519" left="25.938627" top="0.003037" right="30.957195"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/position/y"/>
-              <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/position/y"/>
-              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/position/y"/>
-              <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/position/y"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/position/y"/>
+              <curve color="#ff55ff" name="/AUV_NS/odometry/global_ekf/pose/pose/position/y"/>
+              <curve color="#ffff00" name="/AUV_NS/odometry/global_ukf/pose/pose/position/y"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_iekf/pose/pose/position/y"/>
+              <curve color="#ff0000" name="/AUV_NS/odometry/global_tpi/pose/pose/position/y"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_lpi/pose/pose/position/y"/>
               <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/position/y"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/position/y"/>
             </plot>
@@ -35,10 +37,11 @@
               <range bottom="-0.022526" left="25.938627" top="0.078166" right="30.957195"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/position/z"/>
-              <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/position/z"/>
-              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/position/z"/>
-              <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/position/z"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/position/z"/>
+              <curve color="#ff55ff" name="/AUV_NS/odometry/global_ekf/pose/pose/position/z"/>
+              <curve color="#ffff00" name="/AUV_NS/odometry/global_ukf/pose/pose/position/z"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_iekf/pose/pose/position/z"/>
+              <curve color="#ff0000" name="/AUV_NS/odometry/global_tpi/pose/pose/position/z"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_lpi/pose/pose/position/z"/>
               <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/position/z"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/position/z"/>
             </plot>
@@ -54,10 +57,11 @@
               <range bottom="-0.062796" left="25.938627" top="0.073316" right="30.957195"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/orientation/roll"/>
-              <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/roll"/>
-              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/roll"/>
-              <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/roll"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/orientation/roll"/>
+              <curve color="#ff55ff" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/roll"/>
+              <curve color="#ffff00" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/roll"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/roll"/>
+              <curve color="#ff0000" name="/AUV_NS/odometry/global_tpi/pose/pose/orientation/roll"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_lpi/pose/pose/orientation/roll"/>
               <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/orientation/roll"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/orientation/roll"/>
             </plot>
@@ -67,10 +71,11 @@
               <range bottom="-0.069499" left="25.938627" top="0.070909" right="30.957195"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/orientation/pitch"/>
-              <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/pitch"/>
-              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/pitch"/>
-              <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/pitch"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/orientation/pitch"/>
+              <curve color="#ff55ff" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/pitch"/>
+              <curve color="#ffff00" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/pitch"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/pitch"/>
+              <curve color="#ff0000" name="/AUV_NS/odometry/global_tpi/pose/pose/orientation/pitch"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_lpi/pose/pose/orientation/pitch"/>
               <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/orientation/pitch"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/orientation/pitch"/>
             </plot>
@@ -80,10 +85,11 @@
               <range bottom="-0.031951" left="25.938627" top="0.030409" right="30.957195"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/odometry/truth/pose/pose/orientation/yaw"/>
-              <curve color="#ffff00" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/yaw"/>
-              <curve color="#aa00ff" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/yaw"/>
-              <curve color="#ff0000" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/yaw"/>
-              <curve color="#55aaff" name="/AUV_NS/odometry/global_pi/pose/pose/orientation/yaw"/>
+              <curve color="#ff55ff" name="/AUV_NS/odometry/global_ekf/pose/pose/orientation/yaw"/>
+              <curve color="#ffff00" name="/AUV_NS/odometry/global_ukf/pose/pose/orientation/yaw"/>
+              <curve color="#aa00ff" name="/AUV_NS/odometry/global_iekf/pose/pose/orientation/yaw"/>
+              <curve color="#ff0000" name="/AUV_NS/odometry/global_tpi/pose/pose/orientation/yaw"/>
+              <curve color="#55aaff" name="/AUV_NS/odometry/global_lpi/pose/pose/orientation/yaw"/>
               <curve color="#ffaa00" name="/AUV_NS/odometry/global_isam2/pose/pose/orientation/yaw"/>
               <curve color="#00ff00" name="/AUV_NS/odometry/global/pose/pose/orientation/yaw"/>
             </plot>
@@ -99,8 +105,9 @@
               <range bottom="-0.082545" left="25.940986" top="0.077060" right="30.956643"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/VelocitySensor/twist/twist/linear/x"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/x"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/velocity/twist/twist/linear/x"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/x"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/velocity/twist/twist/linear/x"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/velocity/twist/twist/linear/x"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/velocity/twist/twist/linear/x"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/velocity/twist/twist/linear/x"/>
             </plot>
@@ -110,8 +117,9 @@
               <range bottom="-0.108010" left="25.940986" top="0.093046" right="30.956643"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/VelocitySensor/twist/twist/linear/y"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/y"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/velocity/twist/twist/linear/y"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/y"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/velocity/twist/twist/linear/y"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/velocity/twist/twist/linear/y"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/velocity/twist/twist/linear/y"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/velocity/twist/twist/linear/y"/>
             </plot>
@@ -121,8 +129,9 @@
               <range bottom="-0.019873" left="25.940986" top="0.026462" right="30.956643"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/VelocitySensor/twist/twist/linear/z"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/z"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/velocity/twist/twist/linear/z"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/velocity/twist/twist/linear/z"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/velocity/twist/twist/linear/z"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/velocity/twist/twist/linear/z"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/velocity/twist/twist/linear/z"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/velocity/twist/twist/linear/z"/>
             </plot>
@@ -138,8 +147,9 @@
               <range bottom="-0.003079" left="25.941049" top="0.000075" right="30.956488"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/linear/x"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/x"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/linear/x"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/x"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/imu_bias/twist/twist/linear/x"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/imu_bias/twist/twist/linear/x"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/linear/x"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/linear/x"/>
             </plot>
@@ -149,8 +159,9 @@
               <range bottom="-0.004368" left="25.941049" top="0.000106" right="30.956488"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/linear/y"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/y"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/linear/y"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/y"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/imu_bias/twist/twist/linear/y"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/imu_bias/twist/twist/linear/y"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/linear/y"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/linear/y"/>
             </plot>
@@ -160,8 +171,9 @@
               <range bottom="-0.000036" left="25.941049" top="0.000584" right="30.956488"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/linear/z"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/z"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/linear/z"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/imu_bias/twist/twist/linear/z"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/imu_bias/twist/twist/linear/z"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/imu_bias/twist/twist/linear/z"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/linear/z"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/linear/z"/>
             </plot>
@@ -177,8 +189,9 @@
               <range bottom="-0.001693" left="25.941049" top="0.000041" right="30.956488"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/angular/x"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/x"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/angular/x"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/x"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/imu_bias/twist/twist/angular/x"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/imu_bias/twist/twist/angular/x"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/angular/x"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/angular/x"/>
             </plot>
@@ -188,8 +201,9 @@
               <range bottom="-0.000354" left="25.941049" top="0.000014" right="30.956488"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/angular/y"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/y"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/angular/y"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/y"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/imu_bias/twist/twist/angular/y"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/imu_bias/twist/twist/angular/y"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/angular/y"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/angular/y"/>
             </plot>
@@ -199,8 +213,9 @@
               <range bottom="-0.001157" left="25.941049" top="0.000028" right="30.956488"/>
               <limitY/>
               <curve color="#000000" name="/AUV_NS/imu_bias/twist/twist/angular/z"/>
-              <curve color="#ff0000" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/z"/>
-              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_pi/imu_bias/twist/twist/angular/z"/>
+              <curve color="#aa00ff" name="/AUV_NS/iekf_node/imu_bias/twist/twist/angular/z"/>
+              <curve color="#ff0000" name="/AUV_NS/factor_graph_node_tpi/imu_bias/twist/twist/angular/z"/>
+              <curve color="#55aaff" name="/AUV_NS/factor_graph_node_lpi/imu_bias/twist/twist/angular/z"/>
               <curve color="#ffaa00" name="/AUV_NS/factor_graph_node_isam2/imu_bias/twist/twist/angular/z"/>
               <curve color="#00ff00" name="/AUV_NS/factor_graph_node/imu_bias/twist/twist/angular/z"/>
             </plot>
@@ -231,7 +246,7 @@
     <max_array_size value="100"/>
     <boolean_strings_to_number value="true"/>
     <remove_suffix_from_strings value="true"/>
-    <selected_topics value="/AUV_NS/imu_bias;/AUV_NS/VelocitySensor;/AUV_NS/odometry/global;/AUV_NS/odometry/global_pi;/AUV_NS/odometry/global_isam2;/AUV_NS/odometry/global_iekf;/AUV_NS/odometry/global_ukf;/AUV_NS/odometry/global_ekf;/AUV_NS/odometry/truth;/AUV_NS/factor_graph_node/velocity;/AUV_NS/factor_graph_node/imu_bias;/AUV_NS/factor_graph_node_isam2/imu_bias;/AUV_NS/factor_graph_node_isam2/velocity;/AUV_NS/factor_graph_node_pi/velocity;/AUV_NS/factor_graph_node_pi/imu_bias;/AUV_NS/iekf_node/velocity;/AUV_NS/iekf_node/imu_bias"/>
+    <selected_topics value="/AUV_NS/imu_bias;/AUV_NS/VelocitySensor;/AUV_NS/odometry/global;AUV_NS/odometry/global_isam2;/AUV_NS/odometry/global_lpi;/AUV_NS/odometry/global_tpi;/AUV_NS/odometry/global_iekf;/AUV_NS/odometry/global_ukf;/AUV_NS/odometry/global_ekf;/AUV_NS/odometry/truth;/AUV_NS/factor_graph_node/velocity;/AUV_NS/factor_graph_node/imu_bias;/AUV_NS/factor_graph_node_isam2/imu_bias;/AUV_NS/factor_graph_node_isam2/velocity;/AUV_NS/factor_graph_node_lpi/velocity;/AUV_NS/factor_graph_node_lpi/imu_bias;/AUV_NS/factor_graph_node_tpi/velocity;/AUV_NS/factor_graph_node_tpi/imu_bias;/AUV_NS/iekf_node/velocity;/AUV_NS/iekf_node/imu_bias"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>

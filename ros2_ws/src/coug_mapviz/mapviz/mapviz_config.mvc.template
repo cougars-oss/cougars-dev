@@ -97,7 +97,7 @@ displays:
       visible: false
       collapsed: true
       topic: /AUV_NS/odometry/global_ekf
-      color: "#ffff00"
+      color: "#ff55ff"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
@@ -117,7 +117,7 @@ displays:
       visible: false
       collapsed: true
       topic: /AUV_NS/odometry/global_ukf
-      color: "#aa00ff"
+      color: "#ffff00"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
@@ -137,6 +137,26 @@ displays:
       visible: false
       collapsed: true
       topic: /AUV_NS/odometry/global_iekf
+      color: "#aa00ff"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      show_laps: false
+      show_covariance: true
+      show_all_covariances: false
+      static_arrow_sizes: false
+      arrow_size: 25
+      show_timestamps: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/odometry
+    name: FL-TPI
+    config:
+      visible: false
+      collapsed: true
+      topic: /AUV_NS/odometry/global_tpi
       color: "#ff0000"
       draw_style: lines
       position_tolerance: 0
@@ -152,11 +172,11 @@ displays:
       qos_reliability: 1
       qos_durability: 2
   - type: mapviz_plugins/odometry
-    name: FL-PI
+    name: FL-LPI
     config:
       visible: false
       collapsed: true
-      topic: /AUV_NS/odometry/global_pi
+      topic: /AUV_NS/odometry/global_lpi
       color: "#55aaff"
       draw_style: lines
       position_tolerance: 0
@@ -217,7 +237,7 @@ displays:
       visible: true
       collapsed: true
       topic: /AUV_NS/odometry/dvl
-      color: "#ff55ff"
+      color: "#55ffff"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0

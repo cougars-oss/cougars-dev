@@ -22,7 +22,8 @@ diagnostic_aggregator:
           [
             "factor_graph_node: [/coug0sim] ",
             "factor_graph_node_isam2: [/coug0sim] ",
-            "factor_graph_node_pi: [/coug0sim] ",
+            "factor_graph_node_lpi: [/coug0sim] ",
+            "factor_graph_node_tpi: [/coug0sim] ",
           ]
         timeout: 5.0
 
@@ -74,7 +75,8 @@ diagnostic_aggregator:
           [
             "factor_graph_node: [/coug1sim] ",
             "factor_graph_node_isam2: [/coug1sim] ",
-            "factor_graph_node_pi: [/coug1sim] ",
+            "factor_graph_node_lpi: [/coug1sim] ",
+            "factor_graph_node_tpi: [/coug1sim] ",
           ]
         timeout: 5.0
 
@@ -126,7 +128,8 @@ diagnostic_aggregator:
           [
             "factor_graph_node: [/coug0sim] ",
             "factor_graph_node_isam2: [/coug0sim] ",
-            "factor_graph_node_pi: [/coug0sim] ",
+            "factor_graph_node_lpi: [/coug0sim] ",
+            "factor_graph_node_tpi: [/coug0sim] ",
           ]
         timeout: 5.0
 

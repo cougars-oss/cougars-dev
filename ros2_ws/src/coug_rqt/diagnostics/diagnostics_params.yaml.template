@@ -22,7 +22,8 @@ diagnostic_aggregator:
           [
             "factor_graph_node: [/AUV_NS] ",
             "factor_graph_node_isam2: [/AUV_NS] ",
-            "factor_graph_node_pi: [/AUV_NS] "
+            "factor_graph_node_lpi: [/AUV_NS] ",
+            "factor_graph_node_tpi: [/AUV_NS] ",
           ]
         timeout: 5.0
 
