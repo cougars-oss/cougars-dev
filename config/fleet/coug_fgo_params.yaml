@@ -59,7 +59,7 @@
       gyro_bias_rw_sigmas: [0.0000391, 0.0000391, 0.0000391] # [rad/s/√s] Continuous-time spectral density sigmas for gyroscope bias random walk.
       integration_covariance: 0.00001 # A small covariance for the integration process itself.
       gravity: [0.0, 0.0, -9.8] # [m/s^2]
-      timeout_threshold: 1.0 # [s]
+      diagnostic_timeout_threshold: 1.0 # [s]
 
     gps:
       enable_gps: true
@@ -68,7 +68,7 @@
       use_parameter_covariance: false
       parameter_covariance:
         position_noise_sigmas: [0.015, 0.015] # [m] GPS position uncertainty sigmas.
-      timeout_threshold: 2.0 # [s]
+      diagnostic_timeout_threshold: 2.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 
@@ -77,7 +77,7 @@
       use_parameter_covariance: false
       parameter_covariance:
         position_z_noise_sigma: 0.02 # [m] Depth sensor Z-position uncertainty sigma.
-      timeout_threshold: 1.0 # [s]
+      diagnostic_timeout_threshold: 1.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 
@@ -93,7 +93,7 @@
       # North: 20,842.3 nT, East: 3,963.4 nT, Vertical: 45,767.8 nT
       # NED: [X, Y, Z] -> ENU: [Y, X, -Z]
       reference_field: [0.07857, 0.41316, -0.90726] # [normalized]
-      timeout_threshold: 1.0 # [s]
+      diagnostic_timeout_threshold: 1.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 
@@ -106,7 +106,7 @@
         yaw_noise_sigma: 0.01745 # [rad] AHRS sensor yaw uncertainty sigma.
       # https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml#declination
       mag_declination_radians: 0.0
-      timeout_threshold: 1.0 # [s]
+      diagnostic_timeout_threshold: 1.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 
@@ -115,7 +115,8 @@
       use_parameter_covariance: false
       parameter_covariance:
         velocity_noise_sigmas: [0.02, 0.02, 0.02] # [m/s] DVL body-velocity uncertainty sigmas.
-      timeout_threshold: 0.25 # [s] Time before switching to depth-driven keyframes (DVL dropout).
+      dropout_timeout_threshold: 0.25 # [s] Time before switching to depth-driven keyframes (DVL dropout).
+      diagnostic_timeout_threshold: 0.25 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 
@@ -132,7 +133,7 @@
       mass: [31.87, 60.46, 60.46] # [kg] Mass of the vehicle (diagonal)
       linear_drag: [1.59, 3.02, 3.02] # Linear drag coefficient (diagonal)
       quad_drag: [6.11, 154.0, 154.0] # Quadratic drag coefficient (diagonal)
-      timeout_threshold: 1.0 # [s]
+      diagnostic_timeout_threshold: 1.0 # [s]
       robust_kernel: "None"
       robust_k: 1.345
 
@@ -170,7 +171,7 @@
     origin_pub_rate: 1.0 # [Hz] Rate at which to publish the GPS origin.
     initialization_duration: 0.0 # [s] Time duration to average GPS data before setting origin.
     publish_diagnostics: true # Publish diagnostic information.
-    timeout_threshold: 2.0 # [s]
+    diagnostic_timeout_threshold: 2.0 # [s]
 
     simulate_dropout: false
     dropout_frequency: 0.033 # [Hz] Frequency of the dropout cycle (1/30).
@@ -193,7 +194,7 @@
   ros__parameters:
     # --- Node Settings ---
     publish_diagnostics: true # Publish diagnostic information.
-    timeout_threshold: 0.5 # [s]
+    diagnostic_timeout_threshold: 0.5 # [s]
 
     simulate_dropout: false
     dropout_frequency: 0.033 # [Hz] Frequency of the dropout cycle (1/30).
@@ -213,7 +214,7 @@
   ros__parameters:
     # --- Node Settings ---
     publish_diagnostics: true # Publish diagnostic information.
-    timeout_threshold: 0.5 # [s]
+    diagnostic_timeout_threshold: 0.5 # [s]
 
     # --- ROS Topics and Frames ---
     input_topic: "dvl/position"
