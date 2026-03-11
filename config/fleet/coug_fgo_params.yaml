@@ -155,8 +155,8 @@
       initial_accel_bias_sigmas: [0.01, 0.01, 0.01] # [m/s^2] Initial accelerometer bias uncertainty.
       initial_gyro_bias_sigmas: [0.001, 0.001, 0.001] # [rad/s] Initial gyroscope bias uncertainty.
 
-    # --- Experimental Features ---
-    experimental:
+    # --- Comparison Methods ---
+    comparison:
       # TURTLMap-based loosely-coupled DVL preintegration implementation
       enable_loose_dvl_preintegration: false
       # TURTLMap-based DVL psuedo-measurement using IMU data
