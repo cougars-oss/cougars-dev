@@ -111,13 +111,10 @@ jobs:
   build-base:
     needs: [check-changes, build-gtsam, manifest-gtsam]
     if: |
-      always() &&
-      !cancelled() &&
+      !failure() && !cancelled() &&
       (github.event_name == 'repository_dispatch' ||
        needs.check-changes.outputs.gtsam == 'true' ||
-       needs.check-changes.outputs.base == 'true') &&
-      !contains(needs.build-gtsam.result, 'failure') &&
-      !contains(needs.manifest-gtsam.result, 'failure')
+       needs.check-changes.outputs.base == 'true')
     strategy:
       matrix:
         include:
@@ -161,12 +158,10 @@ jobs:
   manifest-base:
     needs: [check-changes, build-base]
     if: |
-      always() &&
-      !cancelled() &&
+      !failure() && !cancelled() &&
       (github.event_name == 'repository_dispatch' ||
        needs.check-changes.outputs.gtsam == 'true' ||
-       needs.check-changes.outputs.base == 'true') &&
-      !contains(needs.build-base.result, 'failure')
+       needs.check-changes.outputs.base == 'true')
     runs-on: ubuntu-latest
     steps:
       - uses: docker/setup-buildx-action@v3
@@ -182,14 +177,11 @@ jobs:
   build-dev:
     needs: [check-changes, build-base, manifest-base]
     if: |
-      always() &&
-      !cancelled() &&
+      !failure() && !cancelled() &&
       (github.event_name == 'repository_dispatch' ||
        needs.check-changes.outputs.gtsam == 'true' ||
        needs.check-changes.outputs.base == 'true' ||
-       needs.check-changes.outputs.dev == 'true') &&
-      !contains(needs.build-base.result, 'failure') &&
-      !contains(needs.manifest-base.result, 'failure')
+       needs.check-changes.outputs.dev == 'true')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
