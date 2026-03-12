@@ -33,5 +33,5 @@ repositories:
     version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_msgs
   ros2_shared:
     type: git
-    url: https://github.com/ptrmu/ros2_shared
-    version: master
+    url: https://github.com/ptrmu/ros2_shared.git
+    version: 662206467488566aea068541fbd48648c7172b89
