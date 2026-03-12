@@ -4,7 +4,7 @@
   <name>coug_rqt</name>
   <version>0.0.0</version>
   <description>RQT GUI for the CougUV</description>
-  <maintainer email="snelsondurrant@gmail.com">Nelson Durrant</maintainer>
+  <maintainer email="snelsondurrant@gmail.com">snelsondurrant</maintainer>
   <license>Apache-2.0</license>
 
   <exec_depend>rqt_gui</exec_depend>

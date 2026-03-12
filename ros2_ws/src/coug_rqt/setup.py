@@ -20,7 +20,7 @@ setup(
     ],
     install_requires=["setuptools"],
     zip_safe=True,
-    maintainer="Nelson Durrant",
+    maintainer="snelsondurrant",
     maintainer_email="snelsondurrant@gmail.com",
     description="RQT GUI for the CougUV",
     license="Apache-2.0",
