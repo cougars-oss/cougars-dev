@@ -16,7 +16,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
-from launch.conditions import LaunchConfigurationEquals
+from launch.conditions import LaunchConfigurationEquals, LaunchConfigurationNotEquals
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -70,6 +70,7 @@ def generate_launch_description():
             "use_sim_time": use_sim_time,
             "auv_ns": auv_ns,
         }.items(),
+        condition=LaunchConfigurationNotEquals("auv_ns", "blue0sim"),
     )
 
     coug_active_fgo_cmd = IncludeLaunchDescription(
