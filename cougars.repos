@@ -7,7 +7,7 @@ repositories:
     type: git
     url: git@github.com/cougars-auv/coug_active_fgo.git
     version: main
-  coug_visual_dvl
+  coug_visual_dvl:
     type: git
     url: git@github.com/cougars-auv/coug_visual_dvl.git
     version: main
