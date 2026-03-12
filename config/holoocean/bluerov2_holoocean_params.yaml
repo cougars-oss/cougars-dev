@@ -1,7 +1,7 @@
 holoocean_node:
   ros__parameters:
     publish_commands: true
-    show_viewport: true
+    show_viewport: false
     draw_arrow: false
 
     relative_path: false
