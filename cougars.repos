@@ -23,3 +23,7 @@ repositories:
     type: zip
     url: https://github.com/clydemcqueen/orca4/archive/299bcfcc808934cb314703a918971a2a505155b9.zip
     version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_nav2
+  orca_shared:
+    type: zip
+    url: https://github.com/clydemcqueen/orca4/archive/299bcfcc808934cb314703a918971a2a505155b9.zip
+    version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_shared
