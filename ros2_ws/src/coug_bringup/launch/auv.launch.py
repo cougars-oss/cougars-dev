@@ -16,6 +16,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.conditions import LaunchConfigurationEquals
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
@@ -35,6 +36,8 @@ def generate_launch_description():
     coug_fgo_launch_dir = os.path.join(coug_fgo_dir, "launch")
     coug_nav_dir = get_package_share_directory("coug_navigation")
     coug_nav_launch_dir = os.path.join(coug_nav_dir, "launch")
+    coug_active_fgo_dir = get_package_share_directory("coug_active_fgo")
+    coug_active_fgo_launch_dir = os.path.join(coug_active_fgo_dir, "launch")
 
     coug_des_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -67,6 +70,17 @@ def generate_launch_description():
             "use_sim_time": use_sim_time,
             "auv_ns": auv_ns,
         }.items(),
+    )
+
+    coug_active_fgo_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(coug_active_fgo_launch_dir, "coug_active_fgo.launch.py")
+        ),
+        launch_arguments={
+            "use_sim_time": use_sim_time,
+            "auv_ns": auv_ns,
+        }.items(),
+        condition=LaunchConfigurationEquals("auv_ns", "blue0sim"),
     )
 
     return LaunchDescription(
@@ -105,5 +119,6 @@ def generate_launch_description():
             coug_des_cmd,
             coug_fgo_cmd,
             coug_nav_cmd,
+            coug_active_fgo_cmd,
         ]
     )

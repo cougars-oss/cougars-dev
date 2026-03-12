@@ -15,3 +15,15 @@
 /blue0sim/dvl_a50_odom_node:
   ros__parameters:
     publish_diagnostics: false
+
+/blue0sim/global_costmap:
+  global_costmap:
+    ros__parameters:
+      global_frame: "map"
+      robot_base_frame: "blue0sim/base_link"
+
+/blue0sim/local_costmap:
+  local_costmap:
+    ros__parameters:
+      global_frame: "blue0sim/odom"
+      robot_base_frame: "blue0sim/base_link"
