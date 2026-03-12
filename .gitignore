@@ -9,8 +9,14 @@ bags/*
 !bags/.gitkeep
 
 coug_fgo
+coug_active_fgo
+coug_visual_dvl
 holoocean_interfaces
 dvl_msgs
+orca_nav2
+orca_msgs
+orca_shared
+ros2_shared
 
 __pycache__
 .venv
