@@ -3,6 +3,14 @@ repositories:
     type: git
     url: git@github.com:cougars-auv/coug_fgo.git
     version: main
+  coug_active_fgo:
+    type: git
+    url: git@github.com/cougars-auv/coug_active_fgo.git
+    version: main
+  coug_visual_dvl
+    type: git
+    url: git@github.com/cougars-auv/coug_visual_dvl.git
+    version: main
   holoocean_interfaces:
     type: zip
     url: https://github.com/byu-holoocean/holoocean-ros/archive/05a7a4814ac99efb768def844366860b81224e56.zip
@@ -11,3 +19,7 @@ repositories:
     type: zip
     url: https://github.com/paagutie/dvl_msgs/archive/555525ebc027f4ca21fdd654a6f30cecd259772f.zip
     version: dvl_msgs-555525ebc027f4ca21fdd654a6f30cecd259772f
+  orca_nav2:
+    type: zip
+    url: https://github.com/clydemcqueen/orca4/archive/299bcfcc808934cb314703a918971a2a505155b9.zip
+    version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_nav2
