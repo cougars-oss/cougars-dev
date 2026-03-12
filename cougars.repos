@@ -19,19 +19,3 @@ repositories:
     type: zip
     url: https://github.com/paagutie/dvl_msgs/archive/555525ebc027f4ca21fdd654a6f30cecd259772f.zip
     version: dvl_msgs-555525ebc027f4ca21fdd654a6f30cecd259772f
-  orca_nav2:
-    type: zip
-    url: https://github.com/clydemcqueen/orca4/archive/299bcfcc808934cb314703a918971a2a505155b9.zip
-    version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_nav2
-  orca_shared:
-    type: zip
-    url: https://github.com/clydemcqueen/orca4/archive/299bcfcc808934cb314703a918971a2a505155b9.zip
-    version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_shared
-  ros2_shared:
-    type: git
-    url: https://github.com/ptrmu/ros2_shared.git
-    version: 662206467488566aea068541fbd48648c7172b89
-  orca_msgs:
-    type: zip
-    url: https://github.com/clydemcqueen/orca4/archive/299bcfcc808934cb314703a918971a2a505155b9.zip
-    version: orca4-299bcfcc808934cb314703a918971a2a505155b9/orca_msgs
