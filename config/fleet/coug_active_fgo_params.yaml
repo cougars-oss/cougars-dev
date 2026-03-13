@@ -28,7 +28,7 @@
 
   controller_server:
     ros__parameters:
-      controller_frequency: 10.0
+      controller_frequency: 20.0
       odom_topic: "odometry/local"
       progress_checker_plugin: "progress_checker"
       goal_checker_plugins: ["general_goal_checker"]
@@ -48,42 +48,45 @@
       FollowPath:
         plugin: "nav2_mppi_controller::MPPIController"
         transform_tolerance: 2.0
-
-        time_steps: 50
-        model_dt: 0.1
-        batch_size: 800
+        time_steps: 60
+        model_dt: 0.05
+        batch_size: 2000
         iteration_count: 1
 
         motion_model: "Omni"
-        vx_max: 1.5
-        vx_min: -0.5
+        vx_max: 1.0
+        vx_min: -1.0
         vy_max: 1.0
-        wz_max: 0.8
+        vy_min: -1.0
+        wz_max: 0.3
 
-        vx_std: 0.1
-        vy_std: 0.1
-        wz_std: 0.25
+        vx_std: 0.2
+        vy_std: 0.2
+        wz_std: 0.1
 
-        critics: ["ConstraintCritic", "GoalCritic", "PathFollowCritic", "PathAngleCritic"]
+        critics: [
+          "ConstraintCritic",
+          "GoalCritic",
+          "PathFollowCritic",
+          "TwirlingCritic",
+        ]
 
         ConstraintCritic:
           enabled: true
-          cost_weight: 1.0
+          cost_weight: 5.0
 
         GoalCritic:
           enabled: true
-          cost_weight: 15.0
-          threshold_to_consider: 2.0
+          cost_weight: 5.0
 
         PathFollowCritic:
           enabled: true
-          cost_weight: 10.0
-          offset_from_furthest: 10
+          cost_weight: 8.0
+          offset_from_furthest: 20
 
-        PathAngleCritic:
+        TwirlingCritic:
           enabled: true
-          cost_weight: 5.0
-          offset_from_furthest: 10
+          cost_weight: 3.0
 
   behavior_server:
     ros__parameters:
@@ -101,7 +104,7 @@
     global_costmap:
       ros__parameters:
         update_frequency: 1.0
-        publish_frequency: 1.0
+        publish_frequency: 0.0
         robot_radius: 0.3
         transform_tolerance: 2.0
         rolling_window: true
@@ -118,7 +121,7 @@
     local_costmap:
       ros__parameters:
         update_frequency: 5.0
-        publish_frequency: 2.0
+        publish_frequency: 0.0
         robot_radius: 0.3
         transform_tolerance: 2.0
         rolling_window: true
