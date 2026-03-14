@@ -15,14 +15,13 @@
 import random
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from nav_msgs.msg import Odometry
 
 
 class DepthConverterNode(Node):
     """
-    Converts depth data from HoloOcean to odometry messages.
-
-    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
+    Converts depth data from HoloOcean to odometry messages and adds noise.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -58,9 +57,11 @@ class DepthConverterNode(Node):
         )
 
         self.subscription = self.create_subscription(
-            Odometry, input_topic, self.listener_callback, 10
+            Odometry, input_topic, self.listener_callback, qos_profile_system_default
         )
-        self.publisher = self.create_publisher(Odometry, output_topic, 10)
+        self.publisher = self.create_publisher(
+            Odometry, output_topic, qos_profile_system_default
+        )
 
         self.get_logger().info(
             f"Depth converter started. Listening on {input_topic} and "

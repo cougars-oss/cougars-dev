@@ -43,16 +43,19 @@ WaypointFollowerNode::WaypointFollowerNode(const rclcpp::NodeOptions & options)
     params_.rw_step_size);
 
   // --- ROS Interfaces ---
-  heading_pub_ = create_publisher<std_msgs::msg::Float64>(params_.heading_topic, 10);
-  speed_pub_ = create_publisher<std_msgs::msg::Float64>(params_.speed_topic, 10);
-  depth_pub_ = create_publisher<std_msgs::msg::Float64>(params_.depth_topic, 10);
+  heading_pub_ = create_publisher<std_msgs::msg::Float64>(
+    params_.heading_topic, rclcpp::SystemDefaultsQoS());
+  speed_pub_ = create_publisher<std_msgs::msg::Float64>(
+    params_.speed_topic, rclcpp::SystemDefaultsQoS());
+  depth_pub_ = create_publisher<std_msgs::msg::Float64>(
+    params_.depth_topic, rclcpp::SystemDefaultsQoS());
 
   waypoint_sub_ = create_subscription<geometry_msgs::msg::PoseArray>(
-    params_.waypoint_topic, 10,
+    params_.waypoint_topic, rclcpp::SystemDefaultsQoS(),
     std::bind(&WaypointFollowerNode::waypointCallback, this, std::placeholders::_1));
 
   odom_sub_ = create_subscription<nav_msgs::msg::Odometry>(
-    params_.odom_topic, 10,
+    params_.odom_topic, rclcpp::SystemDefaultsQoS(),
     std::bind(&WaypointFollowerNode::odomCallback, this, std::placeholders::_1));
 
   timeout_timer_ = create_wall_timer(

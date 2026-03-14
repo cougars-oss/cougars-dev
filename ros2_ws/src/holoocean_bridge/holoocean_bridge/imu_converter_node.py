@@ -16,16 +16,16 @@ import math
 import random
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import TwistWithCovarianceStamped
 
 
 class ImuConverterNode(Node):
     """
-    Converts IMU data from HoloOcean to standard IMU messages.
+    Converts IMU data from HoloOcean to standard IMU messages and adds noise.
 
-    Injects Gaussian noise and simulated random-walk bias to replicate
-    realistic IMU sensor behavior.
+    Also models IMU bias as a random walk.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -85,11 +85,13 @@ class ImuConverterNode(Node):
         self.last_stamp = None
 
         self.subscription = self.create_subscription(
-            Imu, input_topic, self.listener_callback, 10
+            Imu, input_topic, self.listener_callback, qos_profile_system_default
         )
-        self.publisher = self.create_publisher(Imu, output_topic, 10)
+        self.publisher = self.create_publisher(
+            Imu, output_topic, qos_profile_system_default
+        )
         self.bias_publisher = self.create_publisher(
-            TwistWithCovarianceStamped, bias_topic, 10
+            TwistWithCovarianceStamped, bias_topic, qos_profile_system_default
         )
 
         self.get_logger().info(

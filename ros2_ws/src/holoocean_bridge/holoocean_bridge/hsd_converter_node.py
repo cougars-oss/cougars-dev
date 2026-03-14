@@ -14,6 +14,7 @@
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from std_msgs.msg import Float64
 from holoocean_interfaces.msg import DesiredCommand
 from std_msgs.msg import Header
@@ -63,23 +64,32 @@ class HsdConverterNode(Node):
         )
 
         self.output_heading_pub = self.create_publisher(
-            DesiredCommand, self.output_heading_topic, 10
+            DesiredCommand, self.output_heading_topic, qos_profile_system_default
         )
         self.output_speed_pub = self.create_publisher(
-            DesiredCommand, self.output_speed_topic, 10
+            DesiredCommand, self.output_speed_topic, qos_profile_system_default
         )
         self.output_depth_pub = self.create_publisher(
-            DesiredCommand, self.output_depth_topic, 10
+            DesiredCommand, self.output_depth_topic, qos_profile_system_default
         )
 
         self.heading_sub = self.create_subscription(
-            Float64, self.input_heading_topic, self.heading_callback, 10
+            Float64,
+            self.input_heading_topic,
+            self.heading_callback,
+            qos_profile_system_default,
         )
         self.speed_sub = self.create_subscription(
-            Float64, self.input_speed_topic, self.speed_callback, 10
+            Float64,
+            self.input_speed_topic,
+            self.speed_callback,
+            qos_profile_system_default,
         )
         self.depth_sub = self.create_subscription(
-            Float64, self.input_depth_topic, self.depth_callback, 10
+            Float64,
+            self.input_depth_topic,
+            self.depth_callback,
+            qos_profile_system_default,
         )
 
         self.get_logger().info(

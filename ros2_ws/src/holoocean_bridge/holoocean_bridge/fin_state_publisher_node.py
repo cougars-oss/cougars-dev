@@ -14,6 +14,7 @@
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from holoocean_interfaces.msg import ControlCommand
 from sensor_msgs.msg import JointState
 
@@ -42,9 +43,14 @@ class FinStatePublisherNode(Node):
         self.joint_names = ["top_fin_joint", "left_fin_joint", "right_fin_joint"]
 
         self.subscription = self.create_subscription(
-            ControlCommand, input_topic, self.listener_callback, 10
+            ControlCommand,
+            input_topic,
+            self.listener_callback,
+            qos_profile_system_default,
         )
-        self.publisher = self.create_publisher(JointState, output_topic, 10)
+        self.publisher = self.create_publisher(
+            JointState, output_topic, qos_profile_system_default
+        )
 
         self.get_logger().info(
             f"Fin state publisher started. Listening on {input_topic} "

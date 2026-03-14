@@ -15,14 +15,13 @@
 import random
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from sensor_msgs.msg import MagneticField
 
 
 class MagConverterNode(Node):
     """
-    Converts magnetometer data from HoloOcean to standard MagneticField messages.
-
-    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
+    Converts magnetometer data from HoloOcean to standard MagneticField messages and adds noise.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -54,9 +53,14 @@ class MagConverterNode(Node):
         )
 
         self.subscription = self.create_subscription(
-            MagneticField, input_topic, self.listener_callback, 10
+            MagneticField,
+            input_topic,
+            self.listener_callback,
+            qos_profile_system_default,
         )
-        self.publisher = self.create_publisher(MagneticField, output_topic, 10)
+        self.publisher = self.create_publisher(
+            MagneticField, output_topic, qos_profile_system_default
+        )
 
         self.get_logger().info(
             f"Mag converter started. Listening on {input_topic} and publishing on {output_topic}."

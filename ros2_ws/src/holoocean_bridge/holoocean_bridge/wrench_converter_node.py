@@ -14,6 +14,7 @@
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from geometry_msgs.msg import WrenchStamped, TwistWithCovarianceStamped, Vector3Stamped
 from tf2_ros import Buffer, TransformListener
 import tf2_geometry_msgs
@@ -65,16 +66,26 @@ class WrenchConverterNode(Node):
         )
 
         self.agent_sub = self.create_subscription(
-            AgentCommand, agent_topic, self.agent_callback, 10
+            AgentCommand, agent_topic, self.agent_callback, qos_profile_system_default
         )
         self.control_sub = self.create_subscription(
-            ControlCommand, control_topic, self.control_callback, 10
+            ControlCommand,
+            control_topic,
+            self.control_callback,
+            qos_profile_system_default,
         )
         self.velocity_sub = self.create_subscription(
-            TwistWithCovarianceStamped, velocity_topic, self.velocity_callback, 10
+            TwistWithCovarianceStamped,
+            velocity_topic,
+            self.velocity_callback,
+            qos_profile_system_default,
         )
-        self.wrench_raw_pub = self.create_publisher(WrenchStamped, wrench_raw_topic, 10)
-        self.wrench_pub = self.create_publisher(WrenchStamped, wrench_topic, 10)
+        self.wrench_raw_pub = self.create_publisher(
+            WrenchStamped, wrench_raw_topic, qos_profile_system_default
+        )
+        self.wrench_pub = self.create_publisher(
+            WrenchStamped, wrench_topic, qos_profile_system_default
+        )
 
         # From BlueROV2.h
         self.geo_factor = 0.70710678

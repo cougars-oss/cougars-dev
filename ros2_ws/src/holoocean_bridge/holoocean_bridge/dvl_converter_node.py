@@ -15,16 +15,16 @@
 import random
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from geometry_msgs.msg import TwistWithCovarianceStamped
 from dvl_msgs.msg import DVL
 
 
 class DvlConverterNode(Node):
     """
-    Converts DVL data from HoloOcean to Waterlinked DVL messages.
+    Converts DVL data from HoloOcean to Waterlinked DVL messages and adds noise.
 
-    Injects beam-based Gaussian noise to replicate HoloOcean's internal sensor
-    noise model (Janus configuration).
+    Uses the Janus configuration for the DVL noise model like HoloOcean.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -56,9 +56,14 @@ class DvlConverterNode(Node):
         )
 
         self.subscription = self.create_subscription(
-            TwistWithCovarianceStamped, input_topic, self.listener_callback, 10
+            TwistWithCovarianceStamped,
+            input_topic,
+            self.listener_callback,
+            qos_profile_system_default,
         )
-        self.publisher = self.create_publisher(DVL, output_topic, 10)
+        self.publisher = self.create_publisher(
+            DVL, output_topic, qos_profile_system_default
+        )
 
         self.get_logger().info(
             f"DVL converter started. Listening on {input_topic} and publishing on {output_topic}."

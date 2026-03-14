@@ -16,6 +16,7 @@ import math
 import random
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3Stamped
 
@@ -39,9 +40,7 @@ def get_quaternion_from_euler(roll, pitch, yaw):
 
 class AhrsConverterNode(Node):
     """
-    Converts AHRS data from HoloOcean to standard IMU messages.
-
-    Injects Gaussian noise to replicate HoloOcean's internal sensor noise model.
+    Converts AHRS data from HoloOcean to standard IMU messages and adds noise.
 
     :author: Nelson Durrant (w Gemini 3 Pro)
     :date: Jan 2026
@@ -73,9 +72,14 @@ class AhrsConverterNode(Node):
         )
 
         self.subscription = self.create_subscription(
-            Vector3Stamped, input_topic, self.listener_callback, 10
+            Vector3Stamped,
+            input_topic,
+            self.listener_callback,
+            qos_profile_system_default,
         )
-        self.publisher = self.create_publisher(Imu, output_topic, 10)
+        self.publisher = self.create_publisher(
+            Imu, output_topic, qos_profile_system_default
+        )
 
         self.get_logger().info(
             f"AHRS converter started. Listening on {input_topic} and "

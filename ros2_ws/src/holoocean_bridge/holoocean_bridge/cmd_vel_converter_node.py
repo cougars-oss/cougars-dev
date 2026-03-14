@@ -14,6 +14,7 @@
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import qos_profile_system_default
 from geometry_msgs.msg import Twist
 from holoocean_interfaces.msg import AgentCommand
 
@@ -44,9 +45,11 @@ class CmdVelConverterNode(Node):
         )
 
         self.subscription = self.create_subscription(
-            Twist, input_topic, self.listener_callback, 10
+            Twist, input_topic, self.listener_callback, qos_profile_system_default
         )
-        self.publisher = self.create_publisher(AgentCommand, output_topic, 10)
+        self.publisher = self.create_publisher(
+            AgentCommand, output_topic, qos_profile_system_default
+        )
 
         # From BlueROV2.h
         self.thruster_limit = 28.75
