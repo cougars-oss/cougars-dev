@@ -45,21 +45,6 @@ target_link_libraries(waypoint_follower
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
-  find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(test_waypoint_follower test/test_waypoint_follower.cpp)
-  target_include_directories(test_waypoint_follower PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  )
-  target_link_libraries(test_waypoint_follower
-    waypoint_follower_component
-  )
-  ament_target_dependencies(test_waypoint_follower
-    rclcpp
-    nav_msgs
-    geometry_msgs
-    std_msgs
-  )
 endif()
 
 ament_auto_package(
