@@ -160,8 +160,6 @@
     comparison:
       # TURTLMap-based loosely-coupled DVL preintegration implementation
       enable_loose_dvl_preintegration: false
-      # TURTLMap-based DVL psuedo-measurement using IMU data
-      enable_pseudo_dvl_w_imu: false
       # AQUA-SLAM-based tightly-coupled DVL preintegration implementation
       enable_tight_dvl_preintegration: false
 
