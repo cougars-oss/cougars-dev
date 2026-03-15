@@ -10,19 +10,9 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
 ## 🚀 Get Started
 
-> **Prerequisites:** Several gigabytes of storage, 64-bit Linux or Windows, and a competent NVIDIA GPU (for HoloOcean simulation).
+> **Prerequisites:** 64-bit Linux, free disk space (10+ GB recommended), and a dedicated NVIDIA GPU (for HoloOcean simulation).
 
-- Install Docker and set up the Linux development environment.
-
-  **Linux (Recommended):**
-
-  - Install [Docker Engine](https://docs.docker.com/engine/install/ubuntu/).
-
-  **Windows:**
-
-  - Install [WSL2](https://docs.microsoft.com/en-us/windows/wsl/install).
-
-  - Install [Docker Desktop](https://docs.docker.com/desktop/) and enable the [WSL2 backend](https://docs.docker.com/desktop/windows/wsl/).
+- Install [Docker](https://www.docker.com/get-started/) and [VSCode Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
 
 - Add a [GitHub SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux) and clone the `cougars-dev` repository.
 
@@ -44,7 +34,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
     cd ~/cougars-dev/scripts && ./holoocean_launch.sh
     ```
 
-  - Open a new terminal, build the `ros2_ws` workspace, and launch the development stack using `./sim_launch.sh`.
+  - Open a new terminal, build the `ros2_ws` workspace, and select the matching launch configuration using `./sim_launch.sh`.
 
     ```bash
     cd ~/cougars-dev/ros2_ws && colcon build
@@ -57,7 +47,7 @@ CoUGARs is a low-cost, configurable AUV platform designed for multi-agent autono
 
   - Once the containers load, copy your `rosbag2` bag into the `bags` folder at the root of the repository.
 
-  - Open a new terminal window using `` Ctrl + Alt + Shift + ` ``, build the `ros2_ws` workspace, and launch the development stack using `./bag_launch.sh`.
+  - Open a new terminal window using `` Ctrl + Alt + Shift + ` ``, build the `ros2_ws` workspace, and select the bag using `./bag_launch.sh`.
 
     ```bash
     cd ~/cougars-dev/ros2_ws && colcon build
