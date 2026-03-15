@@ -27,7 +27,7 @@ class TruthConverterNode(Node):
 
     Optionally publishes the map->base_link transform.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

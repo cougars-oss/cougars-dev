@@ -23,7 +23,7 @@ class MagConverterNode(Node):
     """
     Converts magnetometer data from HoloOcean to standard MagneticField messages and adds noise.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

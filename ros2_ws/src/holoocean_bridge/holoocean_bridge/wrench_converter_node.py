@@ -25,7 +25,7 @@ class WrenchConverterNode(Node):
     """
     Converts HoloOcean agent/control command messages back to WrenchStamped messages.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

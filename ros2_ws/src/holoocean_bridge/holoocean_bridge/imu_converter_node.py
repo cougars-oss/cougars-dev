@@ -27,7 +27,7 @@ class ImuConverterNode(Node):
 
     Also models IMU bias as a random walk.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

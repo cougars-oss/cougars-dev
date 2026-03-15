@@ -23,7 +23,7 @@ class FinStatePublisherNode(Node):
     """
     Publishes fin states based on control command messages from HoloOcean.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

@@ -23,7 +23,7 @@ class DepthConverterNode(Node):
     """
     Converts depth data from HoloOcean to odometry messages and adds noise.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

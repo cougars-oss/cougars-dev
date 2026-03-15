@@ -42,7 +42,7 @@ class AhrsConverterNode(Node):
     """
     Converts AHRS data from HoloOcean to standard IMU messages and adds noise.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

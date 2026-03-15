@@ -24,7 +24,7 @@ class HsdConverterNode(Node):
     """
     Converts standard ROS 2 command messages into HoloOcean desired command messages.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 

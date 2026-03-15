@@ -26,7 +26,7 @@ class DvlConverterNode(Node):
 
     Uses the Janus configuration for the DVL noise model like HoloOcean.
 
-    :author: Nelson Durrant (w Gemini 3 Pro)
+    :author: Nelson Durrant
     :date: Jan 2026
     """
 
